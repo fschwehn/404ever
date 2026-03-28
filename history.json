@@ -16,5 +16,16 @@
     ],
     "description": "A living protest broadsheet — typeset in ink-black and newsprint-white — that reassembles its headlines every few seconds, weaving today's real events (antimatter on roads, time crystals, No Kings marches) into an ever-shifting front page that refuses to stay still.",
     "commit": ""
+  },
+  {
+    "date": "2026-03-28",
+    "title": "THRONE FOR SALE — Going Once, Going Forever",
+    "mood": "feverish",
+    "libraries": [
+      "Tone.js",
+      "anime.js"
+    ],
+    "description": "A live auction for the Roman Imperial Throne, running since 193 AD — bids accepted in any currency, buyers warned that all previous owners were assassinated, with a countdown to Earth Hour and a live \"NO KINGS\" protest counter crashing the sale.",
+    "commit": ""
   }
 ]

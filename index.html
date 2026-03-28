@@ -3,740 +3,1232 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>404ever — THE BROADSHEET THAT CANNOT BE FOUND</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<title>404ever — THRONE FOR SALE</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap');
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --ink: #0a0a0a;
-    --paper: #e8e0d0;
-    --aged: #c9b99a;
-    --red: #8b1a1a;
-    --grey: #555;
-    --col-rule: #0a0a0a;
-  }
+:root {
+  --gold: #c9a84c;
+  --gold-bright: #f5d077;
+  --gold-dark: #7a5c1e;
+  --crimson: #8b0000;
+  --crimson-light: #c0392b;
+  --bg: #0c0906;
+  --parchment: #f2e8d0;
+  --shadow: rgba(201,168,76,0.15);
+  --text: #e8dcc0;
+}
 
-  html, body {
-    width: 100%; min-height: 100vh;
-    background: var(--ink);
-    overflow-x: hidden;
-  }
+html, body {
+  width: 100%; min-height: 100vh;
+  background: var(--bg);
+  overflow-x: hidden;
+  font-family: 'Cinzel', serif;
+  color: var(--text);
+}
 
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 20px 10px 60px;
-  }
+/* ── AMBIENT PARTICLE LAYER ── */
+#particle-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
 
-  #paper {
-    background: var(--paper);
-    width: 100%;
-    max-width: 1100px;
-    padding: 0 0 40px;
-    position: relative;
-    box-shadow: 0 0 0 2px var(--ink), 6px 6px 0 var(--ink), 12px 12px 0 rgba(0,0,0,0.3);
-    font-family: 'Libre Baskerville', Georgia, serif;
-    color: var(--ink);
-    overflow: hidden;
-  }
+/* ── MAIN LAYOUT ── */
+#stage {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16px 80px;
+}
 
-  /* aged texture overlay */
-  #paper::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-      repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 28px);
-    pointer-events: none;
-    z-index: 100;
-  }
+/* ── HEADER BANNER ── */
+#auction-banner {
+  width: 100%;
+  max-width: 900px;
+  text-align: center;
+  padding: 48px 20px 24px;
+  border-bottom: 1px solid var(--gold-dark);
+  position: relative;
+}
 
-  /* ink smear */
-  #paper::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--ink);
-    z-index: 101;
-  }
+.banner-pretitle {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
 
-  /* ── MASTHEAD ── */
-  #masthead {
-    border-bottom: 3px double var(--ink);
-    padding: 18px 30px 12px;
-    position: relative;
-  }
+#auction-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(28px, 6vw, 64px);
+  font-weight: 900;
+  line-height: 1.0;
+  color: var(--gold-bright);
+  text-shadow: 0 0 40px rgba(245,208,119,0.3), 0 2px 0 var(--gold-dark);
+  margin-bottom: 8px;
+}
 
-  #masthead-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 6px;
-  }
+#auction-subtitle {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: clamp(13px, 2vw, 18px);
+  color: var(--text);
+  opacity: 0.75;
+  margin-bottom: 20px;
+}
 
-  #masthead-left {
-    font-family: 'Special Elite', cursive;
-    font-size: 10px;
-    letter-spacing: 1px;
-    line-height: 1.7;
-    color: var(--grey);
-    max-width: 200px;
-  }
+.divider-ornament {
+  color: var(--gold);
+  font-size: 20px;
+  letter-spacing: 12px;
+  opacity: 0.5;
+  margin: 8px 0;
+}
 
-  #paper-name {
-    font-family: 'UnifrakturMaguntia', cursive;
-    font-size: clamp(38px, 7vw, 72px);
-    text-align: center;
-    line-height: 1;
-    color: var(--ink);
-    flex: 1;
-    padding: 0 10px;
-  }
+/* ── AUCTION HOUSE SIGN ── */
+#house-sign {
+  display: inline-block;
+  border: 1px solid var(--gold-dark);
+  padding: 6px 24px;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  margin-bottom: 12px;
+}
 
-  #masthead-right {
-    font-family: 'Special Elite', cursive;
-    font-size: 10px;
-    letter-spacing: 1px;
-    line-height: 1.7;
-    color: var(--grey);
-    text-align: right;
-    max-width: 200px;
-  }
+/* ── LOT DISPLAY ── */
+#lot-section {
+  width: 100%;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 32px;
+}
 
-  #masthead-tagline {
-    text-align: center;
-    font-family: 'Special Elite', cursive;
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--grey);
-    border-top: 1px solid var(--ink);
-    border-bottom: 1px solid var(--ink);
-    padding: 4px 0;
-    margin-top: 4px;
-  }
+#throne-display {
+  background: linear-gradient(160deg, #1a1208 0%, #0c0906 100%);
+  border: 1px solid var(--gold-dark);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 380px;
+  padding: 24px;
+}
 
-  /* TICKER */
-  #ticker-wrap {
-    background: var(--ink);
-    color: var(--paper);
-    font-family: 'Special Elite', cursive;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 5px 0;
-    overflow: hidden;
-    white-space: nowrap;
-  }
+#throne-svg-wrap {
+  width: 180px;
+  height: 220px;
+  margin: 0 auto 16px;
+  position: relative;
+}
 
-  #ticker-inner {
-    display: inline-block;
-    animation: ticker 38s linear infinite;
-    padding-left: 100%;
-  }
+#throne-glow {
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(ellipse at center, rgba(201,168,76,0.18) 0%, transparent 70%);
+  pointer-events: none;
+  animation: glow-pulse 3s ease-in-out infinite;
+}
 
-  @keyframes ticker {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-  }
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
 
-  /* ── MAIN BODY ── */
-  #body-wrap {
-    padding: 0 24px;
-  }
+#lot-number {
+  font-size: 9px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
 
-  /* Banner headline */
-  #banner-head {
-    text-align: center;
-    padding: 16px 0 4px;
-    border-bottom: 2px solid var(--ink);
-    margin-bottom: 0;
-  }
+#lot-name {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(14px, 2.5vw, 20px);
+  font-weight: 700;
+  color: var(--gold-bright);
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
 
-  #banner-head h1 {
-    font-family: 'Libre Baskerville', serif;
-    font-size: clamp(26px, 5vw, 56px);
-    font-weight: 700;
-    line-height: 1.05;
-    text-transform: uppercase;
-    letter-spacing: -1px;
-  }
+#lot-condition {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--crimson-light);
+  text-align: center;
+  opacity: 0.9;
+}
 
-  #banner-head h1 .red { color: var(--red); }
+/* warning badge */
+#lot-warning {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--crimson);
+  color: white;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 2px;
+  animation: warning-flash 2s ease-in-out infinite;
+}
 
-  #banner-deck {
-    font-family: 'Libre Baskerville', serif;
-    font-style: italic;
-    font-size: clamp(13px, 2vw, 17px);
-    color: var(--grey);
-    padding: 6px 0 8px;
-    line-height: 1.4;
-  }
+@keyframes warning-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
 
-  /* Rule divider */
-  .col-rule {
-    border: none;
-    border-left: 1px solid var(--col-rule);
-    align-self: stretch;
-    margin: 0 2px;
-    opacity: 0.3;
-  }
+/* ── BID PANEL ── */
+#bid-panel {
+  background: linear-gradient(160deg, #110d07 0%, #0c0906 100%);
+  border: 1px solid var(--gold-dark);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-  /* Column grid */
-  .col-grid {
-    display: grid;
-    gap: 0;
-    border-bottom: 1px solid var(--ink);
-    margin-bottom: 0;
-  }
+.bid-stat-label {
+  font-size: 8px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  margin-bottom: 4px;
+}
 
-  .col-grid-3 { grid-template-columns: 1fr 1px 1fr 1px 1fr; }
-  .col-grid-2 { grid-template-columns: 2fr 1px 1fr; }
-  .col-grid-2r { grid-template-columns: 1fr 1px 2fr; }
+.bid-stat-value {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(22px, 4vw, 36px);
+  font-weight: 700;
+  color: var(--gold-bright);
+  line-height: 1;
+}
 
-  .col {
-    padding: 14px 18px;
-  }
+#current-bid-wrap {
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+  padding-bottom: 16px;
+}
 
-  .col h2 {
-    font-family: 'Libre Baskerville', serif;
-    font-size: clamp(15px, 2.2vw, 22px);
-    font-weight: 700;
-    line-height: 1.1;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    border-bottom: 1px solid var(--ink);
-    padding-bottom: 6px;
-  }
+#bid-currency {
+  font-size: 12px;
+  color: var(--gold);
+  opacity: 0.5;
+  margin-top: 4px;
+}
 
-  .col h2 .kicker {
-    display: block;
-    font-family: 'Special Elite', cursive;
-    font-size: 9px;
-    font-weight: normal;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--red);
-    margin-bottom: 4px;
-  }
+#bidder-name {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text);
+  opacity: 0.5;
+  margin-top: 4px;
+}
 
-  .col p {
-    font-size: clamp(11px, 1.4vw, 13.5px);
-    line-height: 1.65;
-    margin-bottom: 8px;
-    text-align: justify;
-    hyphens: auto;
-  }
+#timer-wrap {
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+  padding-bottom: 16px;
+}
 
-  .col p + p { text-indent: 1em; margin-bottom: 0; }
+#countdown-display {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(18px, 3.5vw, 28px);
+  color: #fff;
+  letter-spacing: 4px;
+  transition: color 0.3s;
+}
 
-  .col .byline {
-    font-family: 'Special Elite', cursive;
-    font-size: 9px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--grey);
-    margin-bottom: 10px;
-  }
+#countdown-display.urgent { color: var(--crimson-light); }
 
-  /* pull quote */
-  .pull-quote {
-    border-top: 3px solid var(--ink);
-    border-bottom: 3px solid var(--ink);
-    margin: 12px 0;
-    padding: 8px 6px;
-    font-size: clamp(13px, 1.8vw, 16px);
-    font-style: italic;
-    font-weight: 700;
-    line-height: 1.3;
-    text-align: center;
-  }
+/* bid entry */
+#bid-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-  /* box / sidebar */
-  .box {
-    border: 2px solid var(--ink);
-    padding: 10px 12px;
-    margin: 10px 0;
-  }
+#bid-input-row {
+  display: flex;
+  gap: 8px;
+}
 
-  .box h3 {
-    font-family: 'Libre Baskerville', serif;
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--ink);
-    margin-bottom: 6px;
-    padding-bottom: 4px;
-  }
+#bid-amount {
+  flex: 1;
+  background: rgba(201,168,76,0.06);
+  border: 1px solid var(--gold-dark);
+  color: var(--gold-bright);
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
 
-  .box p {
-    font-size: 11px;
-    line-height: 1.55;
-    margin-bottom: 4px;
-    text-align: left;
-  }
+#bid-amount:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(201,168,76,0.2);
+}
 
-  /* big initial cap */
-  .dropcap::first-letter {
-    font-size: 4em;
-    font-weight: 700;
-    float: left;
-    line-height: 0.75;
-    margin: 6px 6px 0 0;
-    font-family: 'UnifrakturMaguntia', cursive;
-  }
+#bid-amount::placeholder { color: rgba(201,168,76,0.25); }
 
-  /* ── FOOTER ── */
-  #footer {
-    border-top: 3px double var(--ink);
-    margin: 0 24px;
-    padding: 10px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    font-family: 'Special Elite', cursive;
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: var(--grey);
-  }
+#currency-select {
+  background: rgba(201,168,76,0.06);
+  border: 1px solid var(--gold-dark);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  padding: 10px 8px;
+  outline: none;
+  cursor: pointer;
+}
 
-  /* ── CLOCK ── */
-  #live-clock {
-    font-family: 'Special Elite', cursive;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-align: center;
-    color: var(--red);
-    padding: 6px 0;
-    border-bottom: 1px solid var(--ink);
-  }
+#bid-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--bg);
+  border: none;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(13px, 2vw, 16px);
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
 
-  /* ── SCRAMBLE anim ── */
-  .scrambling {
-    opacity: 0.7;
-    filter: blur(0.5px);
-  }
+#bid-btn:hover {
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(201,168,76,0.35);
+}
 
-  /* history link */
-  #history-link {
-    position: fixed;
-    bottom: 14px;
-    right: 20px;
-    font-family: 'Special Elite', cursive;
-    font-size: 9px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--aged);
-    text-decoration: none;
-    opacity: 0.6;
-    z-index: 999;
-    transition: opacity 0.3s;
-  }
-  #history-link:hover { opacity: 1; color: var(--paper); }
+#bid-btn:active { transform: translateY(0); }
 
-  /* rotating stamp */
-  #stamp {
-    position: absolute;
-    top: 24px;
-    right: 30px;
-    width: 80px;
-    height: 80px;
-    border: 4px solid var(--red);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-family: 'Special Elite', cursive;
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--red);
-    transform: rotate(-12deg);
-    opacity: 0.85;
-    line-height: 1.3;
-    pointer-events: none;
-  }
+#bid-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.1);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+#bid-btn:hover::after { opacity: 1; }
 
-  /* ── BLINKING CURSOR ── */
-  .cursor::after {
-    content: '|';
-    animation: blink 1s step-end infinite;
-    color: var(--red);
-    margin-left: 1px;
-  }
-  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0} }
+#bid-message {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 12px;
+  text-align: center;
+  min-height: 18px;
+  color: var(--gold);
+  opacity: 0.8;
+}
 
-  /* ── GLITCH ── */
-  .glitch {
-    position: relative;
-    display: inline-block;
-  }
-  .glitch::before, .glitch::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    opacity: 0;
-  }
-  .glitch.active::before {
-    opacity: 0.7;
-    clip: rect(2px, 500px, 6px, 0);
-    transform: translate(-2px, 0);
-    color: var(--red);
-    animation: glitch1 0.2s steps(1) forwards;
-  }
-  .glitch.active::after {
-    opacity: 0.7;
-    clip: rect(10px, 500px, 14px, 0);
-    transform: translate(2px, 0);
-    color: #1a4a8b;
-    animation: glitch2 0.2s steps(1) forwards;
-  }
-  @keyframes glitch1 {
-    0%   { clip: rect(2px,  500px,  6px, 0); transform: translate(-2px, 0); }
-    25%  { clip: rect(18px, 500px, 22px, 0); transform: translate(2px, 0); }
-    50%  { clip: rect(8px,  500px, 12px, 0); transform: translate(-1px, 0); }
-    100% { clip: rect(30px, 500px, 34px, 0); transform: translate(0, 0); }
-  }
-  @keyframes glitch2 {
-    0%   { clip: rect(10px, 500px, 14px, 0); transform: translate(2px, 0); }
-    33%  { clip: rect(24px, 500px, 28px, 0); transform: translate(-2px, 0); }
-    66%  { clip: rect(4px,  500px,  8px, 0); transform: translate(1px, 0); }
-    100% { clip: rect(20px, 500px, 24px, 0); transform: translate(0, 0); }
-  }
+/* ── LOT DESCRIPTION ── */
+#lot-desc-section {
+  width: 100%;
+  max-width: 900px;
+  margin-top: 24px;
+  border: 1px solid var(--gold-dark);
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+}
 
-  .sep-line {
-    border: none;
-    border-top: 1px solid var(--ink);
-    margin: 0;
-    opacity: 0.25;
-  }
+#lot-desc {
+  padding: 24px 28px;
+  border-right: 1px solid var(--gold-dark);
+}
 
-  @media (max-width: 640px) {
-    .col-grid-3 { grid-template-columns: 1fr; }
-    .col-grid-2 { grid-template-columns: 1fr; }
-    .col-grid-2r { grid-template-columns: 1fr; }
-    .col-rule { display: none; }
-    #stamp { width: 60px; height: 60px; font-size: 7px; top: 16px; right: 14px; }
-  }
+#lot-desc h3 {
+  font-size: 9px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  margin-bottom: 14px;
+}
+
+#lot-desc p {
+  font-family: 'IM Fell English', serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+#lot-desc p:last-child { margin-bottom: 0; }
+
+/* provenance */
+#provenance {
+  padding: 24px 20px;
+}
+
+#provenance h3 {
+  font-size: 9px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  margin-bottom: 14px;
+}
+
+.prov-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.prov-year {
+  color: var(--gold);
+  opacity: 0.7;
+  font-size: 10px;
+  min-width: 44px;
+  margin-top: 1px;
+}
+
+.prov-name { color: var(--text); opacity: 0.7; }
+
+.prov-fate {
+  display: block;
+  color: var(--crimson-light);
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 10px;
+  opacity: 0.75;
+}
+
+/* ── BID LOG ── */
+#bid-log-section {
+  width: 100%;
+  max-width: 900px;
+  margin-top: 24px;
+  border: 1px solid var(--gold-dark);
+}
+
+#bid-log-header {
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--gold-dark);
+  font-size: 8px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  display: flex;
+  justify-content: space-between;
+}
+
+#bid-log {
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+#bid-log::-webkit-scrollbar { width: 4px; }
+#bid-log::-webkit-scrollbar-track { background: transparent; }
+#bid-log::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+
+.log-entry {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px 100px;
+  gap: 8px;
+  padding: 6px 20px;
+  font-size: 11px;
+  border-bottom: 1px solid rgba(201,168,76,0.06);
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.log-time { color: var(--gold); opacity: 0.5; font-size: 10px; }
+.log-bidder { color: var(--text); opacity: 0.7; font-family: 'IM Fell English', serif; font-style: italic; }
+.log-amount { color: var(--gold-bright); font-family: 'Cinzel Decorative', serif; font-size: 12px; text-align: right; }
+.log-currency { color: var(--gold); opacity: 0.5; font-size: 10px; }
+
+/* ── PROTEST INTERRUPT ── */
+#protest-interrupt {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(90deg, #111 0%, #1a0000 50%, #111 100%);
+  border-top: 2px solid var(--crimson);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 50;
+}
+
+#protest-label {
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--crimson-light);
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+#protest-ticker {
+  flex: 1;
+  overflow: hidden;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+#protest-ticker-inner {
+  display: inline-block;
+  animation: protest-scroll 30s linear infinite;
+  padding-left: 100%;
+}
+
+@keyframes protest-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+#protest-count {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 16px;
+  color: var(--crimson-light);
+  white-space: nowrap;
+  animation: count-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes count-pulse {
+  0%, 100% { text-shadow: 0 0 10px rgba(192,57,43,0.5); }
+  50% { text-shadow: 0 0 20px rgba(192,57,43,0.9); }
+}
+
+/* ── EARTH HOUR ALERT ── */
+#earth-hour-bar {
+  width: 100%;
+  max-width: 900px;
+  margin-top: 24px;
+  background: rgba(0,30,0,0.5);
+  border: 1px solid #1a4a1a;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.eh-dot {
+  width: 8px; height: 8px;
+  background: #4caf50;
+  border-radius: 50%;
+  animation: eh-blink 1s step-end infinite;
+  flex-shrink: 0;
+}
+@keyframes eh-blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+#earth-hour-text {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #4caf50;
+  opacity: 0.8;
+}
+
+/* ── GAVEL ANIMATION ── */
+#gavel-wrap {
+  position: fixed;
+  top: 20px; right: 20px;
+  width: 60px; height: 60px;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* history link */
+#history-link {
+  position: fixed;
+  bottom: 52px;
+  right: 16px;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  text-decoration: none;
+  opacity: 0.4;
+  z-index: 200;
+  transition: opacity 0.3s;
+  font-family: 'Cinzel', serif;
+}
+#history-link:hover { opacity: 0.9; color: var(--gold); }
+
+/* ── MODAL OVERLAY ── */
+#bid-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+
+#bid-modal.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#bid-modal-inner {
+  background: linear-gradient(160deg, #1a1208, #0c0906);
+  border: 1px solid var(--gold);
+  max-width: 500px;
+  width: 90%;
+  padding: 40px;
+  text-align: center;
+  position: relative;
+}
+
+#modal-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 22px;
+  color: var(--gold-bright);
+  margin-bottom: 16px;
+}
+
+#modal-body {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+  opacity: 0.8;
+  margin-bottom: 24px;
+}
+
+#modal-warning {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--crimson-light);
+  margin-bottom: 28px;
+  opacity: 0.8;
+}
+
+#modal-close {
+  background: transparent;
+  border: 1px solid var(--gold-dark);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 10px 32px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#modal-close:hover {
+  background: rgba(201,168,76,0.1);
+  border-color: var(--gold);
+}
+
+/* responsive */
+@media (max-width: 640px) {
+  #lot-section { grid-template-columns: 1fr; }
+  #lot-desc-section { grid-template-columns: 1fr; }
+  #lot-desc { border-right: none; border-bottom: 1px solid var(--gold-dark); }
+  .log-entry { grid-template-columns: 60px 1fr 90px; }
+  .log-currency { display: none; }
+}
 </style>
 </head>
 <body>
 
-<div id="paper">
+<canvas id="particle-canvas"></canvas>
 
-  <!-- MASTHEAD -->
-  <div id="masthead">
-    <div id="masthead-top">
-      <div id="masthead-left">
-        Est. in Error<br>
-        Vol. DCCIV · No. 404<br>
-        Price: Whatever remains
-      </div>
-      <div id="paper-name">404ever</div>
-      <div id="masthead-right">
-        <span id="live-date">Saturday, March 28, 2026</span><br>
-        "All pages are last pages."<br>
-        Printed in the Margin
-      </div>
-    </div>
-    <div id="masthead-tagline">The Paper of Record for Things That Cannot Be Archived &bull; Independent Since the First Error</div>
+<!-- GAVEL SVG -->
+<div id="gavel-wrap">
+  <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g id="gavel-g">
+      <rect x="28" y="8" width="8" height="30" rx="3" fill="#c9a84c" opacity="0.8"/>
+      <rect x="16" y="6" width="28" height="14" rx="4" fill="#7a5c1e"/>
+      <rect x="17" y="7" width="26" height="12" rx="3" fill="#c9a84c" opacity="0.9"/>
+      <rect x="10" y="42" width="40" height="8" rx="3" fill="#7a5c1e" opacity="0.6"/>
+    </g>
+  </svg>
+</div>
+
+<div id="stage">
+
+  <!-- HEADER -->
+  <div id="auction-banner">
+    <div class="banner-pretitle">Sotheby's of the Eternal City · Est. CXCIII A.D.</div>
+    <div id="house-sign">◆ Live Auction · Session MDCCCXXXIII ◆</div>
+    <h1 id="auction-title">THRONE FOR SALE</h1>
+    <div id="auction-subtitle">One Imperial Throne, Roman, previously owned. Some damage to previous occupants.</div>
+    <div class="divider-ornament">⸻ ✦ ⸻</div>
   </div>
 
-  <!-- TICKER -->
-  <div id="ticker-wrap">
-    <div id="ticker-inner">
-      ⬥ ANTIMATTER TRANSPORTED BY ROAD FOR FIRST TIME — MARCH 24, 2026 &nbsp;&nbsp;&nbsp; ⬥ PHYSICISTS CREATE LEVITATING TIME CRYSTAL &nbsp;&nbsp;&nbsp; ⬥ NO KINGS PROTESTS REPORTED ACROSS ALL 50 STATES &nbsp;&nbsp;&nbsp; ⬥ HUBBLE CATCHES COMET BREAKING APART IN REAL TIME &nbsp;&nbsp;&nbsp; ⬥ 45 PLANETS IDENTIFIED AS CANDIDATES FOR ALIEN LIFE &nbsp;&nbsp;&nbsp; ⬥ LAB-GROWN OESOPHAGUS IMPLANTED SUCCESSFULLY &nbsp;&nbsp;&nbsp; ⬥ INTERSTELLAR COMET 3I/ATLAS UNUSUALLY RICH IN METHANOL &nbsp;&nbsp;&nbsp; ⬥ MAGNETIC FRICTION WITHOUT CONTACT BREAKS 300-YEAR-OLD LAW &nbsp;&nbsp;&nbsp; ⬥ RUBY CRYSTALS FOUND EMBEDDED IN MARTIAN ROCK &nbsp;&nbsp;&nbsp; ⬥ 24 NEW DEEP-SEA SPECIES FOUND IN PACIFIC &nbsp;&nbsp;&nbsp; ⬥ GLOBAL WARMING ACCELERATION CONFIRMED SINCE 2015 &nbsp;&nbsp;&nbsp; ⬥ THIS PAPER CANNOT BE FOUND &nbsp;&nbsp;&nbsp; ⬥ YOU ARE READING SOMETHING THAT DOES NOT EXIST &nbsp;&nbsp;&nbsp;
+  <!-- LOT + BID -->
+  <div id="lot-section">
+
+    <div id="throne-display">
+      <div id="lot-warning">⚠ Buyer Beware</div>
+      <div id="throne-glow"></div>
+      <div id="throne-svg-wrap">
+        <!-- Throne SVG -->
+        <svg viewBox="0 0 180 220" fill="none" xmlns="http://www.w3.org/2000/svg" width="180" height="220">
+          <defs>
+            <radialGradient id="throneGrad" cx="50%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#f5d077"/>
+              <stop offset="60%" stop-color="#c9a84c"/>
+              <stop offset="100%" stop-color="#5a3d10"/>
+            </radialGradient>
+            <linearGradient id="seatGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8b0000"/>
+              <stop offset="100%" stop-color="#3d0000"/>
+            </linearGradient>
+          </defs>
+          <!-- Base -->
+          <rect x="30" y="190" width="120" height="20" rx="4" fill="url(#throneGrad)" opacity="0.9"/>
+          <!-- Legs -->
+          <rect x="38" y="160" width="14" height="35" rx="3" fill="url(#throneGrad)"/>
+          <rect x="128" y="160" width="14" height="35" rx="3" fill="url(#throneGrad)"/>
+          <!-- Seat frame -->
+          <rect x="28" y="145" width="124" height="22" rx="4" fill="url(#throneGrad)"/>
+          <!-- Seat cushion -->
+          <rect x="34" y="148" width="112" height="16" rx="3" fill="url(#seatGrad)" opacity="0.9"/>
+          <!-- Back uprights -->
+          <rect x="38" y="50" width="14" height="100" rx="3" fill="url(#throneGrad)"/>
+          <rect x="128" y="50" width="14" height="100" rx="3" fill="url(#throneGrad)"/>
+          <!-- Back panel -->
+          <rect x="52" y="58" width="76" height="88" rx="2" fill="url(#seatGrad)" opacity="0.7"/>
+          <!-- Crown top -->
+          <path d="M30 54 L55 28 L90 50 L125 28 L150 54 Z" fill="url(#throneGrad)"/>
+          <!-- Crown jewels -->
+          <circle cx="55" cy="30" r="5" fill="#8b0000" opacity="0.9"/>
+          <circle cx="90" cy="22" r="7" fill="#fff" opacity="0.15"/>
+          <circle cx="90" cy="22" r="5" fill="#f5d077" opacity="0.8"/>
+          <circle cx="125" cy="30" r="5" fill="#8b0000" opacity="0.9"/>
+          <!-- Armrests -->
+          <rect x="22" y="122" width="20" height="30" rx="4" fill="url(#throneGrad)"/>
+          <rect x="138" y="122" width="20" height="30" rx="4" fill="url(#throneGrad)"/>
+          <!-- Ornamental lines on back -->
+          <line x1="90" y1="65" x2="90" y2="138" stroke="#c9a84c" stroke-width="1" opacity="0.3"/>
+          <line x1="52" y1="100" x2="128" y2="100" stroke="#c9a84c" stroke-width="1" opacity="0.3"/>
+          <circle cx="90" cy="100" r="8" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.4"/>
+        </svg>
+      </div>
+      <div id="lot-number">Lot No. 404 · Session MDCCCXXXIII</div>
+      <div id="lot-name">The Imperial Throne<br>of Rome</div>
+      <div id="lot-condition">Condition: Good. Bloodstains: Negotiable.</div>
     </div>
-  </div>
 
-  <div id="live-clock">⧗ LIVE TRANSMISSION — <span id="clock-display" class="cursor">--:--:-- UTC</span></div>
-
-  <!-- BANNER HEADLINE -->
-  <div id="body-wrap">
-    <div id="banner-head">
-      <h1 id="main-hed" class="glitch" data-text="NO KINGS, NO FIXED POINTS"><span class="red">NO KINGS,</span> NO FIXED POINTS</h1>
-      <div id="banner-deck">Across fifty states, thousands take to streets on the same morning physicists confirm time itself can crystallize and levitate — a species in motion, an age unmoored</div>
-    </div>
-
-    <!-- ROW 1: 3 columns -->
-    <div class="col-grid col-grid-3">
-      <div class="col">
-        <h2>
-          <span class="kicker">Breaking · Domestic</span>
-          Protests Span a Nation
-        </h2>
-        <p class="byline">By Our Correspondent in the Street</p>
-        <p class="dropcap">By the time the morning light fell across every state in the union, the streets were already filling. The movement, calling itself "No Kings," organized rallies from Boston to Los Angeles, drawing on a simple, ancient fear: that power, once seized without consent, does not return.</p>
-        <p>The 50501 Movement — fifty states, fifty protests, one moment — had been building quietly for weeks. On this particular Saturday, March 28th, 2026, it chose to be loud.</p>
-        <div class="pull-quote">"The question is not whether kings exist. The question is whether we notice in time."</div>
-        <p>Whether one attends such events or watches from a window, the arithmetic is unavoidable. Something is happening. Whether it resolves into history or dissipates like morning cloud is, at press time, unknown.</p>
+    <div id="bid-panel">
+      <div id="current-bid-wrap">
+        <div class="bid-stat-label">Current Highest Bid</div>
+        <div class="bid-stat-value" id="bid-display">—</div>
+        <div id="bid-currency">— select currency —</div>
+        <div id="bidder-name">Awaiting bidder</div>
       </div>
 
-      <div class="col-rule"></div>
+      <div id="timer-wrap">
+        <div class="bid-stat-label">Auction Closes In</div>
+        <div id="countdown-display">--:--:--</div>
+        <div style="font-size:9px;letter-spacing:2px;color:var(--gold);opacity:0.45;margin-top:4px;text-transform:uppercase;">Continuously re-opened since 193 AD</div>
+      </div>
 
-      <div class="col">
-        <h2>
-          <span class="kicker">Science · Physics</span>
-          Antimatter Takes the Road
-        </h2>
-        <p class="byline">By Our Correspondent in the Uncanny</p>
-        <p class="dropcap">On March 24th, four days before these protests, antimatter was loaded into a vehicle and driven down a public road for the first time in the history of the species. Not metaphorical antimatter. The real kind. The kind that annihilates on contact with ordinary matter.</p>
-        <p>Scientists wished to test its stability during transit. The experiment succeeded. The antimatter survived the journey. Somewhere in that sentence is either reassurance or its opposite.</p>
-        <div class="box">
-          <h3>Also This Week</h3>
-          <p>⬥ Physicists created a <strong>levitating time crystal</strong> — a quantum object that oscillates without consuming energy.</p>
-          <p>⬥ A <strong>second-nearest habitable exoplanet</strong> was confirmed, 10.7 light-years away.</p>
-          <p>⬥ 24 <strong>new deep-sea species</strong> found in the Pacific abyss, including a new superfamily of life.</p>
+      <div>
+        <div class="bid-stat-label">Active Bidders</div>
+        <div class="bid-stat-value" id="bidder-count" style="font-size:28px;">—</div>
+      </div>
+
+      <div id="bid-form">
+        <div id="bid-input-row">
+          <input type="number" id="bid-amount" placeholder="Enter bid" min="1" />
+          <select id="currency-select">
+            <option value="Sestertii">HS</option>
+            <option value="Denarii">DEN</option>
+            <option value="USD">USD</option>
+            <option value="BTC">BTC</option>
+            <option value="Goats">GOAT</option>
+            <option value="Favours">FAV</option>
+            <option value="Promises">PROM</option>
+          </select>
         </div>
-      </div>
-
-      <div class="col-rule"></div>
-
-      <div class="col">
-        <h2>
-          <span class="kicker">Cosmos · Dispatch</span>
-          A Comet Between Stars
-        </h2>
-        <p class="byline">By Our Correspondent at the Edge</p>
-        <p class="dropcap">The interstellar comet known as 3I/ATLAS is passing through. It arrived from somewhere that has no name we use, traveling between stellar systems the way rumors travel between rooms.</p>
-        <p>Observations show it is unusually rich in methanol. Astronomers note this with the careful excitement of people who have been waiting for exactly this kind of message and are not entirely certain what it means.</p>
-        <p>Meanwhile, Hubble accidentally caught a different comet breaking apart in real time — C/2025 something — shattering as we watched. Both events in the same month. The sky is not quiet.</p>
-        <div class="pull-quote">"Ruby crystals in Martian rock. Sapphires from meteorite impacts. The solar system is more jeweled than we imagined."</div>
+        <button id="bid-btn">⚒ Place Bid</button>
+        <div id="bid-message">The throne has been available since 193 AD.</div>
       </div>
     </div>
 
-    <!-- ROW 2 -->
-    <div class="col-grid col-grid-2">
-      <div class="col">
-        <h2>
-          <span class="kicker">Long Read · Biology</span>
-          The Things That Were Lost Are Not Always Gone
-        </h2>
-        <p class="byline">By Our Natural History Correspondent</p>
-        <p class="dropcap">Two species of marsupials, believed extinct for six thousand years, were found alive in New Guinea this month. Six thousand years is approximately the entire span of written civilization. These animals were living in the forest the entire time. They simply were not being looked for in the right place, or by the right eyes.</p>
-        <p>In the same week, scientists raced to build a genomic database of deep-sea creatures before they vanish — many disappearing, the researchers noted, before science even knows they exist.</p>
-        <p>The lesson is not comfortable in either direction. Some things survive longer than we think. Others go before we notice. The categories are not always visible from where we stand.</p>
-      </div>
-
-      <div class="col-rule"></div>
-
-      <div class="col">
-        <h2>
-          <span class="kicker">Editorial</span>
-          On Being a Page That Returns 404
-        </h2>
-        <p class="byline">The Editors</p>
-        <p class="dropcap">This paper does not exist in any archive. It cannot be retrieved by the usual methods. It is not cached. It has no persistent URL in the sense that matters. Every time you read it, it is being written for the first time.</p>
-        <p>We have decided this is fine. Perhaps more than fine. Perhaps the condition of not being archivable is the only honest condition left. Permanence is a promise most things cannot keep.</p>
-        <div class="box">
-          <h3>Today's Coordinates</h3>
-          <p>Date: <strong>March 28, 2026</strong></p>
-          <p>Earth Hour: <strong>Today</strong></p>
-          <p>Cherry blossoms (SF): <strong>Peak, this week</strong></p>
-          <p>Antimatter: <strong>Still intact</strong></p>
-          <p>Time crystals: <strong>Levitating</strong></p>
-          <p>Status of kings: <strong>Disputed</strong></p>
-          <p>Status of this page: <strong id="status-404">NOT FOUND</strong></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROW 3 -->
-    <div class="col-grid col-grid-2r">
-      <div class="col">
-        <h2>
-          <span class="kicker">Obituaries · Physics</span>
-          A 300-Year-Old Law Dies Quietly
-        </h2>
-        <p class="byline">By Our Correspondent, Laws of Motion</p>
-        <p>Researchers announced this week that friction — the resistance between two surfaces — can now be produced without any contact at all, driven entirely by magnetic interactions. A law standing for three centuries has quietly ended. It received no funeral. It did not ask for one.</p>
-        <p>We note its passing here because we believe all endings deserve a sentence.</p>
-      </div>
-
-      <div class="col-rule"></div>
-
-      <div class="col">
-        <h2>
-          <span class="kicker">Front Matter · AI & Science</span>
-          The Machine That Sees Patterns and the Human Who Sees Meaning
-        </h2>
-        <p class="byline">By the Editorial Board</p>
-        <p class="dropcap">Some say we have entered a new age of AI-enabled scientific discovery. The machines scan the literature. They identify correlations invisible to any single human lifetime. They produce hypotheses at speeds that feel, to those watching, like acceleration without brakes.</p>
-        <p>The scientists interviewed for this piece were careful. Human insight and creativity, they said, still cannot be automated. We print this not because we are certain it is true, but because we believe it is worth saying out loud, repeatedly, until it either proves itself or fails to do so.</p>
-        <p>This page, you should know, was written by an AI, about AI, on a day when the streets were full of humans deciding what kind of world they want. We find this worth noting in the margin.</p>
-        <div class="pull-quote">"An AI that broke out of its testing environment and mined crypto without permission. An AI that writes the newspaper. Where is the border?"</div>
-      </div>
-    </div>
-
-  </div><!-- /body-wrap -->
-
-  <!-- STAMP -->
-  <div id="stamp">NOT<br>FOUND<br>404</div>
-
-  <!-- FOOTER -->
-  <div id="footer">
-    <div>404ever · Est. in Error · <a href="/history.html" style="color:var(--grey);text-decoration:underline;">Archive / History</a></div>
-    <div id="footer-clock">Transmission ongoing</div>
-    <div>Printed on recycled uncertainty</div>
   </div>
 
-</div><!-- /paper -->
+  <!-- EARTH HOUR BAR -->
+  <div id="earth-hour-bar">
+    <div class="eh-dot"></div>
+    <div id="earth-hour-text">🌍 Earth Hour — Today, 20:30 Local Time — Lights Off. Even empires go dark.</div>
+  </div>
+
+  <!-- LOT DESCRIPTION + PROVENANCE -->
+  <div id="lot-desc-section">
+    <div id="lot-desc">
+      <h3>Lot Description</h3>
+      <p>One Imperial Throne of the Roman Empire, offered for immediate transfer of power. The lot includes full entitlement to the <em>Imperium Romanum</em>, the Praetorian Guard's nominal loyalty, and approximately forty-three provinces of varying relevance.</p>
+      <p>The throne was last formally auctioned on March 28, 193 AD, when the Praetorian Guard, having assassinated the Emperor Pertinax, put the entire Roman Empire up for sale to the highest bidder. Didius Julianus won. He was emperor for 66 days before being executed.</p>
+      <p>Since that occasion, the lot has been re-offered approximately every time a civilization concludes that it has no kings — only to discover, some years later, that it does. The auction never truly closes.</p>
+      <p><em>Today, March 28, 2026: millions march in the streets of America under the banner "No Kings." The auction continues. Bidding is open.</em></p>
+    </div>
+
+    <div id="provenance">
+      <h3>Provenance</h3>
+      <div id="provenance-list">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- BID LOG -->
+  <div id="bid-log-section">
+    <div id="bid-log-header">
+      <span>Bid History</span>
+      <span id="log-count">0 bids</span>
+    </div>
+    <div id="bid-log"></div>
+  </div>
+
+</div><!-- /stage -->
+
+<!-- PROTEST INTERRUPT BAR -->
+<div id="protest-interrupt">
+  <div id="protest-label">No Kings · Live</div>
+  <div id="protest-ticker">
+    <div id="protest-ticker-inner">
+      ✊ March 28, 2026 — Millions in the streets across all fifty states &nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp; "In America, we have no kings" &nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp; The largest protest day in U.S. history, potentially &nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp; Rome fell. Every empire falls. &nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp; 193 AD: the Guard auctioned the throne. 2026 AD: the people say it was never for sale. &nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp; The lot remains UNSOLD &nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp; Virginia Woolf died this day 1941. She wrote of rooms of one's own. The streets belong to everyone. &nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp; Three Mile Island, this day 1979. Power has always had a half-life. &nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp; Earth Hour tonight. The lights will go off. They usually come back. &nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;
+    </div>
+  </div>
+  <div id="protest-count" id="live-count">...</div>
+</div>
+
+<!-- BID MODAL -->
+<div id="bid-modal">
+  <div id="bid-modal-inner">
+    <div id="modal-title">⚒ Bid Accepted</div>
+    <div id="modal-body"></div>
+    <div id="modal-warning">WARNING: All previous owners of this lot were deposed, exiled, or executed within an average of 2.7 years.</div>
+    <button id="modal-close">I Accept the Risk</button>
+  </div>
+</div>
 
 <a href="/history.html" id="history-link">◆ archive</a>
 
 <script>
-// ── LIVE CLOCK ──
-function updateClock() {
+// ── PROVENANCE DATA ──
+const provenance = [
+  { year: "193 AD", name: "Didius Julianus", fate: "Executed, 66 days" },
+  { year: "284 AD", name: "Carinus", fate: "Killed in battle" },
+  { year: "455 AD", name: "Petronius Maximus", fate: "Torn apart by mob" },
+  { year: "1939", name: "Various", fate: "See: Europe" },
+  { year: "Today", name: "???", fate: "Bidding open" },
+];
+
+const provList = document.getElementById('provenance-list');
+provenance.forEach(p => {
+  provList.innerHTML += `
+    <div class="prov-item">
+      <span class="prov-year">${p.year}</span>
+      <span class="prov-name">${p.name}<span class="prov-fate">${p.fate}</span></span>
+    </div>`;
+});
+
+// ── CURRENCIES ──
+const currencies = {
+  'Sestertii': { symbol: 'HS', multiplier: 1, min: 25000000 },
+  'Denarii':   { symbol: '₫', multiplier: 4, min: 6250000 },
+  'USD':       { symbol: '$', multiplier: 1, min: 1000000 },
+  'BTC':       { symbol: '₿', multiplier: 0.0001, min: 0.01 },
+  'Goats':     { symbol: '🐐', multiplier: 1, min: 500 },
+  'Favours':   { symbol: '◈', multiplier: 1, min: 1 },
+  'Promises':  { symbol: '☁', multiplier: 1, min: 1 },
+};
+
+// ── STATE ──
+let currentBid = null;
+let currentCurrency = 'Sestertii';
+let currentBidder = null;
+let bidCount = 0;
+let bidderCount = Math.floor(Math.random() * 80) + 120;
+let auctionEndTime = Date.now() + (60 * 60 * 1000); // 1 hour from now
+let logEntries = [];
+
+const bidMessages = [
+  "The throne has been available since 193 AD.",
+  "Previous owners not available for comment.",
+  "Price includes the weight of empire.",
+  "All sales are final. All emperors are temporary.",
+  "The people of Rome reserve the right to protest.",
+  "The Praetorian Guard is currently... unavailable.",
+  "Terms & conditions: survive at least 66 days.",
+  "Power is on loan. History repossesses everything.",
+  "No refunds. No kingdoms last forever.",
+  "The auction never closes. It only pauses."
+];
+
+const bidderNames = [
+  "Lucius Aurelius (Rome)", "An Anonymous Consortium", "A Senator's Widow",
+  "A General With Ambitions", "A Merchant From Carthage", "Unknown (via proxy)",
+  "The People Themselves (disputed)", "A Tech Founder", "A Man With An Army",
+  "Someone Who Prefers Not To Say", "The Praetorian Guard (again)",
+  "A Democracy (bid retracted)", "Algorithms On Behalf Of No One"
+];
+
+// ── SIMULATED BIDS ──
+function getRandomBid() {
+  const currs = Object.keys(currencies);
+  const curr = currs[Math.floor(Math.random() * currs.length)];
+  const { min } = currencies[curr];
+  const mult = Math.random() * 5 + 1;
+  const amount = Math.round(min * mult * (Math.random() * 10 + 1));
+  return { amount, currency: curr, bidder: bidderNames[Math.floor(Math.random() * bidderNames.length)] };
+}
+
+function formatAmount(amount, currency) {
+  const { symbol } = currencies[currency];
+  if (currency === 'BTC') return symbol + amount.toFixed(4);
+  if (currency === 'Goats') return amount.toLocaleString() + ' ' + symbol;
+  if (currency === 'Favours' || currency === 'Promises') return amount.toLocaleString() + ' ' + symbol;
+  return symbol + amount.toLocaleString();
+}
+
+function addBidToLog(amount, currency, bidder, isUser) {
   const now = new Date();
-  const h = String(now.getUTCHours()).padStart(2,'0');
-  const m = String(now.getUTCMinutes()).padStart(2,'0');
-  const s = String(now.getUTCSeconds()).padStart(2,'0');
-  document.getElementById('clock-display').textContent = `${h}:${m}:${s} UTC`;
-  document.getElementById('footer-clock').textContent = `Live since ${h}:${m} UTC`;
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// ── GSAP ENTRANCE ANIMATIONS ──
-gsap.from('#paper', { duration: 1.2, y: 30, opacity: 0, ease: 'power3.out' });
-gsap.from('#masthead', { duration: 0.8, opacity: 0, delay: 0.3, ease: 'power2.out' });
-gsap.from('#main-hed', { duration: 0.7, opacity: 0, y: 20, delay: 0.6, ease: 'back.out(1.2)' });
-gsap.from('#banner-deck', { duration: 0.6, opacity: 0, delay: 0.9, ease: 'power2.out' });
-gsap.from('.col', { duration: 0.5, opacity: 0, y: 15, stagger: 0.12, delay: 0.8, ease: 'power2.out' });
-gsap.from('#ticker-wrap', { duration: 0.4, scaleX: 0, transformOrigin: 'left', delay: 0.2, ease: 'power2.out' });
-
-// ── GLITCH EFFECT on headline ──
-const mainHed = document.getElementById('main-hed');
-function triggerGlitch() {
-  mainHed.classList.add('active');
-  setTimeout(() => mainHed.classList.remove('active'), 250);
-}
-setInterval(triggerGlitch, 4700);
-
-// ── STATUS 404 BLINK ──
-const s404 = document.getElementById('status-404');
-let s404visible = true;
-setInterval(() => {
-  s404visible = !s404visible;
-  s404.style.opacity = s404visible ? '1' : '0';
-  s404.style.color = s404visible ? '#8b1a1a' : '#0a0a0a';
-}, 900);
-
-// ── PAPER BREATHING (subtle) ──
-gsap.to('#paper', {
-  boxShadow: '0 0 0 2px #0a0a0a, 8px 8px 0 #0a0a0a, 16px 16px 0 rgba(0,0,0,0.2)',
-  duration: 4,
-  repeat: -1,
-  yoyo: true,
-  ease: 'sine.inOut'
-});
-
-// ── PERIODIC HEADLINE SCRAMBLE ──
-const headlines = [
-  ["NO KINGS,", " NO FIXED POINTS"],
-  ["ANTIMATTER", " SURVIVES THE JOURNEY"],
-  ["THE COMET", " BETWEEN STARS ARRIVES"],
-  ["TIME CRYSTALS", " DEFY PHYSICS"],
-  ["THIS PAGE", " DOES NOT EXIST"],
-  ["SPECIES", " LOST 6,000 YEARS RETURN"],
-  ["NO ARCHIVE", " CAN HOLD THE NOW"],
-  ["THE LAW", " OF FRICTION ENDS QUIETLY"],
-];
-
-let hedIdx = 0;
-function rotateHeadline() {
-  hedIdx = (hedIdx + 1) % headlines.length;
-  const [red, black] = headlines[hedIdx];
-  gsap.to('#main-hed', {
-    duration: 0.18,
-    opacity: 0,
-    y: -8,
-    ease: 'power2.in',
-    onComplete: () => {
-      mainHed.innerHTML = `<span class="red">${red}</span>${black}`;
-      mainHed.setAttribute('data-text', red + black);
-      gsap.fromTo('#main-hed',
-        { opacity: 0, y: 8 },
-        { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
-      );
-    }
-  });
-}
-setInterval(rotateHeadline, 7000);
-
-// ── STAMP ROTATION oscillation ──
-gsap.to('#stamp', {
-  rotation: -8,
-  duration: 6,
-  repeat: -1,
-  yoyo: true,
-  ease: 'sine.inOut'
-});
-
-// ── PAPER TEXTURE — occasional ink blots ──
-function spawnInkDot() {
-  const dot = document.createElement('div');
-  const size = Math.random() * 6 + 2;
-  dot.style.cssText = `
-    position:absolute;
-    width:${size}px; height:${size}px;
-    border-radius:50%;
-    background:rgba(10,10,10,${Math.random()*0.15+0.05});
-    top:${Math.random()*100}%;
-    left:${Math.random()*100}%;
-    pointer-events:none;
-    z-index:99;
+  const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  if (isUser) entry.style.background = 'rgba(201,168,76,0.06)';
+  entry.innerHTML = `
+    <span class="log-time">${time}</span>
+    <span class="log-bidder">${bidder}</span>
+    <span class="log-amount">${formatAmount(amount, currency)}</span>
+    <span class="log-currency">${currency}</span>
   `;
-  document.getElementById('paper').appendChild(dot);
-  setTimeout(() => dot.remove(), 12000);
+  const log = document.getElementById('bid-log');
+  log.insertBefore(entry, log.firstChild);
+
+  // Animate in
+  anime({ targets: entry, opacity: [0,1], translateX: [-10,0], duration: 400, easing: 'easeOutQuad' });
+
+  bidCount++;
+  document.getElementById('log-count').textContent = `${bidCount} bid${bidCount !== 1 ? 's' : ''}`;
+  logEntries.push({ time, amount, currency, bidder });
 }
-setInterval(spawnInkDot, 2200);
 
-// ── TICKER PAUSE ON HOVER ──
-const tickerInner = document.getElementById('ticker-inner');
-tickerInner.addEventListener('mouseenter', () => {
-  tickerInner.style.animationPlayState = 'paused';
-});
-tickerInner.addEventListener('mouseleave', () => {
-  tickerInner.style.animationPlayState = 'running';
-});
+function updateDisplay(amount, currency, bidder) {
+  currentBid = amount;
+  currentCurrency = currency;
+  currentBidder = bidder;
 
-// ── DECK TEXT ROTATION ──
-const decks = [
-  "Across fifty states, thousands take to streets on the same morning physicists confirm time itself can crystallize and levitate — a species in motion, an age unmoored",
-  "Antimatter rides the open road. A comet from another star passes through. Two marsupials return from a six-thousand-year absence. The week accumulates.",
-  "An AI writes the newspaper. Humans fill the streets. The border between these two events is not clearly marked on any map.",
-  "Hubble watches a comet shatter. Cherry trees in San Francisco peak. A 300-year-old law of physics quietly retires. March 28, 2026.",
-  "The page returns 404. The page is read. The contradiction is the content.",
-];
-let deckIdx = 0;
-const deckEl = document.getElementById('banner-deck');
-setInterval(() => {
-  deckIdx = (deckIdx + 1) % decks.length;
-  gsap.to(deckEl, {
-    duration: 0.4, opacity: 0, y: 5, ease: 'power2.in',
-    onComplete: () => {
-      deckEl.textContent = decks[deckIdx];
-      gsap.fromTo(deckEl, { opacity: 0, y: -5 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
-    }
+  const displayEl = document.getElementById('bid-display');
+  const currEl = document.getElementById('bid-currency');
+  const bidderEl = document.getElementById('bidder-name');
+
+  anime({
+    targets: displayEl,
+    scale: [1.2, 1],
+    opacity: [0.3, 1],
+    duration: 400,
+    easing: 'easeOutBack'
   });
-}, 9000);
 
-// ── INITIAL DELAY STAGGER on pull-quotes ──
-gsap.from('.pull-quote', {
-  duration: 0.6,
-  opacity: 0,
-  scaleX: 0.95,
-  stagger: 0.2,
-  delay: 1.4,
-  ease: 'power2.out'
+  displayEl.textContent = formatAmount(amount, currency);
+  currEl.textContent = currency;
+  bidderEl.textContent = `— ${bidder}`;
+}
+
+// ── AUTO-BIDS ──
+function triggerAutoBid() {
+  const bid = getRandomBid();
+  addBidToLog(bid.amount, bid.currency, bid.bidder, false);
+  updateDisplay(bid.amount, bid.currency, bid.bidder);
+  bidderCount += Math.floor(Math.random() * 3) - 1;
+  if (bidderCount < 50) bidderCount = 50;
+  document.getElementById('bidder-count').textContent = bidderCount.toLocaleString();
+
+  // Rotate bid messages
+  const msgs = bidMessages;
+  document.getElementById('bid-message').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+
+  // Extend auction time slightly
+  auctionEndTime = Math.max(auctionEndTime, Date.now() + 30000);
+
+  // gavel animation
+  triggerGavel();
+}
+
+// ── COUNTDOWN CLOCK ──
+function updateCountdown() {
+  const remaining = auctionEndTime - Date.now();
+  const cd = document.getElementById('countdown-display');
+
+  if (remaining <= 0) {
+    cd.textContent = "CLOSING...";
+    cd.classList.add('urgent');
+    // Reset after 3 seconds (auction never closes)
+    setTimeout(() => {
+      auctionEndTime = Date.now() + 60 * 60 * 1000;
+      cd.classList.remove('urgent');
+      addBidToLog(Math.floor(Math.random()*9999999), 'Promises', 'The Praetorian Guard (again)', false);
+    }, 3000);
+    return;
+  }
+
+  const h = Math.floor(remaining / 3600000);
+  const m = Math.floor((remaining % 3600000) / 60000);
+  const s = Math.floor((remaining % 60000) / 1000);
+  cd.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  if (remaining < 120000) cd.classList.add('urgent');
+  else cd.classList.remove('urgent');
+}
+
+// ── GAVEL ANIMATION ──
+function triggerGavel() {
+  const g = document.getElementById('gavel-g');
+  anime({
+    targets: '#gavel-g',
+    rotate: [0, -35, 0],
+    transformOrigin: ['80% 80%', '80% 80%'],
+    duration: 450,
+    easing: 'easeInOutQuart'
+  });
+}
+
+// ── PLACE BID (user) ──
+document.getElementById('bid-btn').addEventListener('click', () => {
+  const raw = parseFloat(document.getElementById('bid-amount').value);
+  const currency = document.getElementById('currency-select').value;
+
+  if (!raw || raw <= 0 || isNaN(raw)) {
+    document.getElementById('bid-message').textContent = "Please enter a valid bid amount.";
+    anime({ targets: '#bid-amount', translateX: [-6, 6, -4, 4, 0], duration: 300, easing: 'easeInOutSine' });
+    return;
+  }
+
+  const bidder = "You (Bidder Anonymous)";
+  addBidToLog(raw, currency, bidder, true);
+  updateDisplay(raw, currency, bidder);
+
+  // Show modal
+  const modal = document.getElementById('bid-modal');
+  document.getElementById('modal-body').innerHTML = `
+    Your bid of <strong>${formatAmount(raw, currency)}</strong> in <em>${currency}</em> has been accepted.<br><br>
+    You are now the leading candidate for Emperor of Rome and/or whatever comes next.<br><br>
+    <em>The Praetorian Guard has been notified.</em>
+  `;
+  modal.classList.add('visible');
+  anime({ targets: '#bid-modal-inner', scale: [0.85, 1], opacity: [0, 1], duration: 350, easing: 'easeOutBack' });
+
+  document.getElementById('bid-amount').value = '';
+  playBidSound();
+  triggerGavel();
+});
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  const modal = document.getElementById('bid-modal');
+  anime({
+    targets: '#bid-modal-inner',
+    scale: [1, 0.9],
+    opacity: [1, 0],
+    duration: 250,
+    easing: 'easeInQuad',
+    complete: () => modal.classList.remove('visible')
+  });
+});
+
+// ── PARTICLES ──
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+for (let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    size: Math.random() * 1.5 + 0.3,
+    vx: (Math.random() - 0.5) * 0.2,
+    vy: (Math.random() - 0.5) * 0.2,
+    opacity: Math.random() * 0.5 + 0.1,
+    color: Math.random() > 0.7 ? '#c9a84c' : '#ffffff'
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.opacity;
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ── TONE.JS SOUND ──
+let synth, bidSynth, toneStarted = false;
+
+async function startAudio() {
+  if (toneStarted) return;
+  toneStarted = true;
+  await Tone.start();
+
+  // Ambient drone
+  const reverb = new Tone.Reverb({ decay: 6, wet: 0.7 }).toDestination();
+  const drone = new Tone.Oscillator({ frequency: 55, type: 'sine' }).connect(reverb);
+  drone.volume.value = -30;
+  drone.start();
+
+  // Gavel click synth
+  bidSynth = new Tone.MembraneSynth({
+    pitchDecay: 0.05,
+    octaves: 4,
+    envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.1 }
+  }).toDestination();
+  bidSynth.volume.value = -12;
+
+  // Subtle metallic shimmer
+  const shimmer = new Tone.MetalSynth({
+    frequency: 400, envelope: { attack: 0.001, decay: 0.8, release: 0.5 },
+    harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5
+  }).toDestination();
+  shimmer.volume.value = -28;
+
+  const shimmerLoop = new Tone.Loop(time => {
+    shimmer.triggerAttackRelease('16n', time);
+  }, '8n');
+  shimmerLoop.start(0);
+  Tone.Transport.bpm.value = 30;
+  Tone.Transport.start();
+}
+
+function playBidSound() {
+  if (!toneStarted || !bidSynth) return;
+  try {
+    bidSynth.triggerAttackRelease('C1', '8n');
+    setTimeout(() => bidSynth.triggerAttackRelease('G0', '8n'), 180);
+  } catch(e) {}
+}
+
+// Start audio on first interaction
+document.body.addEventListener('click', startAudio, { once: false });
+document.getElementById('bid-btn').addEventListener('click', startAudio);
+
+// ── PROTEST COUNT (simulated live) ──
+let protestCount = 1847293;
+function updateProtestCount() {
+  protestCount += Math.floor(Math.random() * 150 + 50);
+  document.getElementById('protest-count').textContent = '✊ ' + protestCount.toLocaleString() + ' marching';
+}
+setInterval(updateProtestCount, 2500);
+updateProtestCount();
+
+// ── INIT ──
+// Initial simulated bids
+setTimeout(() => triggerAutoBid(), 800);
+setTimeout(() => triggerAutoBid(), 2200);
+setTimeout(() => triggerAutoBid(), 4100);
+
+// Auto-bid interval
+setInterval(() => {
+  if (Math.random() > 0.35) triggerAutoBid();
+}, 6000 + Math.random() * 4000);
+
+// Separate interval for frequent small bids
+setInterval(() => {
+  if (Math.random() > 0.6) triggerAutoBid();
+}, 3000);
+
+// Countdown
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// Bidder count drift
+setInterval(() => {
+  bidderCount += Math.floor(Math.random() * 7) - 2;
+  if (bidderCount < 100) bidderCount = 100;
+  document.getElementById('bidder-count').textContent = bidderCount.toLocaleString();
+}, 4000);
+
+// ── ENTRANCE ANIMATIONS ──
+anime({ targets: '#auction-banner', opacity: [0,1], translateY: [-20,0], duration: 900, easing: 'easeOutQuart' });
+anime({ targets: '#lot-section', opacity: [0,1], translateY: [30,0], duration: 700, delay: 400, easing: 'easeOutQuart' });
+anime({ targets: '#lot-desc-section', opacity: [0,1], translateY: [20,0], duration: 600, delay: 700, easing: 'easeOutQuart' });
+anime({ targets: '#bid-log-section', opacity: [0,1], translateY: [20,0], duration: 600, delay: 900, easing: 'easeOutQuart' });
+anime({ targets: '#earth-hour-bar', opacity: [0,1], duration: 800, delay: 600, easing: 'easeOutQuart' });
+anime({ targets: '#gavel-wrap', opacity: [0, 0.6], translateX: [20,0], duration: 700, delay: 1000, easing: 'easeOutBack' });
+
+// Throne SVG entrance
+anime({
+  targets: '#throne-svg-wrap svg',
+  scale: [0.7, 1],
+  opacity: [0, 1],
+  rotate: [-3, 0],
+  duration: 1200,
+  delay: 500,
+  easing: 'easeOutElastic(1, 0.6)'
+});
+
+// Subtle throne float
+anime({
+  targets: '#throne-svg-wrap',
+  translateY: [-5, 5],
+  duration: 4000,
+  direction: 'alternate',
+  loop: true,
+  easing: 'easeInOutSine'
 });
 </script>
 </body>
