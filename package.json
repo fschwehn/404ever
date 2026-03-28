@@ -4,5 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "npx serve . --listen 3000 --no-clipboard"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0"
   }
 }
