@@ -1,0 +1,38 @@
+name: Daily Reinvention
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 6am UTC every day
+  workflow_dispatch:        # manual trigger for testing
+
+jobs:
+  reinvent:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node agent/reinvent.js
+
+      - name: Commit and push
+        run: |
+          git config user.name "404ever Agent"
+          git config user.email "agent@404ever.art"
+          git add index.html history.json archive/
+          git commit -m "$(date +%Y-%m-%d): $(cat .agent_title)"
+          git push
