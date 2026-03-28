@@ -87,13 +87,38 @@ if (!textBlock) throw new Error("No text block in response");
 
 let result;
 try {
-  // Strip markdown code fences if present
-  const raw = textBlock.text.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
-  result = JSON.parse(raw);
+  result = extractResult(textBlock.text);
 } catch (e) {
-  console.error("Failed to parse agent response as JSON:");
+  console.error("Failed to extract valid JSON from agent response:");
   console.error(textBlock.text);
   throw e;
+}
+
+function extractResult(text) {
+  // Collect all ```json ... ``` blocks
+  const blocks = [];
+  const fenceRe = /```json\s*([\s\S]*?)```/gi;
+  let match;
+  while ((match = fenceRe.exec(text)) !== null) {
+    blocks.push(match[1].trim());
+  }
+
+  // Also try the whole text as a fallback
+  blocks.push(text.trim());
+
+  // From last to first, find a block that parses AND has real HTML
+  for (let i = blocks.length - 1; i >= 0; i--) {
+    try {
+      const parsed = JSON.parse(blocks[i]);
+      if (parsed.html && parsed.html.trim().startsWith("<")) {
+        return parsed;
+      }
+    } catch {
+      // not valid JSON, skip
+    }
+  }
+
+  throw new Error("No valid JSON with real HTML found in response");
 }
 
 const { title, mood, libraries, description, html } = result;
