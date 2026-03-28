@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "date": "2026-03-28",
+    "title": "Half-Life of Everything",
+    "mood": "haunted",
+    "libraries": [],
+    "description": "A meditative generative canvas piece marking 47 years since Three Mile Island — radioactive green decay slowly bleeds into Martian red as particle systems simulate invisible loss, with live clocks counting time elapsed since the meltdown.",
+    "commit": ""
+  }
+]
