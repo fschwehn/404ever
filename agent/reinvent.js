@@ -136,12 +136,12 @@ if (fs.existsSync(INDEX_PATH)) {
 
   const lastEntry = history.at(-1);
   const archiveDate = lastEntry ? lastEntry.date : today;
-  const archivePath = path.join(ARCHIVE_DIR, `${archiveDate}.html`);
+  const archiveTime = new Date().toISOString().split("T")[1].replace(/[:.]/g, "-").slice(0, 8);
+  const archiveName = `${archiveDate}_${archiveTime}`;
+  const archivePath = path.join(ARCHIVE_DIR, `${archiveName}.html`);
 
-  if (!fs.existsSync(archivePath)) {
-    fs.copyFileSync(INDEX_PATH, archivePath);
-    console.log(`[404ever] Archived previous version as ${archiveDate}.html`);
-  }
+  fs.copyFileSync(INDEX_PATH, archivePath);
+  console.log(`[404ever] Archived previous version as ${archiveName}.html`);
 }
 
 // ── Write new index.html ─────────────────────────────────────────────────────
