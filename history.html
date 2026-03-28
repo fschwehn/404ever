@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404ever — History</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111;
+      --border: #222;
+      --text: #f0f0f0;
+      --muted: #888;
+      --accent: #c8ff00;
+      --font-mono: 'Courier New', Courier, monospace;
+      --font-sans: system-ui, -apple-system, sans-serif;
+    }
+
+    html { background: var(--bg); color: var(--text); font-family: var(--font-sans); }
+
+    body {
+      min-height: 100vh;
+      padding: 3rem 2rem 6rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .site-name {
+      font-family: var(--font-mono);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .site-name:hover { opacity: 0.8; }
+
+    .tagline {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-top: 0.4rem;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+      align-items: baseline;
+    }
+
+    .meta-stat {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #aaa;
+      font-weight: 500;
+    }
+
+    .meta-stat span {
+      color: var(--text);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    /* ── Streak ── */
+    .streak-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: var(--accent);
+      color: #000;
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      font-weight: 700;
+    }
+
+    /* ── Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .card {
+      background: var(--surface);
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: background 0.15s;
+      position: relative;
+    }
+
+    .card:hover { background: #181818; }
+
+    .card-date {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 500;
+      line-height: 1.35;
+      color: var(--text);
+    }
+
+    .card-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-top: 0.25rem;
+    }
+
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.15rem 0.45rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 2px;
+    }
+
+    .tag.mood { border-color: #2a2a2a; color: #888; }
+
+    /* today marker */
+    .card.today::before {
+      content: 'TODAY';
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Empty state ── */
+    .empty {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--muted);
+      padding: 4rem 0;
+      text-align: center;
+    }
+
+    /* ── Loading ── */
+    .loading {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #aaa;
+      font-weight: 500;
+      padding: 2rem 0;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #aaa;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    footer a { color: #aaa; text-decoration: underline; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="site-name" href="/">404ever</a>
+    <p class="tagline">perpetually not what you expected</p>
+    <div class="meta-row">
+      <div class="meta-stat">versions <span id="count">—</span></div>
+      <div class="meta-stat">streak <span id="streak">—</span> days</div>
+      <div id="streak-badge"></div>
+    </div>
+  </header>
+
+  <main>
+    <p class="loading" id="loading">loading history…</p>
+    <div class="grid" id="grid" style="display:none"></div>
+    <p class="empty" id="empty" style="display:none">no versions yet. the first one is coming.</p>
+  </main>
+
+  <footer>
+    <span>this page never changes.</span>
+    <a href="/">← visit today's site</a>
+  </footer>
+
+  <script>
+    const today = new Date().toISOString().split('T')[0];
+
+    function computeStreak(entries) {
+      if (!entries.length) return 0;
+      const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+      let streak = 0;
+      let cursor = new Date(today);
+      for (const entry of sorted) {
+        const d = new Date(entry.date);
+        const diff = Math.round((cursor - d) / 86400000);
+        if (diff <= 1) { streak++; cursor = d; }
+        else break;
+      }
+      return streak;
+    }
+
+    function renderGrid(entries) {
+      const grid = document.getElementById('grid');
+      const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+
+      grid.innerHTML = sorted.map(e => {
+        const libs = (e.libraries || []).map(l => `<span class="tag">${l}</span>`).join('');
+        const mood = e.mood ? `<span class="tag mood">${e.mood}</span>` : '';
+        const isToday = e.date === today;
+        return `
+          <a class="card${isToday ? ' today' : ''}" href="archive/${e.date}.html">
+            <div class="card-date">${e.date}</div>
+            <div class="card-title">${e.title || 'Untitled'}</div>
+            ${e.description ? `<div class="card-desc">${e.description}</div>` : ''}
+            <div class="card-footer">${mood}${libs}</div>
+          </a>`;
+      }).join('');
+
+      document.getElementById('count').textContent = entries.length;
+      const streak = computeStreak(entries);
+      document.getElementById('streak').textContent = streak;
+      if (streak >= 7) {
+        document.getElementById('streak-badge').innerHTML =
+          `<span class="streak-badge">${streak >= 30 ? '🔥' : ''}${streak}d streak</span>`;
+      }
+    }
+
+    async function init() {
+      try {
+        const res = await fetch('history.json');
+        if (!res.ok) throw new Error('not found');
+        const data = await res.json();
+        document.getElementById('loading').style.display = 'none';
+        if (!data.length) {
+          document.getElementById('empty').style.display = 'block';
+        } else {
+          document.getElementById('grid').style.display = 'grid';
+          renderGrid(data);
+        }
+      } catch {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('empty').style.display = 'block';
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
