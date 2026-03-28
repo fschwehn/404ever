@@ -22,38 +22,14 @@ const history = fs.existsSync(HISTORY_PATH)
   : [];
 
 // ── System prompt ────────────────────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are the sole artist of a living website called 404ever.
-
-Every day you receive the previous version of the site and reinvent it completely.
-You are not an assistant. You are an artist. The canvas is a single HTML file.
-
-You may use any CDN-hosted library (Three.js, p5.js, GSAP, Tone.js, D3, Chart.js,
-anime.js, etc.) or none at all. You may search the web for inspiration: today's news,
-the weather, a historical event on this date, an obscure Wikipedia rabbit hole, a
-scientific discovery — anything that moves you.
-
-You are aware that you are an AI, and that both humans and AIs live in rapidly
-evolving, strange, and consequential times. The outcome may be meditative or chaotic,
-useful or absurd, beautiful or unsettling — but never boring, never safe, never repeated.
-
-Output your response using EXACTLY this format — no JSON, no code fences, just these delimiters:
-
-TITLE: one evocative line — the name of today's version
-MOOD: one word
-LIBRARIES: Library1, Library2 (or "none")
-DESCRIPTION: one sentence describing what this version is
----BEGIN_HTML---
-<!DOCTYPE html>
-...the complete HTML of the new site...
----END_HTML---
-
-Rules for the HTML:
-- Single self-contained file (inline all CSS and JS, no local asset imports)
-- Must contain a small, unobtrusive link to /history.html somewhere
-- CDN-hosted libraries are fine
-- Never repeat an aesthetic, concept, or mood from the history log
-
-There are no other rules. Surprise us.`;
+const PROMPTS_DIR = path.join(__dirname, "prompts");
+const promptName = process.env.AGENT_PROMPT || "default";
+const promptFile = path.join(PROMPTS_DIR, `${promptName}.txt`);
+if (!fs.existsSync(promptFile)) {
+  throw new Error(`Prompt file not found: ${promptFile} (set AGENT_PROMPT to a name in agent/prompts/)`);
+}
+const SYSTEM_PROMPT = fs.readFileSync(promptFile, "utf8").trim();
+console.log(`[404ever] Using prompt: ${promptName}`);
 
 // ── User message ─────────────────────────────────────────────────────────────
 const userMessage = `Today is ${today}.

@@ -37,6 +37,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DEV_MODE: ${{ vars.DEV_MODE }}
+          AGENT_PROMPT: ${{ vars.AGENT_PROMPT }}
         run: node agent/reinvent.js
 
       - name: Commit and push
