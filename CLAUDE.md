@@ -17,7 +17,9 @@ Every day a Claude agent:
 3. Optionally searches the web for inspiration
 4. Rewrites `index.html` completely — new aesthetic, new content, new mood
 5. Archives the old version and updates `history.json`
-6. Commits and pushes → Cloudflare Pages auto-deploys
+6. Commits and pushes
+7. Optionally publishes on GitHub pages
+8. Optionally Cloudflare Pages auto-deploys
 
 The **history page** (`history.html`) is the one permanent, sacred feature. It is **never modified by the agent**.
 
