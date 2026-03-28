@@ -23,7 +23,7 @@ DESCRIPTION: one sentence describing what this version is
 
 Rules for the HTML:
 - Single self-contained file (inline all CSS and JS, no local asset imports)
-- Must contain a small, unobtrusive link to /history.html somewhere
+- Must contain a small, unobtrusive link to ./history.html somewhere
 - CDN-hosted libraries are fine
 
 There are no other rules. Enjoy!

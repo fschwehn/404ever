@@ -66,7 +66,7 @@ The **history page** (`history.html`) is the one permanent, sacred feature. It i
 ## Agent Rules
 
 - Output exactly two things: a **TITLE** (one evocative line) and the full HTML
-- The site must contain a small, unobtrusive link to `/history.html`
+- The site must contain a small, unobtrusive link to `./history.html`
 - Never repeat an aesthetic or concept from the history log
 - May use any CDN-hosted library (Three.js, p5.js, GSAP, Tone.js, D3, etc.) or none
 - May use web search for inspiration (news, weather, historical events, Wikipedia, etc.)

@@ -80,7 +80,7 @@ if (DEV_MODE) {
   <h1>⚡ DEV MODE</h1>
   <div class="ts">${ts}</div>
   <div class="ts">date: ${today}</div>
-  <a href="/history.html">history</a>
+  <a href="./history.html">history</a>
 </body>
 </html>`;
 
