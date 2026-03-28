@@ -1,0 +1,8 @@
+{
+  "name": "404ever",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve . --listen 3000 --no-clipboard"
+  }
+}
