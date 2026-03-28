@@ -1,400 +1,750 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Earth Hour — The Stars Remember</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Signal/Noise — March 28, 2026</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --ink: #0a0a12;
-    --dim: #0e0e1a;
-    --gold: #f5d08a;
-    --pink: #f9b4c8;
-    --blue: #7ab3e0;
-    --green: #6ec99a;
-    --white: #e8e8f0;
-  }
-
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-    background: var(--ink);
-    font-family: 'Georgia', serif;
-    color: var(--white);
-  }
-
-  canvas#sky {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 0;
-  }
-
-  #ui {
-    position: fixed;
-    z-index: 10;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-
-  #headline {
-    font-size: clamp(1.8rem, 5vw, 3.8rem);
-    letter-spacing: 0.05em;
-    text-align: center;
-    color: var(--gold);
-    text-shadow: 0 0 40px rgba(245,208,138,0.4);
-    opacity: 0;
-    animation: fadeIn 3s ease 0.5s forwards;
-    line-height: 1.2;
-    padding: 0 1rem;
-  }
-
-  #sub {
-    margin-top: 1.2rem;
-    font-size: clamp(0.85rem, 2vw, 1.15rem);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--blue);
-    text-align: center;
-    opacity: 0;
-    animation: fadeIn 3s ease 2s forwards;
-    padding: 0 1rem;
-  }
-
-  #clock {
-    margin-top: 2.5rem;
-    font-size: clamp(3rem, 9vw, 6rem);
-    font-family: 'Courier New', monospace;
-    letter-spacing: 0.08em;
-    color: var(--white);
-    text-shadow: 0 0 30px rgba(200,200,255,0.25);
-    opacity: 0;
-    animation: fadeIn 3s ease 2.5s forwards;
-  }
-
-  #date-line {
-    margin-top: 0.6rem;
-    font-size: clamp(0.7rem, 1.5vw, 0.95rem);
-    color: #6a7080;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    opacity: 0;
-    animation: fadeIn 2s ease 3.5s forwards;
-  }
-
-  #earth-hour-badge {
-    margin-top: 2.8rem;
-    padding: 0.7rem 2rem;
-    border: 1px solid rgba(245,208,138,0.3);
-    border-radius: 2rem;
-    background: rgba(245,208,138,0.06);
-    font-size: clamp(0.75rem, 1.6vw, 0.9rem);
-    letter-spacing: 0.2em;
-    color: var(--gold);
-    text-transform: uppercase;
-    opacity: 0;
-    animation: pulseGold 4s ease 4s infinite;
-  }
-
-  #hint {
-    position: fixed;
-    bottom: 3.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    color: #4a4a60;
-    text-transform: uppercase;
-    z-index: 10;
-    opacity: 0;
-    animation: fadeIn 2s ease 5s forwards;
-    white-space: nowrap;
-  }
-
-  #history-link {
-    position: fixed;
-    bottom: 1.2rem;
-    right: 1.5rem;
-    font-size: 0.65rem;
-    color: #3a3a50;
-    text-decoration: none;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    z-index: 20;
-    transition: color 0.4s;
-  }
-  #history-link:hover { color: #7a7aaa; }
-
-  #petal-layer {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 5;
-    pointer-events: none;
-    overflow: hidden;
-  }
-
-  .petal {
-    position: absolute;
-    border-radius: 50% 0 50% 0;
-    opacity: 0;
-    animation: fallPetal linear infinite;
-  }
-
-  @keyframes fallPetal {
-    0%   { opacity: 0; transform: translateY(-20px) rotate(0deg) scale(0.8); }
-    10%  { opacity: 0.6; }
-    90%  { opacity: 0.3; }
-    100% { opacity: 0; transform: translateY(110vh) rotate(720deg) scale(1.1); }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes pulseGold {
-    0%,100% { opacity: 0; }
-    5%       { opacity: 1; }
-    50%      { opacity: 0.75; box-shadow: 0 0 20px rgba(245,208,138,0.2); }
-    95%      { opacity: 1; }
-  }
-
-  /* mouse ripple */
-  .ripple {
-    position: fixed;
-    border-radius: 50%;
-    border: 1px solid rgba(245,208,138,0.5);
-    animation: expandRipple 1.6s ease-out forwards;
-    pointer-events: none;
-    z-index: 8;
-  }
-  @keyframes expandRipple {
-    from { width: 0; height: 0; opacity: 0.8; transform: translate(-50%,-50%); }
-    to   { width: 200px; height: 200px; opacity: 0; transform: translate(-50%,-50%); }
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050507;
+  --scan:#0a0a10;
+  --red:#e8312a;
+  --amber:#f0a020;
+  --white:#e0e0e8;
+  --dim:#333340;
+  --green:#2ae87a;
+  --blue:#20a0f0;
+  --static:#1a1a22;
+}
+html,body{
+  width:100%;height:100%;
+  overflow:hidden;
+  background:var(--bg);
+  font-family:'Courier New',monospace;
+  color:var(--white);
+  cursor:crosshair;
+}
+canvas#noise-bg{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  z-index:0;
+}
+#crt-overlay{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  z-index:2;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0,0,0,0.03) 0px,
+      rgba(0,0,0,0.03) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  mix-blend-mode:multiply;
+}
+#vignette{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  z-index:3;
+  pointer-events:none;
+  background:radial-gradient(ellipse at center,
+    transparent 40%,
+    rgba(0,0,0,0.7) 100%
+  );
+}
+#ui{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  z-index:10;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+#header{
+  padding:1.2rem 1.5rem 0.8rem;
+  border-bottom:1px solid rgba(232,49,42,0.4);
+  display:flex;
+  align-items:baseline;
+  gap:1.5rem;
+  flex-shrink:0;
+}
+#broadcast-label{
+  font-size:0.65rem;
+  letter-spacing:0.3em;
+  color:var(--red);
+  text-transform:uppercase;
+  animation:blink 1.1s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#date-stamp{
+  font-size:0.65rem;
+  letter-spacing:0.2em;
+  color:var(--dim);
+}
+#signal-strength{
+  margin-left:auto;
+  font-size:0.6rem;
+  letter-spacing:0.15em;
+  color:var(--amber);
+}
+#ticker-wrap{
+  background:rgba(232,49,42,0.12);
+  border-bottom:1px solid rgba(232,49,42,0.2);
+  overflow:hidden;
+  height:1.8rem;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+}
+#ticker{
+  white-space:nowrap;
+  font-size:0.7rem;
+  letter-spacing:0.1em;
+  color:var(--amber);
+  animation:tickerMove 60s linear infinite;
+  padding-left:100%;
+}
+@keyframes tickerMove{
+  from{transform:translateX(0)}
+  to{transform:translateX(-200%)}
+}
+#main-area{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1px 1fr 1px 1fr;
+  grid-template-rows:1fr 1px 1fr;
+  overflow:hidden;
+  gap:0;
+}
+.v-sep{background:rgba(255,255,255,0.05);}
+.h-sep{
+  grid-column:1/-1;
+  height:1px;
+  background:rgba(255,255,255,0.05);
+}
+.panel{
+  padding:1rem 1.2rem;
+  overflow:hidden;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:0.5rem;
+}
+.panel::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.3s;
+  background:rgba(232,49,42,0.03);
+}
+.panel:hover::before{opacity:1;}
+.panel-tag{
+  font-size:0.55rem;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:0.2rem;
+}
+.panel-tag.red{color:var(--red);}
+.panel-tag.green{color:var(--green);}
+.panel-tag.blue{color:var(--blue);}
+.headline{
+  font-size:clamp(0.75rem,1.4vw,1.05rem);
+  line-height:1.45;
+  color:var(--white);
+  font-weight:normal;
+}
+.headline.large{
+  font-size:clamp(1rem,2.5vw,1.7rem);
+  line-height:1.3;
+}
+.sub{
+  font-size:0.62rem;
+  color:#555568;
+  letter-spacing:0.1em;
+  line-height:1.6;
+  margin-top:0.3rem;
+}
+.stat-line{
+  font-size:0.68rem;
+  letter-spacing:0.12em;
+  color:var(--amber);
+  margin-top:auto;
+  padding-top:0.4rem;
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+#clock-panel{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+#big-clock{
+  font-size:clamp(2rem,5vw,3.8rem);
+  letter-spacing:0.1em;
+  color:var(--white);
+  text-shadow:0 0 20px rgba(200,200,255,0.3);
+  font-variant-numeric:tabular-nums;
+}
+#day-of{
+  font-size:0.6rem;
+  color:var(--dim);
+  letter-spacing:0.2em;
+  margin-top:0.4rem;
+}
+#protest-panel{
+  grid-column:1;
+  grid-row:1;
+}
+#war-panel{
+  grid-column:3;
+  grid-row:1;
+}
+#center-panel{
+  grid-column:2;
+  grid-row:1;
+}
+#bottom-left{grid-column:1;grid-row:3;}
+#bottom-mid{grid-column:2/4;grid-row:3;}
+#bottom-right{grid-column:4/-1;grid-row:3;}
+/* glitch text effect */
+.glitch{
+  position:relative;
+  display:inline-block;
+}
+.glitch::before,.glitch::after{
+  content:attr(data-text);
+  position:absolute;
+  top:0;left:0;
+  width:100%;
+  overflow:hidden;
+  color:var(--red);
+  clip-path:inset(0 0 60% 0);
+}
+.glitch::after{
+  color:var(--blue);
+  clip-path:inset(60% 0 0 0);
+  transform:translateX(-2px);
+}
+.glitch:hover::before{
+  animation:glitch-top 0.3s steps(2) infinite;
+}
+.glitch:hover::after{
+  animation:glitch-bot 0.3s steps(2) infinite;
+}
+@keyframes glitch-top{
+  0%{clip-path:inset(0 0 60% 0);transform:translateX(2px)}
+  50%{clip-path:inset(10% 0 50% 0);transform:translateX(-2px)}
+  100%{clip-path:inset(5% 0 55% 0);transform:translateX(1px)}
+}
+@keyframes glitch-bot{
+  0%{clip-path:inset(60% 0 0 0);transform:translateX(-2px)}
+  50%{clip-path:inset(55% 0 5% 0);transform:translateX(2px)}
+  100%{clip-path:inset(62% 0 0 0);transform:translateX(-1px)}
+}
+/* number counter */
+.counter{
+  font-size:clamp(1.5rem,3.5vw,2.8rem);
+  color:var(--red);
+  letter-spacing:0.05em;
+  text-shadow:0 0 15px rgba(232,49,42,0.5);
+}
+.counter-label{
+  font-size:0.6rem;
+  letter-spacing:0.2em;
+  color:#556;
+  text-transform:uppercase;
+}
+/* bottom bar */
+#footer{
+  padding:0.5rem 1.5rem;
+  border-top:1px solid rgba(255,255,255,0.06);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-shrink:0;
+  font-size:0.58rem;
+  color:#444455;
+  letter-spacing:0.15em;
+}
+#history-link{
+  color:#333344;
+  text-decoration:none;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  font-size:0.55rem;
+  transition:color 0.3s;
+}
+#history-link:hover{color:#8888aa;}
+/* scan line sweep */
+#scanline{
+  position:fixed;
+  top:0;left:0;width:100%;height:3px;
+  background:rgba(255,255,255,0.02);
+  z-index:5;
+  pointer-events:none;
+  animation:scan 8s linear infinite;
+}
+@keyframes scan{
+  from{top:-3px}
+  to{top:100%}
+}
+/* disruption overlay on mouse move */
+#disrupt{
+  position:fixed;
+  top:0;left:0;width:100%;height:100%;
+  pointer-events:none;
+  z-index:6;
+  opacity:0;
+  background:rgba(232,49,42,0.03);
+  transition:opacity 0.1s;
+}
+/* noise canvas pulse */
+.noise-flash{
+  animation:flashNoise 0.1s ease-out;
+}
+@keyframes flashNoise{
+  0%{opacity:1}50%{opacity:0.6}100%{opacity:1}
+}
+/* live bar */
+.live-bar{
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  margin-bottom:0.3rem;
+}
+.live-dot{
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--red);
+  animation:blink 0.8s step-end infinite;
+  flex-shrink:0;
+}
+.live-text{
+  font-size:0.55rem;
+  letter-spacing:0.25em;
+  color:var(--red);
+  text-transform:uppercase;
+}
+/* scroll text panels */
+.scroll-text{
+  flex:1;
+  overflow:hidden;
+  mask-image:linear-gradient(to bottom,transparent,black 15%,black 85%,transparent);
+  -webkit-mask-image:linear-gradient(to bottom,transparent,black 15%,black 85%,transparent);
+}
+.scroll-inner{
+  animation:scrollUp 18s linear infinite;
+}
+.scroll-inner:hover{animation-play-state:paused;}
+.scroll-item{
+  font-size:0.65rem;
+  line-height:1.7;
+  color:#666677;
+  padding:0.2rem 0;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.scroll-item .s-head{
+  color:var(--white);
+  display:block;
+  font-size:0.68rem;
+}
+@keyframes scrollUp{
+  from{transform:translateY(0)}
+  to{transform:translateY(-50%)}
+}
+/* earth hour counter */
+#eh-ring{
+  width:80px;height:80px;
+  margin:0 auto;
+  position:relative;
+  flex-shrink:0;
+}
+#eh-ring svg{transform:rotate(-90deg);}
+#eh-ring .track{fill:none;stroke:#1a1a22;stroke-width:4;}
+#eh-ring .fill{
+  fill:none;
+  stroke:var(--green);
+  stroke-width:4;
+  stroke-linecap:round;
+  stroke-dasharray:226;
+  stroke-dashoffset:226;
+  animation:ringFill 4s ease 1s forwards;
+  filter:drop-shadow(0 0 4px var(--green));
+}
+@keyframes ringFill{
+  to{stroke-dashoffset:0}
+}
+.ring-label{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-size:0.55rem;
+  letter-spacing:0.1em;
+  color:var(--green);
+  text-align:center;
+  line-height:1.3;
+  white-space:nowrap;
+}
+/* protest count animation */
+@keyframes countUp{
+  from{opacity:0;transform:translateY(4px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.count-anim{animation:countUp 0.5s ease forwards;}
 </style>
 </head>
 <body>
 
-<canvas id="sky"></canvas>
-
-<div id="petal-layer"></div>
+<canvas id="noise-bg"></canvas>
+<div id="crt-overlay"></div>
+<div id="vignette"></div>
+<div id="scanline"></div>
+<div id="disrupt"></div>
 
 <div id="ui">
-  <div id="headline">Earth Hour</div>
-  <div id="sub">March 28, 2026 · The Stars Remember</div>
-  <div id="clock">--:--:--</div>
-  <div id="date-line">Saturday · Day One · First Light of This Site</div>
-  <div id="earth-hour-badge">🌍 Switch off. Look up. Breathe.</div>
+  <!-- HEADER -->
+  <div id="header">
+    <span id="broadcast-label">● LIVE BROADCAST</span>
+    <span id="date-stamp">SAT  28.MAR.2026  //  DAY 29</span>
+    <span id="signal-strength" id="sig">SIG ▓▓▓▓░░  67%</span>
+  </div>
+
+  <!-- TICKER -->
+  <div id="ticker-wrap">
+    <div id="ticker">
+      ◈ NO KINGS DAY — 3,000+ RALLIES ACROSS AMERICA — UP TO 9M EXPECTED ◈ US-ISRAEL WAR ON IRAN ENTERS MONTH 2 — IRAN WARNS "HEAVY PRICE" ◈ EARTH HOUR — LIGHTS OFF 20:30 LOCAL ◈ FIGURE SKATING WORLDS IN PRAGUE — FINALS TODAY ◈ KENYA: 8,000 TONNES OF TEA TRAPPED AT MOMBASA PORT ◈ TRUMP: "VERY DISAPPOINTED" WITH NATO ◈ IRAN: NO RADIOACTIVE LEAK AFTER NUCLEAR FACILITY STRIKES ◈ HOUTHIS WARN ENTRY IF ATTACKS CONTINUE ◈ 300+ US SOLDIERS WOUNDED SINCE FEB 28 ◈ MARKET THEATRE JOHANNESBURG CELEBRATES 50 YEARS ◈ WITKOFF: "TALKS WITH IRAN THIS WEEK" ◈ NO KINGS DAY — 3,000+ RALLIES ACROSS AMERICA — UP TO 9M EXPECTED ◈
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div id="main-area">
+    <!-- PANEL 1: NO KINGS DAY -->
+    <div class="panel" id="protest-panel">
+      <div class="live-bar"><div class="live-dot"></div><span class="live-text">Breaking</span></div>
+      <div class="panel-tag red">Domestic · Protest</div>
+      <div class="headline large glitch" data-text="NO KINGS DAY">NO KINGS DAY</div>
+      <div class="sub">Organizers expect the largest nationwide demonstration in U.S. history — 3,000+ events, crowds possibly reaching 9 million people. Flagship rally in Minneapolis.</div>
+      <div class="stat-line">
+        <span id="protest-counter" class="counter">9,000,000</span><br>
+        <span class="counter-label">estimated attendees nationwide</span>
+      </div>
+    </div>
+
+    <!-- V SEP -->
+    <div class="v-sep"></div>
+
+    <!-- PANEL 2: WAR IN IRAN -->
+    <div class="panel" id="war-panel">
+      <div class="live-bar"><div class="live-dot"></div><span class="live-text">Developing</span></div>
+      <div class="panel-tag red">Global · Conflict</div>
+      <div class="headline large glitch" data-text="WAR — DAY 29">WAR — DAY 29</div>
+      <div class="sub">US-Israel strikes on Iran enter second month. Tehran warns "heavy price." Talks expected this week. Iran denies radioactive leak at nuclear facilities.</div>
+      <div class="stat-line">
+        <span class="counter" style="font-size:clamp(1rem,2vw,1.8rem);">300+</span>
+        <span class="counter-label"> US soldiers wounded</span>
+      </div>
+    </div>
+
+    <!-- V SEP -->
+    <div class="v-sep"></div>
+
+    <!-- PANEL 3: CLOCK + EARTH HOUR -->
+    <div class="panel" id="clock-panel">
+      <div class="panel-tag green">Local Time</div>
+      <div id="big-clock">--:--:--</div>
+      <div id="day-of">SATURDAY · MARCH 28 · 2026</div>
+      <div style="height:0.8rem"></div>
+      <div id="eh-ring">
+        <svg viewBox="0 0 80 80" width="80" height="80">
+          <circle class="track" cx="40" cy="40" r="36"/>
+          <circle class="fill" cx="40" cy="40" r="36"/>
+        </svg>
+        <div class="ring-label">EARTH<br>HOUR<br>20:30</div>
+      </div>
+      <div class="sub" style="text-align:center;margin-top:0.5rem;font-size:0.58rem;">Switch off. Look up.</div>
+    </div>
+
+    <!-- H SEP -->
+    <div class="h-sep"></div>
+
+    <!-- BOTTOM LEFT: Scroll feed -->
+    <div class="panel" id="bottom-left">
+      <div class="panel-tag blue">World Feed</div>
+      <div class="scroll-text">
+        <div class="scroll-inner" id="world-scroll">
+          <div class="scroll-item"><span class="s-head">Strait of Hormuz deadline extended</span>Trump delays Iran energy facility strikes by 10 days, citing ongoing talks.</div>
+          <div class="scroll-item"><span class="s-head">Saudi Arabia: US troops wounded</span>Iranian strike on air base wounds several US service members.</div>
+          <div class="scroll-item"><span class="s-head">Israel expands Lebanon ground war</span>Israeli troops enter Khiam, push toward Litani River "security zone."</div>
+          <div class="scroll-item"><span class="s-head">World Bank pledges aid</span>Prepared to respond "at scale" to war's economic fallout on emerging markets.</div>
+          <div class="scroll-item"><span class="s-head">Houthis warn entry into war</span>Yemen rebels threaten involvement if Iran attacks continue.</div>
+          <div class="scroll-item"><span class="s-head">Figure Skating Worlds — Prague</span>Amber Glenn & Ilia Malinin contest final medals after Olympic disappointments.</div>
+          <div class="scroll-item"><span class="s-head">Market Theatre, Johannesburg</span>South Africa's iconic anti-apartheid theater marks 50 years of resistance.</div>
+          <div class="scroll-item"><span class="s-head">Measles surge: Mexico</span>Government targets 2.5M vaccinations per week amid tens of thousands of cases.</div>
+          <div class="scroll-item"><span class="s-head">TSA chaos at airports</span>Extreme lines leave passengers scrambling to rebook missed flights.</div>
+          <div class="scroll-item"><span class="s-head">Tea stranded at Mombasa</span>6–8K tonnes worth $24M blocked due to Red Sea conflict disruption.</div>
+          <!-- duplicate for seamless loop -->
+          <div class="scroll-item"><span class="s-head">Strait of Hormuz deadline extended</span>Trump delays Iran energy facility strikes by 10 days, citing ongoing talks.</div>
+          <div class="scroll-item"><span class="s-head">Saudi Arabia: US troops wounded</span>Iranian strike on air base wounds several US service members.</div>
+          <div class="scroll-item"><span class="s-head">Israel expands Lebanon ground war</span>Israeli troops enter Khiam, push toward Litani River "security zone."</div>
+          <div class="scroll-item"><span class="s-head">World Bank pledges aid</span>Prepared to respond "at scale" to war's economic fallout on emerging markets.</div>
+          <div class="scroll-item"><span class="s-head">Houthis warn entry into war</span>Yemen rebels threaten involvement if Iran attacks continue.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V SEP (bottom) -->
+    <div class="v-sep" style="grid-column:2;grid-row:3;"></div>
+
+    <!-- BOTTOM MID: Signal meter / noise art -->
+    <div class="panel" id="bottom-mid" style="grid-column:3;grid-row:3;align-items:center;justify-content:center;">
+      <div class="panel-tag" style="text-align:center;margin-bottom:0.5rem;">System Status</div>
+      <canvas id="mini-wave" width="200" height="60" style="width:100%;max-width:280px;opacity:0.7;"></canvas>
+      <div id="status-text" style="font-size:0.6rem;letter-spacing:0.2em;color:#444455;margin-top:0.6rem;text-align:center;">
+        SIGNAL DEGRADED · NOISE FLOOR ELEVATED
+      </div>
+      <div id="coord-display" style="font-size:0.55rem;letter-spacing:0.15em;color:#333344;margin-top:0.3rem;text-align:center;">
+        X:--- Y:---
+      </div>
+    </div>
+
+    <!-- V SEP -->
+    <div class="v-sep" style="grid-column:4;grid-row:3;"></div>
+
+    <!-- BOTTOM RIGHT: Today's full spectrum -->
+    <div class="panel" id="bottom-right">
+      <div class="panel-tag" style="color:var(--amber);">Also Today</div>
+      <div class="scroll-text" style="flex:1;">
+        <div class="scroll-inner" id="misc-scroll" style="animation-duration:14s;animation-direction:normal;">
+          <div class="scroll-item"><span class="s-head" style="color:var(--green);">🌍 Earth Hour</span>20:30 local time — turn off the lights.</div>
+          <div class="scroll-item"><span class="s-head" style="color:var(--amber);">🎪 Barnum & Bailey Day</span>Circus spirit on a chaotic Saturday.</div>
+          <div class="scroll-item"><span class="s-head" style="color:#c080ff;">♀ International Women in Music Day</span>Blast something loud.</div>
+          <div class="scroll-item"><span class="s-head">🐈 Respect Your Cat Day</span>They're watching all of this with detachment.</div>
+          <div class="scroll-item"><span class="s-head" style="color:var(--amber);">🎂 National Black Forest Cake Day</span>A small mercy.</div>
+          <div class="scroll-item"><span class="s-head">📚 Children's Picture Book Day</span>Show kids a gentler world.</div>
+          <div class="scroll-item"><span class="s-head">👫 Brothers & Sisters Day</span>Hold the people close to you.</div>
+          <!-- loop -->
+          <div class="scroll-item"><span class="s-head" style="color:var(--green);">🌍 Earth Hour</span>20:30 local time — turn off the lights.</div>
+          <div class="scroll-item"><span class="s-head" style="color:var(--amber);">🎪 Barnum & Bailey Day</span>Circus spirit on a chaotic Saturday.</div>
+          <div class="scroll-item"><span class="s-head" style="color:#c080ff;">♀ International Women in Music Day</span>Blast something loud.</div>
+          <div class="scroll-item"><span class="s-head">🐈 Respect Your Cat Day</span>They're watching all of this with detachment.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <span>SIGNAL/NOISE · MARCH 28 2026 · ALL FREQUENCIES MONITORED</span>
+    <span>MOVE CURSOR TO DISRUPT SIGNAL</span>
+    <a href="./history.html" id="history-link">archive</a>
+  </div>
 </div>
 
-<div id="hint">click anywhere · the sky listens</div>
-<a href="./history.html" id="history-link">history</a>
-
 <script>
-/* ─── STARFIELD ─── */
-const canvas = document.getElementById('sky');
-const ctx = canvas.getContext('2d');
-let W, H, stars = [], shooters = [], mouse = {x: 0.5, y: 0.5};
-const NUM_STARS = 340;
-
-function resize() {
-  W = canvas.width  = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-  initStars();
+/* ── NOISE BACKGROUND CANVAS ── */
+const nbg = document.getElementById('noise-bg');
+const nctx = nbg.getContext('2d');
+let NW, NH;
+function resizeNoise(){
+  NW = nbg.width = window.innerWidth;
+  NH = nbg.height = window.innerHeight;
 }
+resizeNoise();
+window.addEventListener('resize', resizeNoise);
 
-function rand(a, b) { return Math.random() * (b - a) + a; }
+let mouseX = 0.5, mouseY = 0.5;
+let disruptStrength = 0;
+const disrupt = document.getElementById('disrupt');
+const coordDisplay = document.getElementById('coord-display');
 
-function initStars() {
-  stars = [];
-  for (let i = 0; i < NUM_STARS; i++) {
-    stars.push({
-      x: rand(0, W),
-      y: rand(0, H),
-      r: rand(0.3, 2.2),
-      baseAlpha: rand(0.15, 0.85),
-      alpha: 0,
-      speed: rand(0.0003, 0.002),
-      phase: rand(0, Math.PI * 2),
-      hue: rand(200, 260),
-      color: Math.random() < 0.08 ? 'gold' : (Math.random() < 0.05 ? 'pink' : 'white'),
-    });
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX / window.innerWidth;
+  mouseY = e.clientY / window.innerHeight;
+  disruptStrength = Math.min(1, disruptStrength + 0.15);
+  disrupt.style.opacity = (disruptStrength * 0.4).toString();
+  coordDisplay.textContent = `X:${String(Math.round(e.clientX)).padStart(4,'0')}  Y:${String(Math.round(e.clientY)).padStart(4,'0')}`;
+});
+
+let noiseT = 0;
+function drawNoise(){
+  noiseT += 0.016;
+  disruptStrength *= 0.92;
+  disrupt.style.opacity = (disruptStrength * 0.4).toString();
+
+  nctx.clearRect(0,0,NW,NH);
+
+  // base very dark bg
+  nctx.fillStyle = '#050507';
+  nctx.fillRect(0,0,NW,NH);
+
+  // subtle noise grain — draw randomly scattered dim pixels
+  const grain = nctx.createImageData(NW, NH);
+  const d = grain.data;
+  const noiseAmount = 0.04 + disruptStrength * 0.12;
+  for(let i=0;i<d.length;i+=4){
+    if(Math.random() < noiseAmount){
+      const v = Math.random() * 30;
+      d[i]=v; d[i+1]=v; d[i+2]=v+5; d[i+3]=255;
+    }
   }
+  nctx.putImageData(grain,0,0);
+
+  // occasional horizontal scan glitch
+  if(disruptStrength > 0.3 && Math.random() < 0.2){
+    const y = Math.floor(Math.random() * NH);
+    const h2 = Math.floor(Math.random() * 4) + 1;
+    const shift = (Math.random() - 0.5) * 20 * disruptStrength;
+    nctx.save();
+    const slice = nctx.getImageData(0, y, NW, h2);
+    nctx.putImageData(slice, shift, y);
+    nctx.restore();
+  }
+
+  requestAnimationFrame(drawNoise);
 }
+drawNoise();
 
-function spawnShooter() {
-  shooters.push({
-    x: rand(0, W * 0.7),
-    y: rand(0, H * 0.4),
-    len: rand(80, 200),
-    speed: rand(6, 14),
-    angle: Math.PI / 5,
-    alpha: 1,
-    life: 1,
-  });
-}
+/* ── MINI WAVEFORM CANVAS ── */
+const mwave = document.getElementById('mini-wave');
+const mctx = mwave.getContext('2d');
+let waveT = 0;
 
-let t = 0;
-function drawFrame() {
-  t += 0.016;
-  ctx.clearRect(0, 0, W, H);
+function drawWave(){
+  waveT += 0.04;
+  const W = mwave.width, H = mwave.height;
+  mctx.clearRect(0,0,W,H);
 
-  // deep gradient sky
-  const grad = ctx.createRadialGradient(W*0.5, H*0.4, 0, W*0.5, H*0.5, Math.max(W,H)*0.75);
-  grad.addColorStop(0, '#0f0f22');
-  grad.addColorStop(0.5, '#08080f');
-  grad.addColorStop(1, '#04040a');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
+  // background
+  mctx.fillStyle = '#08080f';
+  mctx.fillRect(0,0,W,H);
 
-  // subtle aurora band
-  const auroraY = H * 0.28 + Math.sin(t * 0.3) * 30;
-  const aurora = ctx.createLinearGradient(0, auroraY - 80, 0, auroraY + 80);
-  aurora.addColorStop(0, 'rgba(60,180,120,0)');
-  aurora.addColorStop(0.4, 'rgba(60,180,120,0.025)');
-  aurora.addColorStop(0.6, 'rgba(80,140,200,0.03)');
-  aurora.addColorStop(1, 'rgba(80,140,200,0)');
-  ctx.fillStyle = aurora;
-  ctx.fillRect(0, auroraY - 80, W, 160);
+  // multiple signal lines
+  const lines = [
+    {color:'rgba(32,160,240,0.7)', freq:1.2, amp:10, phase:0},
+    {color:'rgba(46,232,122,0.4)', freq:2.3, amp:6, phase:1.1},
+    {color:'rgba(232,49,42,0.3)', freq:0.7, amp:14, phase:2.2},
+  ];
 
-  // parallax stars
-  const dx = (mouse.x - 0.5) * 18;
-  const dy = (mouse.y - 0.5) * 10;
-
-  stars.forEach(s => {
-    const wave = Math.sin(t * s.speed * 60 + s.phase);
-    s.alpha = s.baseAlpha * (0.65 + 0.35 * wave);
-    ctx.save();
-    ctx.globalAlpha = s.alpha;
-    let col;
-    if (s.color === 'gold')  col = `hsl(45,90%,75%)`;
-    else if (s.color === 'pink') col = `hsl(340,80%,80%)`;
-    else col = `hsl(${s.hue},40%,90%)`;
-    ctx.fillStyle = col;
-    ctx.shadowBlur = s.r * 4;
-    ctx.shadowColor = col;
-    ctx.beginPath();
-    ctx.arc(s.x + dx * (s.r / 2.5), s.y + dy * (s.r / 2.5), s.r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+  lines.forEach(l => {
+    mctx.beginPath();
+    mctx.strokeStyle = l.color;
+    mctx.lineWidth = 1.5;
+    for(let x=0;x<W;x++){
+      const noise2 = (Math.random()-0.5)*2 * disruptStrength * 8;
+      const y = H/2
+        + Math.sin(x * 0.04 * l.freq + waveT + l.phase) * l.amp
+        + Math.sin(x * 0.1 + waveT * 1.7 + l.phase) * 3
+        + noise2;
+      if(x===0) mctx.moveTo(x,y);
+      else mctx.lineTo(x,y);
+    }
+    mctx.stroke();
   });
 
-  // shooting stars
-  shooters = shooters.filter(sh => sh.life > 0);
-  shooters.forEach(sh => {
-    sh.life -= 0.018;
-    sh.x += Math.cos(sh.angle) * sh.speed;
-    sh.y += Math.sin(sh.angle) * sh.speed;
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, sh.life * sh.alpha);
-    const grad2 = ctx.createLinearGradient(
-      sh.x - Math.cos(sh.angle)*sh.len, sh.y - Math.sin(sh.angle)*sh.len,
-      sh.x, sh.y
-    );
-    grad2.addColorStop(0, 'rgba(255,255,220,0)');
-    grad2.addColorStop(1, 'rgba(255,255,220,0.9)');
-    ctx.strokeStyle = grad2;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(sh.x - Math.cos(sh.angle)*sh.len, sh.y - Math.sin(sh.angle)*sh.len);
-    ctx.lineTo(sh.x, sh.y);
-    ctx.stroke();
-    // tip glow
-    ctx.beginPath();
-    ctx.arc(sh.x, sh.y, 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,240,0.9)';
-    ctx.fill();
-    ctx.restore();
-  });
-
-  // Earth glow at bottom
-  const earthGrad = ctx.createRadialGradient(W*0.5, H*1.08, 0, W*0.5, H*1.05, H*0.5);
-  earthGrad.addColorStop(0, 'rgba(50,160,100,0.12)');
-  earthGrad.addColorStop(0.4, 'rgba(40,100,180,0.06)');
-  earthGrad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = earthGrad;
-  ctx.fillRect(0, 0, W, H);
-
-  requestAnimationFrame(drawFrame);
+  requestAnimationFrame(drawWave);
 }
+drawWave();
 
-// shooter timer
-setInterval(() => {
-  if (Math.random() < 0.55) spawnShooter();
-}, 2800);
-
-window.addEventListener('resize', resize);
-window.addEventListener('mousemove', e => {
-  mouse.x = e.clientX / W;
-  mouse.y = e.clientY / H;
-});
-
-window.addEventListener('click', e => {
-  // ripple
-  const r = document.createElement('div');
-  r.className = 'ripple';
-  r.style.left = e.clientX + 'px';
-  r.style.top  = e.clientY + 'px';
-  document.body.appendChild(r);
-  setTimeout(() => r.remove(), 1700);
-  // extra shooter
-  spawnShooter(); spawnShooter();
-});
-
-resize();
-drawFrame();
-
-/* ─── CLOCK ─── */
-function pad(n) { return String(n).padStart(2,'0'); }
-function tick() {
+/* ── CLOCK ── */
+function pad(n){return String(n).padStart(2,'0');}
+const bigClock = document.getElementById('big-clock');
+function tick(){
   const now = new Date();
-  document.getElementById('clock').textContent =
-    pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+  bigClock.textContent = pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
 }
 tick();
-setInterval(tick, 1000);
+setInterval(tick,1000);
 
-/* ─── PETALS ─── */
-const petalLayer = document.getElementById('petal-layer');
-const PETAL_COLORS = [
-  'rgba(249,180,200,0.55)', 'rgba(255,200,215,0.45)',
-  'rgba(240,160,185,0.5)',  'rgba(255,220,235,0.4)',
-  'rgba(200,220,255,0.35)'
-];
-
-function spawnPetal() {
-  const p = document.createElement('div');
-  p.className = 'petal';
-  const size = Math.random() * 10 + 6;
-  const left = Math.random() * 100;
-  const dur  = Math.random() * 12 + 10;
-  const delay = Math.random() * 8;
-  const col   = PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)];
-  p.style.cssText = `
-    width:${size}px; height:${size * 0.7}px;
-    left:${left}vw;
-    top: -20px;
-    background: ${col};
-    animation-duration: ${dur}s;
-    animation-delay: ${delay}s;
-    transform: rotate(${Math.random()*360}deg);
-  `;
-  petalLayer.appendChild(p);
-  setTimeout(() => p.remove(), (dur + delay) * 1000 + 500);
+/* ── SIGNAL STRENGTH FLUCTUATION ── */
+const sigEl = document.getElementById('signal-strength');
+const bars = ['▓','▓','▓','▓','░','░'];
+function updateSignal(){
+  const strength = Math.round(55 + Math.random()*30 + disruptStrength*(-25));
+  const filled = Math.round(strength/100*6);
+  let bar = '';
+  for(let i=0;i<6;i++) bar += i<filled ? '▓':'░';
+  sigEl.textContent = `SIG ${bar}  ${strength}%`;
+  sigEl.style.color = strength < 60 ? 'var(--red)' : 'var(--amber)';
 }
+setInterval(updateSignal,800);
 
-// initial burst then trickle
-for (let i = 0; i < 22; i++) spawnPetal();
-setInterval(spawnPetal, 900);
+/* ── RANDOM GLITCH ON HEADLINES ── */
+function scheduleGlitch(){
+  const headlines = document.querySelectorAll('.glitch');
+  const target = headlines[Math.floor(Math.random()*headlines.length)];
+  const orig = target.dataset.text;
+  const glitchChars = '░▒▓█▄▀■□▪▫';
+  let i = 0;
+  const iv = setInterval(()=>{
+    if(i>6){clearInterval(iv); target.textContent=orig; return;}
+    target.textContent = orig.split('').map((c,idx)=>
+      Math.random()<0.15 ? glitchChars[Math.floor(Math.random()*glitchChars.length)] : c
+    ).join('');
+    i++;
+  },60);
+  setTimeout(scheduleGlitch, 2000 + Math.random()*5000);
+}
+setTimeout(scheduleGlitch, 3000);
+
+/* ── PROTEST COUNTER ANIMATION ── */
+const protestCounter = document.getElementById('protest-counter');
+function animateCounter(el, target, duration){
+  const start = 0;
+  const step = Math.ceil(target / (duration/50));
+  let cur = 0;
+  const iv = setInterval(()=>{
+    cur = Math.min(cur + step, target);
+    el.textContent = cur.toLocaleString();
+    if(cur >= target) clearInterval(iv);
+  }, 50);
+}
+setTimeout(()=>animateCounter(protestCounter, 9000000, 3000), 1500);
+
+/* ── STATUS TEXT CYCLE ── */
+const statusMessages = [
+  'SIGNAL DEGRADED · NOISE FLOOR ELEVATED',
+  'ALL FREQUENCIES MONITORED',
+  'BROADCAST INTEGRITY: COMPROMISED',
+  'RECEIVING ON ALL CHANNELS',
+  'SOURCE: UNVERIFIED · TIMESTAMP: NOW',
+  'THIS IS NOT A TEST',
+];
+let msgIdx = 0;
+const statusText = document.getElementById('status-text');
+setInterval(()=>{
+  msgIdx = (msgIdx+1) % statusMessages.length;
+  statusText.style.opacity = '0';
+  setTimeout(()=>{
+    statusText.textContent = statusMessages[msgIdx];
+    statusText.style.opacity = '1';
+  }, 300);
+}, 3500);
+statusText.style.transition = 'opacity 0.3s';
+
+/* ── CLICK DISRUPTION ── */
+document.addEventListener('click', e=>{
+  disruptStrength = 1;
+  // brief flash
+  const flash = document.createElement('div');
+  flash.style.cssText = `
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(232,49,42,0.08);pointer-events:none;z-index:50;
+    animation:flashNoise 0.15s ease-out forwards;
+  `;
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),200);
+});
 </script>
 </body>
 </html>
