@@ -71,47 +71,86 @@ ${JSON.stringify(history.slice(-30), null, 2)}
 Reinvent the site completely. Search the web if you want inspiration.
 Output using the delimiter format specified in your instructions.`;
 
-// ── Run the agent ────────────────────────────────────────────────────────────
-console.log(`[404ever] Running agent for ${today}…`);
+// ── Dev mode (DEV_MODE=true skips the AI call entirely) ──────────────────────
+const DEV_MODE = process.env.DEV_MODE === "true";
 
-const client = new Anthropic();
+let title, mood, libraries, description, html;
 
-const response = await client.messages.create({
-  model: "claude-sonnet-4-6",
-  max_tokens: 16000,
-  tools: [{ type: "web_search_20250305", name: "web_search" }],
-  system: SYSTEM_PROMPT,
-  messages: [{ role: "user", content: userMessage }],
-});
+if (DEV_MODE) {
+  console.log(`[404ever] ⚡ DEV MODE — skipping AI agent`);
 
-// ── Extract result from response ─────────────────────────────────────────────
-const textBlock = response.content.findLast((b) => b.type === "text");
-if (!textBlock) throw new Error("No text block in response");
+  const ts = new Date().toISOString();
+  title = `DEV BUILD — ${ts}`;
+  mood = "debug";
+  libraries = [];
+  description = "Minimal test page generated without AI to verify the workflow.";
+  html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404ever · DEV</title>
+<style>
+  body { font-family: monospace; background: #0a0a0a; color: #0f0; margin: 0;
+         display: flex; flex-direction: column; align-items: center;
+         justify-content: center; min-height: 100vh; gap: 1rem; }
+  h1   { font-size: 1.4rem; margin: 0; }
+  .ts  { font-size: 0.85rem; opacity: 0.6; }
+  a    { color: #0f0; font-size: 0.75rem; opacity: 0.4; text-decoration: none; }
+  a:hover { opacity: 1; }
+</style>
+</head>
+<body>
+  <h1>⚡ DEV MODE</h1>
+  <div class="ts">${ts}</div>
+  <div class="ts">date: ${today}</div>
+  <a href="/history.html">history</a>
+</body>
+</html>`;
 
-console.log(`[404ever] stop_reason: ${response.stop_reason}`);
+} else {
+  // ── Run the AI agent ──────────────────────────────────────────────────────
+  console.log(`[404ever] Running agent for ${today}…`);
 
-const text = textBlock.text;
+  const client = new Anthropic();
 
-function parseField(text, field) {
-  const match = text.match(new RegExp(`^${field}:\\s*(.+)$`, "m"));
-  return match ? match[1].trim() : "";
+  const response = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 16000,
+    tools: [{ type: "web_search_20250305", name: "web_search" }],
+    system: SYSTEM_PROMPT,
+    messages: [{ role: "user", content: userMessage }],
+  });
+
+  // ── Extract result from response ────────────────────────────────────────────
+  const textBlock = response.content.findLast((b) => b.type === "text");
+  if (!textBlock) throw new Error("No text block in response");
+
+  console.log(`[404ever] stop_reason: ${response.stop_reason}`);
+
+  const text = textBlock.text;
+
+  function parseField(text, field) {
+    const match = text.match(new RegExp(`^${field}:\\s*(.+)$`, "m"));
+    return match ? match[1].trim() : "";
+  }
+
+  title = parseField(text, "TITLE");
+  mood = parseField(text, "MOOD");
+  const librariesRaw = parseField(text, "LIBRARIES");
+  description = parseField(text, "DESCRIPTION");
+  libraries = librariesRaw === "none" ? [] : librariesRaw.split(",").map((s) => s.trim()).filter(Boolean);
+
+  const htmlMatch = text.match(/---BEGIN_HTML---\s*([\s\S]*?)\s*---END_HTML---/);
+  if (!htmlMatch) {
+    console.error("Response text:\n", text);
+    throw new Error("Could not find ---BEGIN_HTML--- / ---END_HTML--- delimiters in response");
+  }
+  html = htmlMatch[1];
+
+  if (!title) throw new Error("Missing TITLE in response");
+  if (!html.trim().startsWith("<")) throw new Error("HTML does not look like HTML");
 }
-
-const title = parseField(text, "TITLE");
-const mood = parseField(text, "MOOD");
-const librariesRaw = parseField(text, "LIBRARIES");
-const description = parseField(text, "DESCRIPTION");
-const libraries = librariesRaw === "none" ? [] : librariesRaw.split(",").map((s) => s.trim()).filter(Boolean);
-
-const htmlMatch = text.match(/---BEGIN_HTML---\s*([\s\S]*?)\s*---END_HTML---/);
-if (!htmlMatch) {
-  console.error("Response text:\n", text);
-  throw new Error("Could not find ---BEGIN_HTML--- / ---END_HTML--- delimiters in response");
-}
-const html = htmlMatch[1];
-
-if (!title) throw new Error("Missing TITLE in response");
-if (!html.trim().startsWith("<")) throw new Error("HTML does not look like HTML");
 
 console.log(`[404ever] Title: "${title}"`);
 
