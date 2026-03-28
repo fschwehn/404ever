@@ -44,16 +44,16 @@ jobs:
         run: |
           git config user.name "404ever Agent"
           git config user.email "agent@404ever.art"
-          git add index.html history.json
-          git add archive/ 2>/dev/null || true
-          git commit -m "$(date +%Y-%m-%d): $(cat .agent_title)"
+          git add public/index.html public/history.json
+          git add public/archive/ 2>/dev/null || true
+          git commit -m "$(date +%Y-%m-%d): $(cat public/.agent_title)"
           git push
 
       - name: Upload to GitHub Pages
         if: vars.PUBLISH_GITHUB_PAGES == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: public
 
       - name: Deploy to GitHub Pages
         if: vars.PUBLISH_GITHUB_PAGES == 'true'

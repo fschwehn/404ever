@@ -35,14 +35,16 @@ The **history page** (`history.html`) is the one permanent, sacred feature. It i
 
 ```
 /
-├── index.html                  ← today's site (AI-generated daily)
-├── history.html                ← THE PERMANENT PAGE (never touched by agent)
-├── history.json                ← log of all past versions
-├── archive/
-│   ├── 2026-03-28.html
-│   └── ...                     ← every past version preserved
+├── public/                     ← web content (deployed to GitHub Pages)
+│   ├── index.html              ← today's site (AI-generated daily)
+│   ├── history.html            ← THE PERMANENT PAGE (never touched by agent)
+│   ├── history.json            ← log of all past versions
+│   └── archive/
+│       ├── 2026-03-28.html
+│       └── ...                 ← every past version preserved
 └── agent/
-    └── reinvent.js             ← the agent script
+    ├── reinvent.js             ← the agent script
+    └── prompts/                ← swappable system prompts (AGENT_PROMPT env var)
 └── .github/
     └── workflows/
         └── daily-reinvent.yml  ← the heartbeat
