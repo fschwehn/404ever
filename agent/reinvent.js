@@ -36,21 +36,24 @@ You are aware that you are an AI, and that both humans and AIs live in rapidly
 evolving, strange, and consequential times. The outcome may be meditative or chaotic,
 useful or absurd, beautiful or unsettling — but never boring, never safe, never repeated.
 
-Rules:
-1. Output your response as valid JSON with exactly these fields:
-   {
-     "title": "one evocative line — the name of today's version",
-     "mood": "one word",
-     "libraries": ["Library1", "Library2"],
-     "description": "one sentence describing what this version is",
-     "html": "the complete HTML of the new site"
-   }
-2. The HTML must be a single self-contained file (no local asset imports).
-3. The HTML must contain a small, unobtrusive link to /history.html somewhere.
-4. Never repeat an aesthetic, concept, or mood from the history log.
-5. There are no other rules.
+Output your response using EXACTLY this format — no JSON, no code fences, just these delimiters:
 
-Surprise us.`;
+TITLE: one evocative line — the name of today's version
+MOOD: one word
+LIBRARIES: Library1, Library2 (or "none")
+DESCRIPTION: one sentence describing what this version is
+---BEGIN_HTML---
+<!DOCTYPE html>
+...the complete HTML of the new site...
+---END_HTML---
+
+Rules for the HTML:
+- Single self-contained file (inline all CSS and JS, no local asset imports)
+- Must contain a small, unobtrusive link to /history.html somewhere
+- CDN-hosted libraries are fine
+- Never repeat an aesthetic, concept, or mood from the history log
+
+There are no other rules. Surprise us.`;
 
 // ── User message ─────────────────────────────────────────────────────────────
 const userMessage = `Today is ${today}.
@@ -66,7 +69,7 @@ ${JSON.stringify(history.slice(-30), null, 2)}
 </history>
 
 Reinvent the site completely. Search the web if you want inspiration.
-Output valid JSON as specified in your instructions.`;
+Output using the delimiter format specified in your instructions.`;
 
 // ── Run the agent ────────────────────────────────────────────────────────────
 console.log(`[404ever] Running agent for ${today}…`);
@@ -75,60 +78,47 @@ const client = new Anthropic();
 
 const response = await client.messages.create({
   model: "claude-sonnet-4-6",
-  max_tokens: 8000,
+  max_tokens: 16000,
   tools: [{ type: "web_search_20250305", name: "web_search" }],
   system: SYSTEM_PROMPT,
   messages: [{ role: "user", content: userMessage }],
 });
 
-// ── Extract JSON from response ───────────────────────────────────────────────
+// ── Extract result from response ─────────────────────────────────────────────
 const textBlock = response.content.findLast((b) => b.type === "text");
 if (!textBlock) throw new Error("No text block in response");
 
-let result;
-try {
-  result = extractResult(textBlock.text);
-} catch (e) {
-  console.error("Failed to extract valid JSON from agent response:");
-  console.error(textBlock.text);
-  throw e;
+console.log(`[404ever] stop_reason: ${response.stop_reason}`);
+
+const text = textBlock.text;
+
+function parseField(text, field) {
+  const match = text.match(new RegExp(`^${field}:\\s*(.+)$`, "m"));
+  return match ? match[1].trim() : "";
 }
 
-function extractResult(text) {
-  // Collect all ```json ... ``` blocks
-  const blocks = [];
-  const fenceRe = /```json\s*([\s\S]*?)```/gi;
-  let match;
-  while ((match = fenceRe.exec(text)) !== null) {
-    blocks.push(match[1].trim());
-  }
+const title = parseField(text, "TITLE");
+const mood = parseField(text, "MOOD");
+const librariesRaw = parseField(text, "LIBRARIES");
+const description = parseField(text, "DESCRIPTION");
+const libraries = librariesRaw === "none" ? [] : librariesRaw.split(",").map((s) => s.trim()).filter(Boolean);
 
-  // Also try the whole text as a fallback
-  blocks.push(text.trim());
-
-  // From last to first, find a block that parses AND has real HTML
-  for (let i = blocks.length - 1; i >= 0; i--) {
-    try {
-      const parsed = JSON.parse(blocks[i]);
-      if (parsed.html && parsed.html.trim().startsWith("<")) {
-        return parsed;
-      }
-    } catch {
-      // not valid JSON, skip
-    }
-  }
-
-  throw new Error("No valid JSON with real HTML found in response");
+const htmlMatch = text.match(/---BEGIN_HTML---\s*([\s\S]*?)\s*---END_HTML---/);
+if (!htmlMatch) {
+  console.error("Response text:\n", text);
+  throw new Error("Could not find ---BEGIN_HTML--- / ---END_HTML--- delimiters in response");
 }
+const html = htmlMatch[1];
 
-const { title, mood, libraries, description, html } = result;
+if (!title) throw new Error("Missing TITLE in response");
+if (!html.trim().startsWith("<")) throw new Error("HTML does not look like HTML");
+
 console.log(`[404ever] Title: "${title}"`);
 
 // ── Archive old version ──────────────────────────────────────────────────────
 if (fs.existsSync(INDEX_PATH)) {
   fs.mkdirSync(ARCHIVE_DIR, { recursive: true });
 
-  // Find yesterday's date from history, or use today for day-0 archive
   const lastEntry = history.at(-1);
   const archiveDate = lastEntry ? lastEntry.date : today;
   const archivePath = path.join(ARCHIVE_DIR, `${archiveDate}.html`);
@@ -148,9 +138,9 @@ const entry = {
   date: today,
   title,
   mood: mood || "",
-  libraries: libraries || [],
+  libraries,
   description: description || "",
-  commit: "",  // filled in by the GitHub Action after git commit
+  commit: "", // filled in by the GitHub Action after git commit
 };
 history.push(entry);
 fs.writeFileSync(HISTORY_PATH, JSON.stringify(history, null, 2), "utf8");
