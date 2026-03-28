@@ -6,5 +6,15 @@
     "libraries": [],
     "description": "A meditative generative canvas piece marking 47 years since Three Mile Island — radioactive green decay slowly bleeds into Martian red as particle systems simulate invisible loss, with live clocks counting time elapsed since the meltdown.",
     "commit": ""
+  },
+  {
+    "date": "2026-03-28",
+    "title": "THE BROADSHEET THAT CANNOT BE FOUND",
+    "mood": "insurgent",
+    "libraries": [
+      "GSAP"
+    ],
+    "description": "A living protest broadsheet — typeset in ink-black and newsprint-white — that reassembles its headlines every few seconds, weaving today's real events (antimatter on roads, time crystals, No Kings marches) into an ever-shifting front page that refuses to stay still.",
+    "commit": ""
   }
 ]

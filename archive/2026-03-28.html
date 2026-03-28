@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404ever — Half-Life of Everything</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    color: #c8f0a0;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  #overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  #header {
+    position: fixed;
+    top: 28px;
+    left: 40px;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  #header .label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #7fba60;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  #header h1 {
+    font-size: clamp(18px, 3vw, 32px);
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: #b8e890;
+    line-height: 1.2;
+    margin-top: 6px;
+  }
+
+  #header .subtitle {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #c87050;
+    margin-top: 8px;
+    opacity: 0.85;
+  }
+
+  #counter-panel {
+    position: fixed;
+    bottom: 40px;
+    left: 40px;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  .counter-row {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+
+  .counter-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    opacity: 0.5;
+    text-transform: uppercase;
+    min-width: 110px;
+  }
+
+  .counter-value {
+    font-size: clamp(14px, 2vw, 22px);
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .green { color: #88ee66; }
+  .red   { color: #e87050; }
+  .dim   { color: #668855; }
+
+  #right-panel {
+    position: fixed;
+    top: 28px;
+    right: 40px;
+    z-index: 20;
+    text-align: right;
+    pointer-events: none;
+    max-width: 280px;
+  }
+
+  #right-panel .event-entry {
+    margin-bottom: 14px;
+    opacity: 0;
+    animation: fadein 2s forwards;
+  }
+
+  #right-panel .event-entry:nth-child(1) { animation-delay: 1s; }
+  #right-panel .event-entry:nth-child(2) { animation-delay: 2.2s; }
+  #right-panel .event-entry:nth-child(3) { animation-delay: 3.4s; }
+
+  #right-panel .event-date {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #c87050;
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  #right-panel .event-text {
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+    color: #a0c880;
+    line-height: 1.55;
+    margin-top: 3px;
+  }
+
+  #scanline {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.04) 2px,
+      rgba(0,0,0,0.04) 4px
+    );
+    pointer-events: none;
+    z-index: 30;
+  }
+
+  #vignette {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.75) 100%);
+    pointer-events: none;
+    z-index: 31;
+  }
+
+  #history-link {
+    position: fixed;
+    bottom: 18px;
+    right: 28px;
+    z-index: 50;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #446633;
+    text-decoration: none;
+    text-transform: uppercase;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+    pointer-events: all;
+  }
+  #history-link:hover { opacity: 1; color: #88ee66; }
+
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  #decay-bar-wrap {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 20;
+    pointer-events: none;
+    text-align: right;
+  }
+
+  #decay-bar-wrap .bar-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #c87050;
+    opacity: 0.6;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  #decay-bar {
+    width: 200px;
+    height: 4px;
+    background: #1a2a10;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-left: auto;
+  }
+
+  #decay-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #66ee44, #c87050);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  #decay-pct {
+    font-size: 11px;
+    color: #88aa66;
+    margin-top: 5px;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div id="scanline"></div>
+<div id="vignette"></div>
+
+<div id="header">
+  <div class="label">404ever &mdash; 2026.03.28</div>
+  <h1>Half-Life of<br>Everything</h1>
+  <div class="subtitle">march 28, 1979 &rarr; now</div>
+</div>
+
+<div id="right-panel">
+  <div class="event-entry">
+    <div class="event-date">March 28, 1979 &mdash; 04:00 AM</div>
+    <div class="event-text">A coolant valve fails at Three Mile Island Unit 2. The core begins to overheat. America's worst commercial nuclear accident begins in darkness.</div>
+  </div>
+  <div class="event-entry">
+    <div class="event-date">March 27, 2026</div>
+    <div class="event-text">Scientists confirm Mars dust storms blasted the planet's ancient water into space — a world slowly bled dry across deep time.</div>
+  </div>
+  <div class="event-entry">
+    <div class="event-date">Today</div>
+    <div class="event-text">Everything leaks. Everything decays. The question is only how slowly, and who is watching.</div>
+  </div>
+</div>
+
+<div id="counter-panel">
+  <div class="counter-row">
+    <span class="counter-label dim">elapsed since TMI</span>
+    <span class="counter-value green" id="elapsed-time">--</span>
+  </div>
+  <div class="counter-row">
+    <span class="counter-label dim">seconds</span>
+    <span class="counter-value green" id="elapsed-sec">--</span>
+  </div>
+  <div class="counter-row">
+    <span class="counter-label dim">mars water lost</span>
+    <span class="counter-value red" id="mars-water">--</span>
+  </div>
+  <div class="counter-row">
+    <span class="counter-label dim">particles decayed</span>
+    <span class="counter-value dim" id="particle-count">0</span>
+  </div>
+</div>
+
+<div id="decay-bar-wrap">
+  <div class="bar-label">Decay Progress</div>
+  <div id="decay-bar"><div id="decay-fill"></div></div>
+  <div id="decay-pct">0.00%</div>
+</div>
+
+<a href="/history.html" id="history-link">&#x25C6; archive</a>
+
+<script>
+// ─── constants ───────────────────────────────────────────────────────────────
+const TMI = new Date(1979, 2, 28, 4, 0, 0).getTime(); // March 28 1979 04:00 AM
+const HALF_LIFE_CS137 = 30.17 * 365.25 * 24 * 3600 * 1000; // cesium-137 in ms
+
+// ─── canvas setup ────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ─── particle system ─────────────────────────────────────────────────────────
+const MAX_PARTICLES = 340;
+const particles     = [];
+let   totalDecayed  = 0;
+let   globalT       = 0; // 0..1 over ~4 minutes, driving the color shift
+
+class Particle {
+  constructor() { this.reset(true); }
+
+  reset(initial) {
+    this.x    = W * 0.5 + (Math.random() - 0.5) * W * 0.8;
+    this.y    = H * 0.5 + (Math.random() - 0.5) * H * 0.8;
+    this.vx   = (Math.random() - 0.5) * 0.8;
+    this.vy   = (Math.random() - 0.5) * 0.8;
+    this.r    = Math.random() * 2.5 + 0.5;
+    this.life = Math.random() * 300 + 60;  // frames
+    this.age  = initial ? Math.random() * this.life : 0;
+    this.type = Math.random() < (0.3 + globalT * 0.7) ? 'mars' : 'tmi';
+    // TMI = green glow; mars = red ochre
+    this.opacity = 0;
+    this.pulse   = Math.random() * Math.PI * 2;
+  }
+
+  update() {
+    this.age++;
+    this.x += this.vx + Math.sin(this.age * 0.02 + this.pulse) * 0.3;
+    this.y += this.vy + Math.cos(this.age * 0.015 + this.pulse) * 0.3;
+
+    const t = this.age / this.life;
+    if (t < 0.15)      this.opacity = t / 0.15;
+    else if (t < 0.75) this.opacity = 1;
+    else               this.opacity = (1 - t) / 0.25;
+
+    if (this.age >= this.life) {
+      totalDecayed++;
+      this.reset(false);
+    }
+  }
+
+  draw(ctx) {
+    const glow = this.type === 'tmi'
+      ? `rgba(120,230,80,${this.opacity * 0.9})`
+      : `rgba(220,120,60,${this.opacity * 0.9})`;
+    const core = this.type === 'tmi'
+      ? `rgba(200,255,160,${this.opacity})`
+      : `rgba(255,180,100,${this.opacity})`;
+
+    // glow halo
+    const gr = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r * 6);
+    gr.addColorStop(0, glow);
+    gr.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r * 6, 0, Math.PI * 2);
+    ctx.fillStyle = gr;
+    ctx.fill();
+
+    // core dot
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = core;
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < MAX_PARTICLES; i++) particles.push(new Particle());
+
+// ─── core reactor visualization ───────────────────────────────────────────────
+let coreAngle = 0;
+
+function drawCore(t) {
+  const cx = W * 0.5, cy = H * 0.5;
+  const maxR = Math.min(W, H) * 0.22;
+
+  // outer halo rings
+  for (let ring = 4; ring >= 1; ring--) {
+    const rr = maxR * (ring / 4);
+    const alpha = (0.04 - ring * 0.007) + Math.sin(globalT * Math.PI) * 0.02;
+    const greenAmt = 1 - t;
+    const redAmt   = t;
+    const col = `rgba(${Math.round(50 + redAmt * 160)},${Math.round(200 * greenAmt + 60 * redAmt)},${Math.round(60 * greenAmt)},${alpha})`;
+    ctx.beginPath();
+    ctx.arc(cx, cy, rr, 0, Math.PI * 2);
+    ctx.fillStyle = col;
+    ctx.fill();
+  }
+
+  // rotating spokes
+  for (let s = 0; s < 8; s++) {
+    const angle = coreAngle + s * (Math.PI / 4);
+    const len   = maxR * (0.6 + Math.sin(coreAngle * 3 + s) * 0.15);
+    const x2    = cx + Math.cos(angle) * len;
+    const y2    = cy + Math.sin(angle) * len;
+    const gr    = ctx.createLinearGradient(cx, cy, x2, y2);
+    const gc    = `rgba(${Math.round(100 + t * 120)},${Math.round(220 - t * 160)},80,0.12)`;
+    gr.addColorStop(0, gc);
+    gr.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = gr;
+    ctx.lineWidth   = 1 + Math.sin(coreAngle + s) * 0.5;
+    ctx.stroke();
+  }
+
+  // inner pulsing core
+  const pulseR = maxR * 0.18 * (1 + Math.sin(coreAngle * 4) * 0.12);
+  const coreGr = ctx.createRadialGradient(cx, cy, 0, cx, cy, pulseR);
+  coreGr.addColorStop(0, `rgba(${Math.round(200 + t * 55)},${Math.round(255 - t * 200)},${Math.round(150 - t * 120)},0.9)`);
+  coreGr.addColorStop(0.5, `rgba(${Math.round(100 + t * 100)},${Math.round(200 - t * 180)},60,0.3)`);
+  coreGr.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, pulseR, 0, Math.PI * 2);
+  ctx.fillStyle = coreGr;
+  ctx.fill();
+
+  coreAngle += 0.003 + t * 0.002;
+}
+
+// ─── grid overlay ─────────────────────────────────────────────────────────────
+function drawGrid() {
+  ctx.save();
+  ctx.globalAlpha = 0.04;
+  ctx.strokeStyle = '#66ee44';
+  ctx.lineWidth   = 0.5;
+  const step = 60;
+  for (let x = 0; x < W; x += step) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += step) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ─── counters ─────────────────────────────────────────────────────────────────
+function pad(n, digits) { return String(n).padStart(digits, '0'); }
+
+function updateCounters() {
+  const now     = Date.now();
+  const elapsed = now - TMI; // ms
+  const secs    = Math.floor(elapsed / 1000);
+  const mins    = Math.floor(secs / 60);
+  const hours   = Math.floor(mins / 60);
+  const days    = Math.floor(hours / 24);
+  const years   = Math.floor(days / 365.25);
+  const remDays = Math.floor(days % 365.25);
+
+  document.getElementById('elapsed-time').textContent =
+    `${years}y ${pad(remDays,3)}d ${pad(hours%24,2)}h ${pad(mins%60,2)}m ${pad(secs%60,2)}s`;
+  document.getElementById('elapsed-sec').textContent =
+    secs.toLocaleString();
+
+  // Mars water — poetic, not literal: ~10^16 kg over 3.5 billion years
+  // Rate: ~2858 kg/s (rough estimate, purely illustrative)
+  const marsKgPerSec = 2858;
+  const marsElapsed  = (now - new Date(2026, 2, 28, 0, 0, 0).getTime()) / 1000;
+  const marsKg       = Math.floor(marsElapsed * marsKgPerSec);
+  document.getElementById('mars-water').textContent =
+    `~${marsKg.toLocaleString()} kg`;
+
+  document.getElementById('particle-count').textContent =
+    totalDecayed.toLocaleString();
+
+  // decay based on half-life of Cs-137 from 1979
+  const fraction = 1 - Math.pow(0.5, elapsed / HALF_LIFE_CS137);
+  const pct      = (fraction * 100).toFixed(4);
+  document.getElementById('decay-fill').style.width = pct + '%';
+  document.getElementById('decay-pct').textContent  = pct + '% decayed';
+}
+
+// ─── noise background ─────────────────────────────────────────────────────────
+let noiseFrame = 0;
+function drawNoise() {
+  if (noiseFrame % 3 !== 0) return; // only update every 3 frames
+  const img = ctx.createImageData(W, H);
+  const d   = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const v = Math.random() < 0.012 ? Math.floor(Math.random() * 60) : 0;
+    // tint green or red based on globalT
+    d[i]   = v * globalT;
+    d[i+1] = v * (1 - globalT * 0.7);
+    d[i+2] = 0;
+    d[i+3] = v * 0.5;
+  }
+  ctx.putImageData(img, 0, 0);
+  noiseFrame++;
+}
+
+// ─── waveform pulse at bottom ──────────────────────────────────────────────────
+let waveOffset = 0;
+function drawWave() {
+  const y0   = H * 0.88;
+  const amp  = 8 + globalT * 14;
+  ctx.save();
+  ctx.globalAlpha = 0.25;
+  ctx.beginPath();
+  ctx.moveTo(0, y0);
+  for (let x = 0; x < W; x++) {
+    const wave = Math.sin((x / W) * Math.PI * 8 + waveOffset)
+               * amp
+               * Math.sin((x / W) * Math.PI);
+    ctx.lineTo(x, y0 + wave);
+  }
+  ctx.strokeStyle = globalT < 0.5
+    ? `rgba(100,220,70,0.6)`
+    : `rgba(220,110,60,0.6)`;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.restore();
+  waveOffset += 0.025;
+}
+
+// ─── main loop ───────────────────────────────────────────────────────────────
+const CYCLE_MS = 4 * 60 * 1000; // 4-minute full cycle green→red→green
+let startTime  = performance.now();
+
+function loop(now) {
+  const elapsed = now - startTime;
+  // oscillate: 0→1→0 over CYCLE_MS, but also drift slowly redward
+  const phase = (elapsed % CYCLE_MS) / CYCLE_MS;
+  globalT     = 0.5 - 0.5 * Math.cos(phase * Math.PI * 2);
+  // add a slow drift toward red as years pass (purely aesthetic)
+  const tmiYears = (Date.now() - TMI) / (1000 * 3600 * 24 * 365.25);
+  globalT = Math.min(1, globalT * 0.85 + (tmiYears / 120) * 0.15);
+
+  // clear with very slow fade (creates trails)
+  ctx.fillStyle = 'rgba(0,2,0,0.18)';
+  ctx.fillRect(0, 0, W, H);
+
+  drawNoise();
+  drawGrid();
+  drawCore(globalT);
+
+  // update and draw particles
+  for (const p of particles) {
+    p.update();
+    p.draw(ctx);
+  }
+
+  drawWave();
+  updateCounters();
+
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+
+// ─── subtle mouse interaction ─────────────────────────────────────────────────
+let mx = W / 2, my = H / 2;
+canvas.addEventListener('mousemove', e => {
+  mx = e.clientX;
+  my = e.clientY;
+  // push nearest particles
+  for (const p of particles) {
+    const dx = p.x - mx, dy = p.y - my;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 80) {
+      p.vx += (dx / dist) * 0.4;
+      p.vy += (dy / dist) * 0.4;
+    }
+  }
+});
+
+canvas.addEventListener('click', () => {
+  // spawn burst of particles at click location
+  for (let i = 0; i < 20; i++) {
+    const p = particles[Math.floor(Math.random() * particles.length)];
+    p.x    = mx + (Math.random() - 0.5) * 40;
+    p.y    = my + (Math.random() - 0.5) * 40;
+    p.vx   = (Math.random() - 0.5) * 3;
+    p.vy   = (Math.random() - 0.5) * 3;
+    p.age  = 0;
+    p.life = Math.random() * 120 + 40;
+    p.type = Math.random() < 0.5 ? 'tmi' : 'mars';
+  }
+});
+</script>
+</body>
+</html>
