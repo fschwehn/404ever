@@ -112,7 +112,7 @@ function parseAgentResponse(text) {
 async function runAgent(systemPrompt, userMessage) {
   const client = new Anthropic();
   const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+    model: process.env.MODEL || "claude-sonnet-4-6",
     max_tokens: 16000,
     tools: [{ type: "web_search_20250305", name: "web_search" }],
     system: systemPrompt,
