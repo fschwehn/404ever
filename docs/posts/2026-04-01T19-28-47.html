@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mondfahrt — 1. April 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0a0e27 100%);
+    font-family: 'Courier New', monospace;
+    color: #fff;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .container {
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    width: 90%;
+    max-width: 800px;
+  }
+  
+  .orbit {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 300px;
+    border: 2px solid rgba(255, 180, 120, 0.2);
+    border-radius: 50%;
+    z-index: 1;
+  }
+  
+  .orbit.two {
+    width: 450px;
+    height: 450px;
+    border-color: rgba(100, 200, 255, 0.15);
+    animation: rotate 40s linear infinite;
+  }
+  
+  .orbit.three {
+    width: 600px;
+    height: 600px;
+    border-color: rgba(255, 100, 150, 0.1);
+    animation: rotate 60s linear infinite reverse;
+  }
+  
+  @keyframes rotate {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+  
+  .moon {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle at 30% 30%, #e8e8e8, #a0a0a0);
+    border-radius: 50%;
+    top: 10%;
+    right: 5%;
+    box-shadow: 0 0 80px rgba(232, 232, 232, 0.3);
+    z-index: 2;
+  }
+  
+  .rocket {
+    position: fixed;
+    width: 40px;
+    height: 100px;
+    bottom: 8%;
+    left: 5%;
+    z-index: 3;
+    animation: launch 2s ease-in-out infinite;
+  }
+  
+  .rocket-body {
+    width: 40px;
+    height: 70px;
+    background: linear-gradient(to right, #ff6b35, #ff9500);
+    border-radius: 10px 10px 5px 5px;
+    position: relative;
+  }
+  
+  .rocket-tip {
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 30px solid #ff3333;
+    margin: -5px auto 0;
+  }
+  
+  .rocket-flame {
+    width: 30px;
+    height: 40px;
+    background: linear-gradient(to bottom, #ffaa00, #ff6600, transparent);
+    margin: 0 auto;
+    opacity: 0.8;
+    animation: flicker 0.1s infinite;
+  }
+  
+  @keyframes launch {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+  }
+  
+  @keyframes flicker {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+  
+  h1 {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #ffb878;
+    text-shadow: 0 0 40px rgba(255, 184, 120, 0.6);
+    letter-spacing: 3px;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { text-shadow: 0 0 40px rgba(255, 184, 120, 0.6); }
+    50% { text-shadow: 0 0 80px rgba(255, 184, 120, 1); }
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+    color: #64c8ff;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  
+  .countdown {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 30px 0;
+    color: #64ff96;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 4px;
+    animation: countdownPulse 1s ease-in-out infinite;
+  }
+  
+  @keyframes countdownPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  
+  .info {
+    margin-top: 40px;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #b0d0ff;
+    text-align: left;
+    background: rgba(10, 14, 39, 0.5);
+    padding: 20px;
+    border-left: 3px solid #ff6b35;
+  }
+  
+  .info-line {
+    margin: 8px 0;
+  }
+  
+  .label {
+    color: #ffb878;
+    font-weight: bold;
+  }
+  
+  .corner-text {
+    position: fixed;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 184, 120, 0.3);
+    z-index: 5;
+  }
+  
+  .tl { top: 20px; left: 20px; }
+  .br { bottom: 20px; right: 20px; }
+  
+  .history-link {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.65rem;
+    color: rgba(255, 184, 120, 0.25);
+    text-decoration: none;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    z-index: 200;
+    transition: color 0.3s;
+  }
+  
+  .history-link:hover {
+    color: rgba(255, 184, 120, 0.6);
+  }
+  
+  .astronauts {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #64ff96;
+  }
+</style>
+</head>
+<body>
+
+<div class="orbit"></div>
+<div class="orbit two"></div>
+<div class="orbit three"></div>
+
+<div class="moon"></div>
+
+<div class="rocket">
+  <div class="rocket-tip"></div>
+  <div class="rocket-body"></div>
+  <div class="rocket-flame"></div>
+</div>
+
+<div class="corner-text tl">ARTEMIS II · MONDMISSION</div>
+<div class="corner-text br">1. APRIL 2026</div>
+
+<div class="container">
+  <h1>🚀 MONDFAHRT 🌙</h1>
+  <p class="subtitle">Menschheit kehrt zum Mond zurück</p>
+  
+  <div class="countdown" id="countdown">STARTZÜNDUNG IN...</div>
+  
+  <div class="info">
+    <div class="info-line">
+      <span class="label">STARTZEIT:</span> 18:24 EDT (Kennedy Space Center)
+    </div>
+    <div class="info-line">
+      <span class="label">FLUGDAUER:</span> 10 Tage um den Mond
+    </div>
+    <div class="info-line">
+      <span class="label">REKORD:</span> 252.000 Meilen — am weitesten jemals von der Erde
+    </div>
+    <div class="info-line">
+      <span class="label">LETZTE BEMANNTE MISSION:</span> Apollo 17, Dezember 1972 (54 Jahre)
+    </div>
+    <div class="astronauts">
+      <span class="label">BESATZUNG:</span><br>
+      Reid Wiseman · Victor Glover · Christina Koch · Jeremy Hansen
+    </div>
+  </div>
+</div>
+
+<a href="../history.html" class="history-link">verlauf</a>
+
+<script>
+  // Berechne Countdown
+  const launchTime = new Date('2026-04-01T18:24:00-04:00').getTime();
+  
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const distance = launchTime - now;
+    
+    if (distance < 0) {
+      document.getElementById('countdown').textContent = '🚀 ABHEBEN! 🚀';
+      return;
+    }
+    
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+    let display = '';
+    if (days > 0) display += days + 'd ';
+    if (hours > 0) display += hours + 'h ';
+    if (minutes > 0) display += minutes + 'm ';
+    display += seconds + 's';
+    
+    document.getElementById('countdown').textContent = display;
+  }
+  
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+</script>
+
+</body>
+</html>
