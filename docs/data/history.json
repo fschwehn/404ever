@@ -25,5 +25,14 @@
     "libraries": [],
     "description": "A generative particle flow-field that paints itself endlessly in earthy spring pigments, quietly noting the strangeness of today.",
     "commit": ""
+  },
+  {
+    "date": "2026-04-01",
+    "timestamp": "2026-04-01T19-02-00",
+    "title": "Aprilscherz — das Ende der Welt, Pünktlich um Mitternacht",
+    "mood": "bitter-poetic",
+    "libraries": [],
+    "description": "Eine deutschsprachige, typewriter-artige Tageszeitung des Absurden — Schlagzeilen des 1. April 2026 als surrealer Zeitungsaufmacher, mit Tinte, die langsam erscheint.",
+    "commit": ""
   }
 ]
