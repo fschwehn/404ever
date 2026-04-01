@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>244,036 miles away</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a080f;
+    --moon: #f5d0e0;
+    --glow: #d06090;
+    --text: #c8a0b8;
+    --dim: rgba(200, 160, 184, 0.35);
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+
+  /* star field */
+  body::before {
+    content:'';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(1px 1px at  8% 11%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 19%  3%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 31% 19%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 47%  7%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 62% 14%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 74%  4%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 22%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 93%  9%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at  5% 31%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 28% 38%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 28%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 71% 35%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 13% 58%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 65%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 78% 55%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at  3% 72%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 52% 79%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 88% 70%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 22% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 96% 83%, rgba(255,255,255,0.5) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .scene {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* The moon */
+  .moon-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin-bottom: 3rem;
+  }
+
+  .moon {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 36%,
+      #fff8fc 0%,
+      #f5d0e0 30%,
+      #e0a0c0 60%,
+      #b06080 100%
+    );
+    box-shadow:
+      0 0 40px 12px rgba(208, 96, 144, 0.3),
+      0 0 100px 40px rgba(208, 96, 144, 0.12),
+      0 0 200px 80px rgba(208, 96, 144, 0.05);
+    animation: breathe 5s ease-in-out infinite;
+    cursor: pointer;
+    transition: transform 0.6s ease;
+  }
+
+  .moon:hover {
+    transform: scale(1.04);
+  }
+
+  .moon:active {
+    transform: scale(0.97);
+  }
+
+  /* crater hints */
+  .moon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse 18px 12px at 58% 42%, rgba(160,80,110,0.18) 0%, transparent 100%),
+      radial-gradient(ellipse 10px 8px  at 35% 62%, rgba(160,80,110,0.13) 0%, transparent 100%),
+      radial-gradient(ellipse 14px 9px  at 70% 28%, rgba(160,80,110,0.10) 0%, transparent 100%);
+  }
+
+  @keyframes breathe {
+    0%, 100% {
+      box-shadow:
+        0 0 40px 12px rgba(208, 96, 144, 0.30),
+        0 0 100px 40px rgba(208, 96, 144, 0.12),
+        0 0 200px 80px rgba(208, 96, 144, 0.05);
+    }
+    50% {
+      box-shadow:
+        0 0 55px 20px rgba(208, 96, 144, 0.48),
+        0 0 130px 60px rgba(208, 96, 144, 0.18),
+        0 0 260px 110px rgba(208, 96, 144, 0.08);
+    }
+  }
+
+  /* ripple on click */
+  .ripple {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(208, 96, 144, 0.6);
+    animation: none;
+    pointer-events: none;
+  }
+
+  @keyframes rippleOut {
+    0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+    100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+  }
+
+  .ripple.go {
+    animation: rippleOut 1.2s ease-out forwards;
+  }
+
+  /* text block */
+  .label-top {
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 0.7rem;
+    text-align: center;
+  }
+
+  .distance {
+    font-size: clamp(1.6rem, 5vw, 2.6rem);
+    font-weight: 700;
+    color: var(--moon);
+    text-align: center;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .distance .unit {
+    font-size: 0.55em;
+    font-weight: 300;
+    color: var(--glow);
+    letter-spacing: 0.1em;
+    vertical-align: middle;
+    margin-left: 0.3em;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+    color: var(--dim);
+    text-align: center;
+    letter-spacing: 0.12em;
+    margin-bottom: 2.8rem;
+    text-transform: uppercase;
+  }
+
+  /* divider */
+  .divider {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--glow), transparent);
+    margin-bottom: 2rem;
+    opacity: 0.4;
+  }
+
+  /* breath instruction */
+  .breath-ring {
+    position: relative;
+    width: 48px; height: 48px;
+    margin-bottom: 0.9rem;
+  }
+
+  .breath-ring svg {
+    width: 48px; height: 48px;
+    animation: breathe-ring 5s ease-in-out infinite;
+  }
+
+  @keyframes breathe-ring {
+    0%, 100% { transform: scale(0.75); opacity: 0.3; }
+    50%       { transform: scale(1);    opacity: 0.9; }
+  }
+
+  .breath-text {
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-align: center;
+  }
+
+  /* date line */
+  .date-line {
+    position: fixed;
+    top: 1.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    z-index: 2;
+    white-space: nowrap;
+  }
+
+  /* peak time */
+  .peak {
+    position: fixed;
+    bottom: 2.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--dim);
+    z-index: 2;
+    text-align: center;
+    line-height: 2;
+    white-space: nowrap;
+  }
+
+  .peak span {
+    color: var(--text);
+  }
+
+  /* message popup */
+  .message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--moon);
+    text-align: center;
+    line-height: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    z-index: 10;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px var(--glow);
+  }
+
+  .message.show {
+    opacity: 1;
+  }
+
+  /* history */
+  .history-link {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    font-size: 0.58rem;
+    color: rgba(200, 160, 184, 0.2);
+    text-decoration: none;
+    z-index: 200;
+    letter-spacing: 0.1em;
+    transition: color 0.3s;
+  }
+  .history-link:hover { color: rgba(200, 160, 184, 0.6); }
+</style>
+</head>
+<body>
+
+<div class="date-line">april 1, 2026 &nbsp;·&nbsp; full moon</div>
+
+<div class="scene">
+  <div class="label-top">april pink moon</div>
+
+  <div class="moon-wrap">
+    <div class="moon" id="moon"></div>
+    <div class="ripple" id="ripple"></div>
+  </div>
+
+  <div class="distance">244,036<span class="unit">mi</span></div>
+  <div class="subtitle">from here to the moon tonight</div>
+
+  <div class="divider"></div>
+
+  <div class="breath-ring">
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="22" stroke="#d06090" stroke-width="1"/>
+      <circle cx="24" cy="24" r="14" stroke="#f5d0e0" stroke-width="0.5" opacity="0.5"/>
+    </svg>
+  </div>
+  <div class="breath-text" id="breathText">breathe in</div>
+</div>
+
+<div class="peak">
+  peak fullness &nbsp;<span>10:12 pm ET</span>&nbsp;·&nbsp; touch the moon
+</div>
+
+<div class="message" id="message"></div>
+
+<a href="../history.html" class="history-link">history</a>
+
+<script>
+  // breath cycle
+  const breathEl = document.getElementById('breathText');
+  const phases = [
+    { text: 'breathe in',  dur: 5000 },
+    { text: 'hold',        dur: 2000 },
+    { text: 'breathe out', dur: 5000 },
+    { text: 'rest',        dur: 2000 },
+  ];
+  let pi = 0;
+  function nextBreath() {
+    breathEl.textContent = phases[pi].text;
+    setTimeout(() => {
+      pi = (pi + 1) % phases.length;
+      nextBreath();
+    }, phases[pi].dur);
+  }
+  nextBreath();
+
+  // moon click
+  const moonEl = document.getElementById('moon');
+  const rippleEl = document.getElementById('ripple');
+  const msgEl = document.getElementById('message');
+
+  const msgs = [
+    'the world is loud tonight\nthe moon does not care',
+    'it has been here\nlonger than language',
+    'no rockets, no news feeds\njust gravity and light',
+    'in 1972 we walked on it\nwe haven\'t been back since',
+    'look up later\nit will be full at 10:12 pm',
+    'it\'s not actually pink\njust named for wild phlox blooms',
+    'the tide feels this too\nyou might also',
+    'stillness is not empty\nit is the whole thing',
+  ];
+  let mi = 0;
+  let msgTimer = null;
+
+  moonEl.addEventListener('click', () => {
+    // ripple
+    rippleEl.classList.remove('go');
+    void rippleEl.offsetWidth;
+    rippleEl.classList.add('go');
+
+    // message
+    msgEl.textContent = msgs[mi % msgs.length];
+    mi++;
+    msgEl.classList.add('show');
+    if (msgTimer) clearTimeout(msgTimer);
+    msgTimer = setTimeout(() => msgEl.classList.remove('show'), 3200);
+  });
+</script>
+</body>
+</html>
