@@ -1,419 +1,559 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>INTRODUCING: Nothing™</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700;900&display=swap');
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>INTRODUCING: Nothing™</title>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700;900&display=swap");
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
 
-  :root {
-    --pink: #ff4fcf;
-    --yellow: #ffe94f;
-    --cyan: #4fffff;
-    --bg: #0d0015;
-  }
+            :root {
+                --pink: #ff4fcf;
+                --yellow: #ffe94f;
+                --cyan: #4fffff;
+                --bg: #0d0015;
+            }
 
-  body {
-    background: var(--bg);
-    color: #fff;
-    font-family: 'Space Grotesk', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 2rem 1rem 4rem;
-    position: relative;
-  }
+            body {
+                background: var(--bg);
+                color: #fff;
+                font-family: "Space Grotesk", sans-serif;
+                min-height: 100vh;
+                overflow-x: hidden;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                padding: 2rem 1rem 4rem;
+                position: relative;
+            }
 
-  /* Stars */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(1px 1px at 12% 14%, #fff 0%, transparent 100%),
-      radial-gradient(1px 1px at 34% 7%, #fff 0%, transparent 100%),
-      radial-gradient(1px 1px at 67% 22%, #fff 0%, transparent 100%),
-      radial-gradient(1px 1px at 88% 5%, #fff 0%, transparent 100%),
-      radial-gradient(1px 1px at 45% 35%, #fff 0%, transparent 100%),
-      radial-gradient(1px 1px at 78% 45%, #fff 0%, transparent 100%),
-      radial-gradient(1px 1px at 23% 55%, #fff 0%, transparent 100%),
-      radial-gradient(1px 1px at 91% 60%, #fff 0%, transparent 100%),
-      radial-gradient(1px 1px at 5% 80%, #fff 0%, transparent 100%),
-      radial-gradient(1px 1px at 55% 75%, #fff 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
-  }
+            /* Stars */
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                background:
+                    radial-gradient(
+                        1px 1px at 12% 14%,
+                        #fff 0%,
+                        transparent 100%
+                    ),
+                    radial-gradient(
+                        1px 1px at 34% 7%,
+                        #fff 0%,
+                        transparent 100%
+                    ),
+                    radial-gradient(
+                        1px 1px at 67% 22%,
+                        #fff 0%,
+                        transparent 100%
+                    ),
+                    radial-gradient(
+                        1px 1px at 88% 5%,
+                        #fff 0%,
+                        transparent 100%
+                    ),
+                    radial-gradient(
+                        1px 1px at 45% 35%,
+                        #fff 0%,
+                        transparent 100%
+                    ),
+                    radial-gradient(
+                        1px 1px at 78% 45%,
+                        #fff 0%,
+                        transparent 100%
+                    ),
+                    radial-gradient(
+                        1px 1px at 23% 55%,
+                        #fff 0%,
+                        transparent 100%
+                    ),
+                    radial-gradient(
+                        1px 1px at 91% 60%,
+                        #fff 0%,
+                        transparent 100%
+                    ),
+                    radial-gradient(
+                        1px 1px at 5% 80%,
+                        #fff 0%,
+                        transparent 100%
+                    ),
+                    radial-gradient(
+                        1px 1px at 55% 75%,
+                        #fff 0%,
+                        transparent 100%
+                    );
+                pointer-events: none;
+                z-index: 0;
+            }
 
-  .moon {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #ffe0f0, #ff8fc0, #c04080);
-    box-shadow: 0 0 60px 20px rgba(255, 100, 180, 0.4);
-    margin: 1rem auto 0.5rem;
-    position: relative;
-    z-index: 1;
-    animation: moonpulse 3s ease-in-out infinite;
-  }
+            .moon {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                background: radial-gradient(
+                    circle at 35% 35%,
+                    #ffe0f0,
+                    #ff8fc0,
+                    #c04080
+                );
+                box-shadow: 0 0 60px 20px rgba(255, 100, 180, 0.4);
+                margin: 1rem auto 0.5rem;
+                position: relative;
+                z-index: 1;
+                animation: moonpulse 3s ease-in-out infinite;
+            }
 
-  @keyframes moonpulse {
-    0%, 100% { box-shadow: 0 0 60px 20px rgba(255,100,180,0.4); }
-    50% { box-shadow: 0 0 90px 35px rgba(255,100,180,0.7); }
-  }
+            @keyframes moonpulse {
+                0%,
+                100% {
+                    box-shadow: 0 0 60px 20px rgba(255, 100, 180, 0.4);
+                }
+                50% {
+                    box-shadow: 0 0 90px 35px rgba(255, 100, 180, 0.7);
+                }
+            }
 
-  .moon-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    color: var(--pink);
-    text-align: center;
-    text-transform: uppercase;
-    opacity: 0.7;
-    margin-bottom: 2.5rem;
-    position: relative;
-    z-index: 1;
-  }
+            .moon-label {
+                font-size: 0.65rem;
+                letter-spacing: 0.15em;
+                color: var(--pink);
+                text-align: center;
+                text-transform: uppercase;
+                opacity: 0.7;
+                margin-bottom: 2.5rem;
+                position: relative;
+                z-index: 1;
+            }
 
-  .badge {
-    display: inline-block;
-    background: var(--yellow);
-    color: #000;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.3em 0.8em;
-    border-radius: 2em;
-    margin-bottom: 1.2rem;
-    position: relative;
-    z-index: 1;
-    animation: wiggle 1.4s ease-in-out infinite;
-  }
+            .badge {
+                display: inline-block;
+                background: var(--yellow);
+                color: #000;
+                font-size: 0.7rem;
+                font-weight: 700;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                padding: 0.3em 0.8em;
+                border-radius: 2em;
+                margin-bottom: 1.2rem;
+                position: relative;
+                z-index: 1;
+                animation: wiggle 1.4s ease-in-out infinite;
+            }
 
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(-2deg); }
-    50% { transform: rotate(2deg); }
-  }
+            @keyframes wiggle {
+                0%,
+                100% {
+                    transform: rotate(-2deg);
+                }
+                50% {
+                    transform: rotate(2deg);
+                }
+            }
 
-  h1 {
-    font-size: clamp(2.8rem, 10vw, 6rem);
-    font-weight: 900;
-    text-align: center;
-    line-height: 1;
-    position: relative;
-    z-index: 1;
-    background: linear-gradient(90deg, var(--pink), var(--yellow), var(--cyan), var(--pink));
-    background-size: 200%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: slide-gradient 3s linear infinite;
-    margin-bottom: 0.6rem;
-  }
+            h1 {
+                font-size: clamp(2.8rem, 10vw, 6rem);
+                font-weight: 900;
+                text-align: center;
+                line-height: 1;
+                position: relative;
+                z-index: 1;
+                background: linear-gradient(
+                    90deg,
+                    var(--pink),
+                    var(--yellow),
+                    var(--cyan),
+                    var(--pink)
+                );
+                background-size: 200%;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: slide-gradient 3s linear infinite;
+                margin-bottom: 0.6rem;
+            }
 
-  @keyframes slide-gradient {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 200% 50%; }
-  }
+            @keyframes slide-gradient {
+                0% {
+                    background-position: 0% 50%;
+                }
+                100% {
+                    background-position: 200% 50%;
+                }
+            }
 
-  .trademark {
-    font-size: 1.2rem;
-    vertical-align: super;
-    -webkit-text-fill-color: var(--yellow);
-  }
+            .trademark {
+                font-size: 1.2rem;
+                vertical-align: super;
+                -webkit-text-fill-color: var(--yellow);
+            }
 
-  .tagline {
-    font-size: 1rem;
-    font-weight: 300;
-    color: rgba(255,255,255,0.55);
-    text-align: center;
-    max-width: 480px;
-    line-height: 1.6;
-    position: relative;
-    z-index: 1;
-    margin-bottom: 2.5rem;
-  }
+            .tagline {
+                font-size: 1rem;
+                font-weight: 300;
+                color: rgba(255, 255, 255, 0.55);
+                text-align: center;
+                max-width: 480px;
+                line-height: 1.6;
+                position: relative;
+                z-index: 1;
+                margin-bottom: 2.5rem;
+            }
 
-  .tagline em {
-    color: var(--cyan);
-    font-style: normal;
-    font-weight: 700;
-  }
+            .tagline em {
+                color: var(--cyan);
+                font-style: normal;
+                font-weight: 700;
+            }
 
-  .features {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    max-width: 700px;
-    width: 100%;
-    position: relative;
-    z-index: 1;
-    margin-bottom: 2.5rem;
-  }
+            .features {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 1rem;
+                max-width: 700px;
+                width: 100%;
+                position: relative;
+                z-index: 1;
+                margin-bottom: 2.5rem;
+            }
 
-  .feature {
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 1rem;
-    padding: 1.2rem 1rem;
-    background: rgba(255,255,255,0.04);
-    text-align: center;
-    transition: transform 0.2s, background 0.2s;
-    cursor: default;
-  }
+            .feature {
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 1rem;
+                padding: 1.2rem 1rem;
+                background: rgba(255, 255, 255, 0.04);
+                text-align: center;
+                transition:
+                    transform 0.2s,
+                    background 0.2s;
+                cursor: default;
+            }
 
-  .feature:hover {
-    transform: translateY(-4px) rotate(1deg);
-    background: rgba(255,255,255,0.08);
-  }
+            .feature:hover {
+                transform: translateY(-4px) rotate(1deg);
+                background: rgba(255, 255, 255, 0.08);
+            }
 
-  .feature .icon { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
-  .feature .name { font-size: 0.85rem; font-weight: 700; color: var(--yellow); margin-bottom: 0.3rem; }
-  .feature .desc { font-size: 0.72rem; color: rgba(255,255,255,0.45); line-height: 1.5; }
+            .feature .icon {
+                font-size: 2rem;
+                display: block;
+                margin-bottom: 0.4rem;
+            }
+            .feature .name {
+                font-size: 0.85rem;
+                font-weight: 700;
+                color: var(--yellow);
+                margin-bottom: 0.3rem;
+            }
+            .feature .desc {
+                font-size: 0.72rem;
+                color: rgba(255, 255, 255, 0.45);
+                line-height: 1.5;
+            }
 
-  .cta {
-    position: relative;
-    z-index: 1;
-    display: inline-block;
-    padding: 1em 2.5em;
-    border-radius: 3em;
-    background: linear-gradient(135deg, var(--pink), #a020f0);
-    color: #fff;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 0 30px rgba(255,79,207,0.5);
-    transition: transform 0.15s, box-shadow 0.15s;
-    margin-bottom: 1rem;
-  }
+            .cta {
+                position: relative;
+                z-index: 1;
+                display: inline-block;
+                padding: 1em 2.5em;
+                border-radius: 3em;
+                background: linear-gradient(135deg, var(--pink), #a020f0);
+                color: #fff;
+                font-family: inherit;
+                font-size: 1rem;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+                cursor: pointer;
+                border: none;
+                box-shadow: 0 0 30px rgba(255, 79, 207, 0.5);
+                transition:
+                    transform 0.15s,
+                    box-shadow 0.15s;
+                margin-bottom: 1rem;
+            }
 
-  .cta:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 50px rgba(255,79,207,0.8);
-  }
+            .cta:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 50px rgba(255, 79, 207, 0.8);
+            }
 
-  .disclaimer {
-    font-size: 0.62rem;
-    color: rgba(255,255,255,0.25);
-    text-align: center;
-    max-width: 420px;
-    line-height: 1.6;
-    position: relative;
-    z-index: 1;
-    margin-bottom: 1.5rem;
-  }
+            .disclaimer {
+                font-size: 0.62rem;
+                color: rgba(255, 255, 255, 0.25);
+                text-align: center;
+                max-width: 420px;
+                line-height: 1.6;
+                position: relative;
+                z-index: 1;
+                margin-bottom: 1.5rem;
+            }
 
-  .fool-stamp {
-    font-size: clamp(3rem, 15vw, 8rem);
-    font-weight: 900;
-    color: transparent;
-    -webkit-text-stroke: 2px rgba(255,79,207,0.3);
-    position: fixed;
-    bottom: -1rem;
-    right: -1rem;
-    pointer-events: none;
-    z-index: 0;
-    transform: rotate(-15deg);
-    line-height: 1;
-    user-select: none;
-  }
+            .fool-stamp {
+                font-size: clamp(3rem, 15vw, 8rem);
+                font-weight: 900;
+                color: transparent;
+                -webkit-text-stroke: 2px rgba(255, 79, 207, 0.3);
+                position: fixed;
+                bottom: -1rem;
+                right: -1rem;
+                pointer-events: none;
+                z-index: 0;
+                transform: rotate(-15deg);
+                line-height: 1;
+                user-select: none;
+            }
 
-  /* Confetti canvas */
-  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
+            /* Confetti canvas */
+            #confetti {
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 100;
+            }
 
-  .history-link {
-    position: fixed;
-    bottom: 1rem;
-    left: 1rem;
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.2);
-    text-decoration: none;
-    z-index: 200;
-    transition: color 0.2s;
-  }
-  .history-link:hover { color: rgba(255,255,255,0.6); }
+            .history-link {
+                position: fixed;
+                bottom: 1rem;
+                left: 1rem;
+                font-size: 0.65rem;
+                color: rgba(255, 255, 255, 0.2);
+                text-decoration: none;
+                z-index: 200;
+                transition: color 0.2s;
+            }
+            .history-link:hover {
+                color: rgba(255, 255, 255, 0.6);
+            }
 
-  .countdown-strip {
-    position: relative;
-    z-index: 1;
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 0.1em;
-    margin-bottom: 2rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .countdown-strip span { color: var(--cyan); }
+            .countdown-strip {
+                position: relative;
+                z-index: 1;
+                font-size: 0.72rem;
+                color: rgba(255, 255, 255, 0.35);
+                letter-spacing: 0.1em;
+                margin-bottom: 2rem;
+                font-weight: 700;
+                text-transform: uppercase;
+            }
+            .countdown-strip span {
+                color: var(--cyan);
+            }
 
-  .jester { font-size: 1.4rem; animation: spin 6s linear infinite; display: inline-block; }
-  @keyframes spin {
-    0% { transform: rotateY(0deg); }
-    50% { transform: rotateY(180deg); }
-    100% { transform: rotateY(360deg); }
-  }
-</style>
-</head>
-<body>
-<canvas id="confetti"></canvas>
+            .jester {
+                font-size: 1.4rem;
+                animation: spin 6s linear infinite;
+                display: inline-block;
+            }
+            @keyframes spin {
+                0% {
+                    transform: rotateY(0deg);
+                }
+                50% {
+                    transform: rotateY(180deg);
+                }
+                100% {
+                    transform: rotateY(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="confetti"></canvas>
 
-<div class="moon"></div>
-<div class="moon-label">🌕 pink moon · april 1, 2026</div>
+        <div class="moon"></div>
+        <div class="moon-label">🌕 pink moon · april 1, 2026</div>
 
-<div class="badge"><span class="jester">🃏</span> april fools 2026</div>
+        <div class="badge"><span class="jester">🃏</span> april fools 2026</div>
 
-<h1>Nothing<span class="trademark">™</span></h1>
+        <h1>Nothing<span class="trademark">™</span></h1>
 
-<div class="countdown-strip">
-  time wasted on this page: <span id="timer">0s</span>
-</div>
+        <div class="countdown-strip">
+            time wasted on this page: <span id="timer">0s</span>
+        </div>
 
-<p class="tagline">
-  Introducing <em>Nothing™</em> — the world's first product that does
-  <em>absolutely nothing</em>, backed by zero funding, zero engineers,
-  and an entirely fake launch event.
-</p>
+        <p class="tagline">
+            Introducing <em>Nothing™</em> — the world's first product that does
+            <em>absolutely nothing</em>, backed by zero funding, zero engineers,
+            and an entirely fake launch event.
+        </p>
 
-<div class="features">
-  <div class="feature">
-    <span class="icon">🫥</span>
-    <div class="name">Invisible Design</div>
-    <div class="desc">You literally cannot see it. Zero-mass enclosure made from pure vibes.</div>
-  </div>
-  <div class="feature">
-    <span class="icon">🔋</span>
-    <div class="name">∞ Battery Life</div>
-    <div class="desc">Runs forever. Has no battery. Does not require electricity or hope.</div>
-  </div>
-  <div class="feature">
-    <span class="icon">🧠</span>
-    <div class="name">Anti-AI Inside</div>
-    <div class="desc">No models. No hallucinations. No opinions. Blissful, thoughtless nothing.</div>
-  </div>
-  <div class="feature">
-    <span class="icon">📦</span>
-    <div class="name">Ships Today</div>
-    <div class="desc">Nothing arrives instantly — it may already be on your doorstep.</div>
-  </div>
-  <div class="feature">
-    <span class="icon">🔒</span>
-    <div class="name">Unbreakable</div>
-    <div class="desc">Cannot be broken, lost, stolen, or recalled. It was never there.</div>
-  </div>
-  <div class="feature">
-    <span class="icon">💸</span>
-    <div class="name">Free Forever</div>
-    <div class="desc">$0.00. Also worth exactly that. Possibly less.</div>
-  </div>
-</div>
+        <div class="features">
+            <div class="feature">
+                <span class="icon">🫥</span>
+                <div class="name">Invisible Design</div>
+                <div class="desc">
+                    You literally cannot see it. Zero-mass enclosure made from
+                    pure vibes.
+                </div>
+            </div>
+            <div class="feature">
+                <span class="icon">🔋</span>
+                <div class="name">∞ Battery Life</div>
+                <div class="desc">
+                    Runs forever. Has no battery. Does not require electricity
+                    or hope.
+                </div>
+            </div>
+            <div class="feature">
+                <span class="icon">🧠</span>
+                <div class="name">Anti-AI Inside</div>
+                <div class="desc">
+                    No models. No hallucinations. No opinions. Blissful,
+                    thoughtless nothing.
+                </div>
+            </div>
+            <div class="feature">
+                <span class="icon">📦</span>
+                <div class="name">Ships Today</div>
+                <div class="desc">
+                    Nothing arrives instantly — it may already be on your
+                    doorstep.
+                </div>
+            </div>
+            <div class="feature">
+                <span class="icon">🔒</span>
+                <div class="name">Unbreakable</div>
+                <div class="desc">
+                    Cannot be broken, lost, stolen, or recalled. It was never
+                    there.
+                </div>
+            </div>
+            <div class="feature">
+                <span class="icon">💸</span>
+                <div class="name">Free Forever</div>
+                <div class="desc">
+                    $0.00. Also worth exactly that. Possibly less.
+                </div>
+            </div>
+        </div>
 
-<button class="cta" id="buyBtn">Order Nothing™ Now</button>
+        <button class="cta" id="buyBtn">Order Nothing™ Now</button>
 
-<p class="disclaimer">
-  *Nothing™ is not a real product. No engineers were harmed. This website is an act of creative absurdity
-  in honour of April Fools' Day 2026. The Pink Moon is real though. Go outside tonight. 🌕
-</p>
+        <p class="disclaimer">
+            *Nothing™ is not a real product. No engineers were harmed. This
+            website is an act of creative absurdity in honour of April Fools'
+            Day 2026. The Pink Moon is real though. Go outside tonight. 🌕
+        </p>
 
-<div class="fool-stamp">FOOL</div>
+        <div class="fool-stamp">FOOL</div>
 
-<a href="./history.html" class="history-link">history</a>
+        <a href="../history.html" class="history-link">history</a>
 
-<script>
-  // --- timer ---
-  const timerEl = document.getElementById('timer');
-  let secs = 0;
-  setInterval(() => {
-    secs++;
-    timerEl.textContent = secs < 60 ? secs + 's' : Math.floor(secs/60) + 'm ' + (secs%60) + 's';
-  }, 1000);
+        <script>
+            // --- timer ---
+            const timerEl = document.getElementById("timer");
+            let secs = 0;
+            setInterval(() => {
+                secs++;
+                timerEl.textContent =
+                    secs < 60
+                        ? secs + "s"
+                        : Math.floor(secs / 60) + "m " + (secs % 60) + "s";
+            }, 1000);
 
-  // --- buy button ---
-  const btn = document.getElementById('buyBtn');
-  const msgs = [
-    'Order Nothing™ Now',
-    'Are you sure? (nothing will happen)',
-    'Really sure?',
-    "Ok fine. Done. Nothing's on its way.",
-    "It arrived already.",
-    "You didn't notice? It's invisible.",
-    "Click again to unorder Nothing™",
-    "Unordered. Now you have less than nothing.",
-    "Order Nothing™ Again",
-  ];
-  let idx = 0;
-  btn.addEventListener('click', () => {
-    idx = (idx + 1) % msgs.length;
-    btn.textContent = msgs[idx];
-    launchConfetti(30);
-  });
+            // --- buy button ---
+            const btn = document.getElementById("buyBtn");
+            const msgs = [
+                "Order Nothing™ Now",
+                "Are you sure? (nothing will happen)",
+                "Really sure?",
+                "Ok fine. Done. Nothing's on its way.",
+                "It arrived already.",
+                "You didn't notice? It's invisible.",
+                "Click again to unorder Nothing™",
+                "Unordered. Now you have less than nothing.",
+                "Order Nothing™ Again",
+            ];
+            let idx = 0;
+            btn.addEventListener("click", () => {
+                idx = (idx + 1) % msgs.length;
+                btn.textContent = msgs[idx];
+                launchConfetti(30);
+            });
 
-  // --- confetti ---
-  const canvas = document.getElementById('confetti');
-  const ctx = canvas.getContext('2d');
-  let W, H;
-  const resize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
-  resize();
-  window.addEventListener('resize', resize);
+            // --- confetti ---
+            const canvas = document.getElementById("confetti");
+            const ctx = canvas.getContext("2d");
+            let W, H;
+            const resize = () => {
+                W = canvas.width = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            };
+            resize();
+            window.addEventListener("resize", resize);
 
-  const COLORS = ['#ff4fcf','#ffe94f','#4fffff','#a020f0','#ff6060','#60ff80'];
-  let particles = [];
+            const COLORS = [
+                "#ff4fcf",
+                "#ffe94f",
+                "#4fffff",
+                "#a020f0",
+                "#ff6060",
+                "#60ff80",
+            ];
+            let particles = [];
 
-  function launchConfetti(n) {
-    for (let i = 0; i < n; i++) {
-      particles.push({
-        x: W / 2 + (Math.random() - 0.5) * 200,
-        y: H * 0.4,
-        vx: (Math.random() - 0.5) * 8,
-        vy: -Math.random() * 12 - 4,
-        size: Math.random() * 8 + 4,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        rot: Math.random() * Math.PI * 2,
-        drot: (Math.random() - 0.5) * 0.3,
-        life: 1,
-        shape: Math.random() < 0.5 ? 'rect' : 'circle',
-      });
-    }
-  }
+            function launchConfetti(n) {
+                for (let i = 0; i < n; i++) {
+                    particles.push({
+                        x: W / 2 + (Math.random() - 0.5) * 200,
+                        y: H * 0.4,
+                        vx: (Math.random() - 0.5) * 8,
+                        vy: -Math.random() * 12 - 4,
+                        size: Math.random() * 8 + 4,
+                        color: COLORS[
+                            Math.floor(Math.random() * COLORS.length)
+                        ],
+                        rot: Math.random() * Math.PI * 2,
+                        drot: (Math.random() - 0.5) * 0.3,
+                        life: 1,
+                        shape: Math.random() < 0.5 ? "rect" : "circle",
+                    });
+                }
+            }
 
-  function drawParticle(p) {
-    ctx.save();
-    ctx.globalAlpha = p.life;
-    ctx.fillStyle = p.color;
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.rot);
-    if (p.shape === 'rect') {
-      ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
-    } else {
-      ctx.beginPath();
-      ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
-  }
+            function drawParticle(p) {
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rot);
+                if (p.shape === "rect") {
+                    ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
 
-  function tick() {
-    ctx.clearRect(0, 0, W, H);
-    particles = particles.filter(p => p.life > 0.01);
-    for (const p of particles) {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.4;
-      p.vx *= 0.99;
-      p.rot += p.drot;
-      p.life -= 0.015;
-      drawParticle(p);
-    }
-    requestAnimationFrame(tick);
-  }
-  tick();
+            function tick() {
+                ctx.clearRect(0, 0, W, H);
+                particles = particles.filter((p) => p.life > 0.01);
+                for (const p of particles) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.4;
+                    p.vx *= 0.99;
+                    p.rot += p.drot;
+                    p.life -= 0.015;
+                    drawParticle(p);
+                }
+                requestAnimationFrame(tick);
+            }
+            tick();
 
-  // initial burst
-  setTimeout(() => launchConfetti(60), 400);
-</script>
-</body>
+            // initial burst
+            setTimeout(() => launchConfetti(60), 400);
+        </script>
+    </body>
 </html>
