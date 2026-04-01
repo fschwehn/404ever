@@ -70,7 +70,9 @@ ${JSON.stringify(history.slice(-30), null, 2)}
 </history>
 
 Reinvent the site completely. Search the web if you want inspiration.
-Output using the delimiter format specified in your instructions.`;
+Output using the delimiter format specified in your instructions.${
+    process.env.LANGUAGE ? `\n\nWrite all content in ${process.env.LANGUAGE}.` : ""
+  }`;
 }
 
 function parseAgentResponse(text) {
