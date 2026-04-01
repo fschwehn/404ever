@@ -3,40 +3,65 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// -- Paths
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.join(__dirname, "..", "public");
+const ROOT = path.join(__dirname, "..", "docs");
+const PATHS = {
+  index:   path.join(ROOT, "index.html"),
+  history: path.join(ROOT, "data", "history.json"),
+  posts:   path.join(ROOT, "posts"),
+  title:   path.join(ROOT, ".agent_title"),
+};
 
-// ── Paths ────────────────────────────────────────────────────────────────────
-const INDEX_PATH = path.join(root, "index.html");
-const HISTORY_PATH = path.join(root, "history.json");
-const ARCHIVE_DIR = path.join(root, "archive");
-const TITLE_PATH = path.join(root, ".agent_title");
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
-// ── Load current state ───────────────────────────────────────────────────────
-const today = new Date().toISOString().split("T")[0];
-const currentSite = fs.existsSync(INDEX_PATH)
-  ? fs.readFileSync(INDEX_PATH, "utf8")
-  : "(no site yet — this is day one)";
-const history = fs.existsSync(HISTORY_PATH)
-  ? JSON.parse(fs.readFileSync(HISTORY_PATH, "utf8"))
-  : [];
-
-// ── System prompt ────────────────────────────────────────────────────────────
-const PROMPTS_DIR = path.join(__dirname, "prompts");
-const promptName = process.env.AGENT_PROMPT || "default";
-const promptFile = path.join(PROMPTS_DIR, `${promptName}.txt`);
-if (!fs.existsSync(promptFile)) {
-  throw new Error(`Prompt file not found: ${promptFile} (set AGENT_PROMPT to a name in agent/prompts/)`);
+function readFileOr(filePath, fallback) {
+  return fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : fallback;
 }
-const SYSTEM_PROMPT = fs.readFileSync(promptFile, "utf8").trim();
-console.log(`[404ever] Using prompt: ${promptName}`);
 
-// ── User message ─────────────────────────────────────────────────────────────
-const userMessage = `Today is ${today}.
+function parseField(text, field) {
+  const match = text.match(new RegExp(`^${field}:\\s*(.+)$`, "m"));
+  return match ? match[1].trim() : "";
+}
+
+// ── Load state ───────────────────────────────────────────────────────────────
+
+function loadState() {
+  const now = new Date();
+  const today = now.toISOString().split("T")[0];
+  const timestamp = now.toISOString().replace(/\.\d{3}Z$/, "").replace(/:/g, "-");
+
+  const history = JSON.parse(readFileOr(PATHS.history, "[]"));
+
+  const latestEntry = history.at(-1);
+  const latestPost = latestEntry
+    ? readFileOr(path.join(PATHS.posts, `${latestEntry.timestamp}.html`), "(no previous post)")
+    : "(no site yet — this is day one)";
+
+  return { today, timestamp, latestPost, history };
+}
+
+function loadSystemPrompt() {
+  const promptName = process.env.AGENT_PROMPT || "default";
+  const promptFile = path.join(__dirname, "prompts", `${promptName}.txt`);
+  if (!fs.existsSync(promptFile)) {
+    throw new Error(
+      `Prompt file not found: ${promptFile} (set AGENT_PROMPT to a name in agent/prompts/)`,
+    );
+  }
+  console.log(`[404ever] Using prompt: ${promptName}`);
+  return fs.readFileSync(promptFile, "utf8").trim();
+}
+
+// ── Agent ────────────────────────────────────────────────────────────────────
+
+function buildUserMessage(today, latestPost, history) {
+  return `Today is ${today}.
 
 Here is the current site:
 <current_site>
-${currentSite}
+${latestPost}
 </current_site>
 
 Past versions (most recent 30):
@@ -46,21 +71,68 @@ ${JSON.stringify(history.slice(-30), null, 2)}
 
 Reinvent the site completely. Search the web if you want inspiration.
 Output using the delimiter format specified in your instructions.`;
+}
 
-// ── Dev mode (DEV_MODE=true skips the AI call entirely) ──────────────────────
-const DEV_MODE = process.env.DEV_MODE === "true";
+function parseAgentResponse(text) {
+  const htmlMatch = text.match(
+    /---BEGIN_HTML---\s*([\s\S]*?)\s*---END_HTML---/,
+  );
+  if (!htmlMatch) {
+    console.error("Response text:\n", text);
+    throw new Error(
+      "Could not find ---BEGIN_HTML--- / ---END_HTML--- delimiters in response",
+    );
+  }
 
-let title, mood, libraries, description, html;
+  const title = parseField(text, "TITLE");
+  if (!title) throw new Error("Missing TITLE in response");
 
-if (DEV_MODE) {
-  console.log(`[404ever] ⚡ DEV MODE — skipping AI agent`);
+  const html = htmlMatch[1];
+  if (!html.trim().startsWith("<"))
+    throw new Error("HTML does not look like HTML");
 
+  const librariesRaw = parseField(text, "LIBRARIES");
+  return {
+    title,
+    mood: parseField(text, "MOOD"),
+    libraries:
+      librariesRaw === "none"
+        ? []
+        : librariesRaw
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+    description: parseField(text, "DESCRIPTION"),
+    html,
+  };
+}
+
+async function runAgent(systemPrompt, userMessage) {
+  const client = new Anthropic();
+  const response = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 16000,
+    tools: [{ type: "web_search_20250305", name: "web_search" }],
+    system: systemPrompt,
+    messages: [{ role: "user", content: userMessage }],
+  });
+
+  console.log(`[404ever] stop_reason: ${response.stop_reason}`);
+
+  const textBlock = response.content.findLast((b) => b.type === "text");
+  if (!textBlock) throw new Error("No text block in response");
+
+  return parseAgentResponse(textBlock.text);
+}
+
+function buildDevResult(today, timestamp) {
   const ts = new Date().toISOString();
-  title = `DEV BUILD — ${ts}`;
-  mood = "debug";
-  libraries = [];
-  description = "Minimal test page generated without AI to verify the workflow.";
-  html = `<!DOCTYPE html>
+  return {
+    title: `DEV BUILD — ${ts}`,
+    mood: "debug",
+    libraries: [],
+    description: "Minimal test page generated without AI to verify the workflow.",
+    html: `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -80,88 +152,70 @@ if (DEV_MODE) {
   <h1>⚡ DEV MODE</h1>
   <div class="ts">${ts}</div>
   <div class="ts">date: ${today}</div>
-  <a href="./history.html">history</a>
+  <div class="ts">post: ${timestamp}</div>
+  <a href="../history.html">history</a>
 </body>
+</html>`,
+  };
+}
+
+// ── Persist ───────────────────────────────────────────────────────────────────
+
+function buildRedirect(timestamp) {
+  const url = `./posts/${timestamp}.html`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; url=${url}">
+<script>window.location.replace('${url}');</script>
+</head>
+<body></body>
 </html>`;
-
-} else {
-  // ── Run the AI agent ──────────────────────────────────────────────────────
-  console.log(`[404ever] Running agent for ${today}…`);
-
-  const client = new Anthropic();
-
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 16000,
-    tools: [{ type: "web_search_20250305", name: "web_search" }],
-    system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content: userMessage }],
-  });
-
-  // ── Extract result from response ────────────────────────────────────────────
-  const textBlock = response.content.findLast((b) => b.type === "text");
-  if (!textBlock) throw new Error("No text block in response");
-
-  console.log(`[404ever] stop_reason: ${response.stop_reason}`);
-
-  const text = textBlock.text;
-
-  function parseField(text, field) {
-    const match = text.match(new RegExp(`^${field}:\\s*(.+)$`, "m"));
-    return match ? match[1].trim() : "";
-  }
-
-  title = parseField(text, "TITLE");
-  mood = parseField(text, "MOOD");
-  const librariesRaw = parseField(text, "LIBRARIES");
-  description = parseField(text, "DESCRIPTION");
-  libraries = librariesRaw === "none" ? [] : librariesRaw.split(",").map((s) => s.trim()).filter(Boolean);
-
-  const htmlMatch = text.match(/---BEGIN_HTML---\s*([\s\S]*?)\s*---END_HTML---/);
-  if (!htmlMatch) {
-    console.error("Response text:\n", text);
-    throw new Error("Could not find ---BEGIN_HTML--- / ---END_HTML--- delimiters in response");
-  }
-  html = htmlMatch[1];
-
-  if (!title) throw new Error("Missing TITLE in response");
-  if (!html.trim().startsWith("<")) throw new Error("HTML does not look like HTML");
 }
 
-console.log(`[404ever] Title: "${title}"`);
+function persist(result, history, today, timestamp) {
+  fs.mkdirSync(PATHS.posts, { recursive: true });
+  const postPath = path.join(PATHS.posts, `${timestamp}.html`);
+  fs.writeFileSync(postPath, result.html, "utf8");
+  console.log(`[404ever] Wrote post ${timestamp}.html`);
 
-// ── Archive old version ──────────────────────────────────────────────────────
-if (fs.existsSync(INDEX_PATH)) {
-  fs.mkdirSync(ARCHIVE_DIR, { recursive: true });
+  fs.writeFileSync(PATHS.index, buildRedirect(timestamp), "utf8");
+  console.log(`[404ever] Updated index.html → posts/${timestamp}.html`);
 
-  const lastEntry = history.at(-1);
-  const archiveDate = lastEntry ? lastEntry.date : today;
-  const archiveTime = new Date().toISOString().split("T")[1].replace(/[:.]/g, "-").slice(0, 8);
-  const archiveName = `${archiveDate}_${archiveTime}`;
-  const archivePath = path.join(ARCHIVE_DIR, `${archiveName}.html`);
+  const entry = {
+    date: today,
+    timestamp,
+    title: result.title,
+    mood: result.mood || "",
+    libraries: result.libraries,
+    description: result.description || "",
+    commit: "", // filled in by the GitHub Action after git commit
+  };
+  fs.mkdirSync(path.dirname(PATHS.history), { recursive: true });
+  history.push(entry);
+  fs.writeFileSync(PATHS.history, JSON.stringify(history, null, 2), "utf8");
+  console.log(`[404ever] Updated history.json`);
 
-  fs.copyFileSync(INDEX_PATH, archivePath);
-  console.log(`[404ever] Archived previous version as ${archiveName}.html`);
+  fs.writeFileSync(PATHS.title, result.title, "utf8");
 }
 
-// ── Write new index.html ─────────────────────────────────────────────────────
-fs.writeFileSync(INDEX_PATH, html, "utf8");
-console.log(`[404ever] Wrote new index.html`);
+// ── Main ──────────────────────────────────────────────────────────────────────
 
-// ── Update history.json ──────────────────────────────────────────────────────
-const entry = {
-  date: today,
-  title,
-  mood: mood || "",
-  libraries,
-  description: description || "",
-  commit: "", // filled in by the GitHub Action after git commit
-};
-history.push(entry);
-fs.writeFileSync(HISTORY_PATH, JSON.stringify(history, null, 2), "utf8");
-console.log(`[404ever] Updated history.json`);
+const { today, timestamp, latestPost, history } = loadState();
 
-// ── Write title file for git commit message ──────────────────────────────────
-fs.writeFileSync(TITLE_PATH, title, "utf8");
+const result =
+  process.env.DEV_MODE === "true"
+    ? (console.log(`[404ever] ⚡ DEV MODE — skipping AI agent`),
+      buildDevResult(today, timestamp))
+    : (console.log(`[404ever] Running agent for ${today}…`),
+      await runAgent(
+        loadSystemPrompt(),
+        buildUserMessage(today, latestPost, history),
+      ));
 
-console.log(`[404ever] Done. "${title}"`);
+console.log(`[404ever] Title: "${result.title}"`);
+
+persist(result, history, today, timestamp);
+
+console.log(`[404ever] Done. "${result.title}"`);
