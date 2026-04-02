@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Das Danach — 2. April 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    font-family: 'Georgia', serif;
+    color: #d4d4d4;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .surface {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 30%;
+    background: radial-gradient(ellipse at center bottom, #404040, #2a2a2a);
+    opacity: 0.6;
+  }
+  
+  .footprints {
+    position: fixed;
+    bottom: 30%;
+    width: 100%;
+    height: 20%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    opacity: 0.3;
+  }
+  
+  .footprint {
+    width: 30px;
+    height: 50px;
+    border: 2px solid rgba(180, 180, 180, 0.5);
+    border-radius: 15px 15px 10px 10px;
+    margin-bottom: 20px;
+    animation: fade 8s ease-in-out infinite;
+  }
+  
+  .footprint:nth-child(1) { animation-delay: 0s; }
+  .footprint:nth-child(2) { animation-delay: 1s; }
+  .footprint:nth-child(3) { animation-delay: 2s; }
+  .footprint:nth-child(4) { animation-delay: 3s; }
+  .footprint:nth-child(5) { animation-delay: 4s; }
+  
+  @keyframes fade {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.4; }
+  }
+  
+  .container {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    max-width: 600px;
+    padding: 60px 40px;
+  }
+  
+  h1 {
+    font-size: 2.2rem;
+    font-weight: normal;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+    color: #b0b0b0;
+    text-transform: uppercase;
+  }
+  
+  .counter {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #64c8ff;
+    margin: 40px 0;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+  }
+  
+  .distance-label {
+    font-size: 0.9rem;
+    color: #888;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 50px;
+  }
+  
+  .text {
+    line-height: 1.8;
+    font-size: 0.95rem;
+    color: #a8a8a8;
+    margin: 40px 0;
+    font-style: italic;
+  }
+  
+  .crew-note {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(180, 180, 180, 0.2);
+    font-size: 0.8rem;
+    color: #808080;
+    letter-spacing: 1px;
+  }
+  
+  .crew-name {
+    color: #64c8ff;
+    font-style: normal;
+    margin: 8px 0;
+  }
+  
+  .corner-text {
+    position: fixed;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(180, 180, 180, 0.15);
+    z-index: 5;
+  }
+  
+  .tl { top: 20px; left: 20px; }
+  .br { bottom: 20px; right: 20px; }
+  
+  .history-link {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.65rem;
+    color: rgba(180, 180, 180, 0.25);
+    text-decoration: none;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    z-index: 200;
+    transition: color 0.3s;
+  }
+  
+  .history-link:hover {
+    color: rgba(180, 180, 180, 0.6);
+  }
+  
+  .star {
+    position: fixed;
+    width: 1px;
+    height: 1px;
+    background: white;
+    border-radius: 50%;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="surface"></div>
+
+<div class="footprints">
+  <div class="footprint"></div>
+  <div class="footprint"></div>
+  <div class="footprint"></div>
+  <div class="footprint"></div>
+  <div class="footprint"></div>
+</div>
+
+<div class="corner-text tl">ARTEMIS II · MISSION TAG 1</div>
+<div class="corner-text br">2. APRIL 2026</div>
+
+<div class="container">
+  <h1>Das Danach</h1>
+  
+  <div class="distance-label">Entfernung vom Mond</div>
+  
+  <div class="counter" id="distance">—</div>
+  
+  <div class="text">
+    Vier Menschen hoch oben.<br>
+    Die Erde drehte sich weiter.<br>
+    Die Stille nach dem Donner.
+  </div>
+  
+  <div class="crew-note">
+    Sie sind dort oben. Reid Wiseman. Victor Glover. Christina Koch. Jeremy Hansen.<br>
+    <div class="crew-name">Zehn Tage um den Mond.</div>
+    Und wir schauen nach.
+  </div>
+</div>
+
+<a href="../history.html" class="history-link">verlauf</a>
+
+<script>
+  // Update distance every second
+  function updateDistance() {
+    const now = new Date();
+    const launchTime = new Date('2026-04-01T22:24:00Z');
+    const elapsedSeconds = (now - launchTime) / 1000;
+    
+    // Rough estimate: Artemis II travels at ~11 km/s initially, but slows as it climbs
+    // and then accelerates toward the moon. Let's use a simple approximation.
+    // To the moon is 384,400 km away
+    // This is a simplified calculation for visual effect
+    const distanceToMoon = 384400;
+    const approximateDistance = Math.max(0, distanceToMoon - (elapsedSeconds * 5));
+    
+    const hours = Math.floor(elapsedSeconds / 3600);
+    const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+    
+    let display = '';
+    if (hours > 0) {
+      display += hours + 'h ';
+    }
+    display += minutes + 'm unterwegs';
+    
+    document.getElementById('distance').textContent = display;
+  }
+  
+  updateDistance();
+  setInterval(updateDistance, 1000);
+  
+  // Generate random stars
+  function generateStars() {
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 60 + '%';
+      star.style.opacity = Math.random() * 0.7 + 0.2;
+      document.body.appendChild(star);
+    }
+  }
+  
+  generateStars();
+</script>
+
+</body>
+</html>
