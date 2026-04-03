@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Perspective — April 3, 2026</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      font-family: 'Georgia', serif;
+      color: #fff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    
+    .text-container {
+      max-width: 600px;
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .quote {
+      font-size: 1.4rem;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, 0.8);
+      font-style: italic;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.7);
+      opacity: 0;
+      animation: fadeInQuote 3s ease-in-out forwards;
+    }
+    
+    @keyframes fadeInQuote {
+      0% { opacity: 0; }
+      30% { opacity: 0; }
+      100% { opacity: 0.8; }
+    }
+    
+    .subtitle {
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      margin-top: 40px;
+      opacity: 0;
+      animation: fadeInSubtitle 5s ease-in-out forwards;
+    }
+    
+    @keyframes fadeInSubtitle {
+      0% { opacity: 0; }
+      60% { opacity: 0; }
+      100% { opacity: 0.4; }
+    }
+    
+    .distance {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.3);
+      letter-spacing: 1px;
+      text-align: right;
+      z-index: 20;
+    }
+    
+    .distance-value {
+      font-size: 1.6rem;
+      color: rgba(100, 200, 255, 0.7);
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    
+    .history-link {
+      position: fixed;
+      bottom: 10px;
+      left: 15px;
+      font-size: 0.5rem;
+      color: rgba(255, 255, 255, 0.1);
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      z-index: 200;
+      transition: color 0.3s;
+    }
+    
+    .history-link:hover {
+      color: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="overlay">
+  <div class="text-container">
+    <div class="quote">
+      "You could see the entire globe, from pole to pole. Africa, Europe, and if you looked really close, you could see the northern lights."
+    </div>
+    <div class="subtitle">— Commander Reid Wiseman, Earth Orbit, April 2, 2026</div>
+  </div>
+</div>
+
+<div class="distance">
+  <div>Distance from Earth</div>
+  <div class="distance-value" id="distance">~252,000 km</div>
+</div>
+
+<a href="../history.html" class="history-link">archive</a>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+  
+  // Stars
+  const stars = [];
+  for (let i = 0; i < 800; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 1.5,
+      opacity: Math.random() * 0.5 + 0.3
+    });
+  }
+  
+  // Launch time: April 1, 2026, 6:35 PM EDT = 2026-04-01T22:35:00Z
+  // Current time: April 3, 2026
+  const launchTime = new Date('2026-04-01T22:35:00Z');
+  
+  function getElapsedHours() {
+    const now = new Date('2026-04-03T12:00:00Z'); // Approximate current time
+    return (now - launchTime) / (1000 * 60 * 60);
+  }
+  
+  function updateDistance() {
+    const elapsedHours = getElapsedHours();
+    // Approximate distance: roughly 1,050 km/h average speed after TLI
+    const distance = Math.min(252000, 6000 + (elapsedHours * 10000));
+    document.getElementById('distance').textContent = Math.round(distance).toLocaleString() + ' km';
+  }
+  
+  // Particles for atmosphere effect
+  const particles = [];
+  
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2;
+      this.opacity = Math.random() * 0.3 + 0.1;
+      this.vx = (Math.random() - 0.5) * 0.5;
+      this.vy = (Math.random() - 0.5) * 0.5;
+    }
+    
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.opacity -= 0.002;
+      
+      if (this.x < 0 || this.x > canvas.width || 
+          this.y < 0 || this.y > canvas.height ||
+          this.opacity <= 0) {
+        return false;
+      }
+      return true;
+    }
+    
+    draw(ctx) {
+      ctx.fillStyle = `rgba(100, 200, 255, ${this.opacity})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  
+  function animate() {
+    // Black background with subtle gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#000814');
+    gradient.addColorStop(0.5, '#001033');
+    gradient.addColorStop(1, '#000410');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw stars
+    ctx.fillStyle = '#fff';
+    stars.forEach(star => {
+      ctx.globalAlpha = star.opacity + Math.sin(Date.now() * 0.0003 + star.x) * 0.2;
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    
+    // Add new particles occasionally
+    if (Math.random() < 0.3) {
+      particles.push(new Particle());
+    }
+    
+    // Update and draw particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      if (!particles[i].update()) {
+        particles.splice(i, 1);
+      } else {
+        particles[i].draw(ctx);
+      }
+    }
+    
+    // Draw Earth as a subtle glowing reference in bottom left
+    const earthSize = 60;
+    const earthX = canvas.width * 0.15;
+    const earthY = canvas.height * 0.85;
+    
+    // Earth glow
+    const earthGradient = ctx.createRadialGradient(earthX, earthY, 0, earthX, earthY, earthSize + 20);
+    earthGradient.addColorStop(0, 'rgba(100, 150, 200, 0.3)');
+    earthGradient.addColorStop(1, 'rgba(100, 150, 200, 0)');
+    ctx.fillStyle = earthGradient;
+    ctx.beginPath();
+    ctx.arc(earthX, earthY, earthSize + 20, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Earth body
+    ctx.fillStyle = '#4a7c9e';
+    ctx.beginPath();
+    ctx.arc(earthX, earthY, earthSize, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Subtle continents
+    ctx.fillStyle = 'rgba(80, 140, 100, 0.6)';
+    ctx.beginPath();
+    ctx.arc(earthX - 15, earthY - 15, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(earthX + 20, earthY + 10, 15, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Label for Earth
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.font = '11px Georgia';
+    ctx.textAlign = 'center';
+    ctx.fillText('home', earthX, earthY + earthSize + 35);
+    
+    requestAnimationFrame(animate);
+  }
+  
+  animate();
+  updateDistance();
+  setInterval(updateDistance, 5000);
+</script>
+
+</body>
+</html>
