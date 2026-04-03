@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Two Worlds — April 3, 2026</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    :root {
+      --sky: #00030f;
+      --earth: #0d0a07;
+      --divider: #e8c87a;
+      --cosmos-text: rgba(200, 220, 255, 0.85);
+      --ground-text: rgba(230, 210, 180, 0.85);
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    /* ── LAYOUT ── */
+    #cosmos {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 50%;
+      background: var(--sky);
+      overflow: hidden;
+    }
+
+    #ground {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 50%;
+      background: var(--earth);
+      overflow: hidden;
+    }
+
+    /* ── DIVIDER ── */
+    #horizon {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      transform: translateY(-50%);
+      z-index: 100;
+      background: linear-gradient(90deg, transparent 0%, var(--divider) 20%, #fff 50%, var(--divider) 80%, transparent 100%);
+      box-shadow: 0 0 18px 4px rgba(232, 200, 122, 0.5), 0 0 60px 10px rgba(232, 200, 122, 0.15);
+    }
+
+    #horizon-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 110;
+      background: #000;
+      border: 1px solid var(--divider);
+      color: var(--divider);
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      padding: 5px 14px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ── CANVAS ── */
+    #cosmos-canvas {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%; height: 100%;
+    }
+
+    /* ── ORION LABEL ── */
+    #orion-info {
+      position: absolute;
+      top: 16px; right: 20px;
+      z-index: 50;
+      text-align: right;
+      color: var(--cosmos-text);
+      pointer-events: none;
+    }
+    #orion-info .label {
+      font-size: 0.52rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(150, 190, 255, 0.5);
+      margin-bottom: 3px;
+    }
+    #orion-info .big {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: rgba(180, 220, 255, 0.9);
+      font-family: 'Courier New', monospace;
+      text-shadow: 0 0 20px rgba(100, 180, 255, 0.7);
+    }
+    #orion-info .sub {
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      color: rgba(150, 190, 255, 0.45);
+      margin-top: 2px;
+    }
+
+    /* ── COSMOS QUOTE ── */
+    #cosmos-quote {
+      position: absolute;
+      bottom: 18px;
+      left: 20px;
+      right: 160px;
+      z-index: 50;
+      color: rgba(180, 210, 255, 0.55);
+      font-style: italic;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      pointer-events: none;
+    }
+    #cosmos-quote span {
+      color: rgba(150, 190, 255, 0.35);
+      font-style: normal;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* ── DATE BADGE ── */
+    #date-badge {
+      position: absolute;
+      top: 16px; left: 20px;
+      z-index: 50;
+      color: rgba(200, 220, 255, 0.3);
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    /* ── GROUND CANVAS ── */
+    #ground-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    /* ── GROUND GRID ── */
+    #ground-content {
+      position: absolute;
+      inset: 0;
+      padding: 22px 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    .ground-title {
+      font-size: 0.5rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(180, 140, 80, 0.45);
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+
+    .headlines-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px 18px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .headline-item {
+      border-top: 1px solid rgba(180, 140, 80, 0.2);
+      padding-top: 7px;
+      overflow: hidden;
+    }
+
+    .headline-tag {
+      font-size: 0.44rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(200, 150, 60, 0.5);
+      margin-bottom: 4px;
+    }
+
+    .headline-text {
+      font-size: 0.72rem;
+      line-height: 1.45;
+      color: rgba(220, 200, 170, 0.75);
+      font-style: italic;
+    }
+
+    /* ── TICKER ── */
+    #ticker-wrap {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 28px;
+      background: rgba(20, 14, 6, 0.9);
+      border-top: 1px solid rgba(180, 140, 80, 0.25);
+      overflow: hidden;
+      z-index: 60;
+    }
+
+    #ticker {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      white-space: nowrap;
+      animation: ticker-scroll 55s linear infinite;
+    }
+
+    .ticker-item {
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: rgba(220, 190, 130, 0.6);
+      padding: 0 40px;
+    }
+
+    .ticker-sep {
+      color: rgba(180, 140, 80, 0.35);
+      padding: 0 6px;
+    }
+
+    @keyframes ticker-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── MISSION CLOCK ── */
+    #mission-clock {
+      position: absolute;
+      bottom: 34px; right: 20px;
+      z-index: 50;
+      text-align: right;
+      pointer-events: none;
+    }
+    #mission-clock .mc-label {
+      font-size: 0.46rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(180, 140, 80, 0.35);
+    }
+    #mission-clock .mc-value {
+      font-size: 0.95rem;
+      font-family: 'Courier New', monospace;
+      color: rgba(200, 160, 90, 0.65);
+      text-shadow: 0 0 12px rgba(200, 160, 90, 0.3);
+    }
+
+    /* ── GOOD FRIDAY MARK ── */
+    #holy-mark {
+      position: absolute;
+      bottom: 34px; left: 20px;
+      z-index: 50;
+      color: rgba(180, 140, 80, 0.28);
+      font-size: 0.52rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    /* ── HISTORY LINK ── */
+    a.hist {
+      position: fixed;
+      bottom: 8px; left: 12px;
+      z-index: 999;
+      font-size: 0.45rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.08);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    a.hist:hover { color: rgba(255,255,255,0.25); }
+
+    /* ── FLIGHT DAY ── */
+    #flight-day {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      color: rgba(150, 190, 255, 0.35);
+      font-size: 0.52rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    /* fade in */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .headline-item {
+      animation: fadeUp 1.2s ease both;
+    }
+    .headline-item:nth-child(1) { animation-delay: 0.2s; }
+    .headline-item:nth-child(2) { animation-delay: 0.45s; }
+    .headline-item:nth-child(3) { animation-delay: 0.7s; }
+    .headline-item:nth-child(4) { animation-delay: 0.95s; }
+    .headline-item:nth-child(5) { animation-delay: 1.2s; }
+    .headline-item:nth-child(6) { animation-delay: 1.45s; }
+  </style>
+</head>
+<body>
+
+<!-- ── COSMOS HALF ── -->
+<section id="cosmos">
+  <canvas id="cosmos-canvas"></canvas>
+
+  <div id="date-badge">April 3, 2026 &nbsp;·&nbsp; Good Friday</div>
+  <div id="flight-day">Flight Day 3 &nbsp;·&nbsp; Orion "Integrity"</div>
+
+  <div id="orion-info">
+    <div class="label">Distance from Earth</div>
+    <div class="big" id="dist-val">124,000 km</div>
+    <div class="sub">Outbound · Translunar trajectory</div>
+  </div>
+
+  <div id="cosmos-quote">
+    "None of us can get to lunch because we're glued to the window."
+    <span>— Jeremy Hansen, CSA, from Orion, April 3, 2026</span>
+  </div>
+</section>
+
+<!-- ── DIVIDER ── -->
+<div id="horizon"></div>
+<div id="horizon-label">Good Friday &middot; April 3, 2026</div>
+
+<!-- ── GROUND HALF ── -->
+<section id="ground">
+  <canvas id="ground-canvas"></canvas>
+
+  <div id="ground-content">
+    <div class="ground-title">Dispatches from the Surface</div>
+    <div class="headlines-grid">
+      <div class="headline-item">
+        <div class="headline-tag">Middle East</div>
+        <div class="headline-text">Iran fires missiles at Gulf states; UK hosts 40-nation summit on Strait of Hormuz reopening</div>
+      </div>
+      <div class="headline-item">
+        <div class="headline-tag">Ukraine</div>
+        <div class="headline-text">Russia claims control of Luhansk Oblast; Kyiv's 3rd Assault Brigade disputes the claim</div>
+      </div>
+      <div class="headline-item">
+        <div class="headline-tag">Diplomacy</div>
+        <div class="headline-text">Pakistan &amp; Afghanistan begin peace talks in China; Iran suggests diplomatic engagement is possible</div>
+      </div>
+      <div class="headline-item">
+        <div class="headline-tag">U.S. Economy</div>
+        <div class="headline-text">178,000 jobs added in March; unemployment falls to 4.3%</div>
+      </div>
+      <div class="headline-item">
+        <div class="headline-tag">Space</div>
+        <div class="headline-text">Artemis II on free-return trajectory; crew glued to windows watching a crescent Earth recede</div>
+      </div>
+      <div class="headline-item">
+        <div class="headline-tag">Holy Week</div>
+        <div class="headline-text">Good Friday observed worldwide; Easter Sunday arrives in two days, April 5</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mission-clock">
+    <div class="mc-label">Mission elapsed</div>
+    <div class="mc-value" id="met-val">00d 00h 00m</div>
+  </div>
+
+  <div id="holy-mark">Good Friday &nbsp;·&nbsp; Via Crucis</div>
+
+  <!-- TICKER -->
+  <div id="ticker-wrap">
+    <div id="ticker">
+      <span class="ticker-item">ARTEMIS II · FLIGHT DAY 3 · CREW HEALTHY · ORION INTEGRITY ON FREE-RETURN TRAJECTORY</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">US JOBS +178,000 IN MARCH · UNEMPLOYMENT 4.3%</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">UK HOSTS 40-NATION STRAIT OF HORMUZ SUMMIT</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">RUSSIA CLAIMS LUHANSK OBLAST · UKRAINE DENIES</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">MAX DISTANCE FROM EARTH: ~252,021 STATUTE MILES · BREAKS APOLLO 13 RECORD</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">AFGHANISTAN–PAKISTAN TALKS BEGIN IN BEIJING</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">GOOD FRIDAY · EASTER SUNDAY APRIL 5</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">LUNAR FLYBY PLANNED: MONDAY APRIL 6</span>
+      <span class="ticker-sep">◆</span>
+      <!-- duplicate for seamless loop -->
+      <span class="ticker-item">ARTEMIS II · FLIGHT DAY 3 · CREW HEALTHY · ORION INTEGRITY ON FREE-RETURN TRAJECTORY</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">US JOBS +178,000 IN MARCH · UNEMPLOYMENT 4.3%</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">UK HOSTS 40-NATION STRAIT OF HORMUZ SUMMIT</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">RUSSIA CLAIMS LUHANSK OBLAST · UKRAINE DENIES</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">MAX DISTANCE FROM EARTH: ~252,021 STATUTE MILES · BREAKS APOLLO 13 RECORD</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">AFGHANISTAN–PAKISTAN TALKS BEGIN IN BEIJING</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">GOOD FRIDAY · EASTER SUNDAY APRIL 5</span>
+      <span class="ticker-sep">◆</span>
+      <span class="ticker-item">LUNAR FLYBY PLANNED: MONDAY APRIL 6</span>
+      <span class="ticker-sep">◆</span>
+    </div>
+  </div>
+</section>
+
+<a href="./history.html" class="hist">archive</a>
+
+<script>
+// ─────────────────────────────────────────────
+//  COSMOS CANVAS — stars + Orion trajectory
+// ─────────────────────────────────────────────
+const cosmosCanvas = document.getElementById('cosmos-canvas');
+const cCtx = cosmosCanvas.getContext('2d');
+
+function resizeCosmos() {
+  cosmosCanvas.width = cosmosCanvas.offsetWidth;
+  cosmosCanvas.height = cosmosCanvas.offsetHeight;
+}
+resizeCosmos();
+
+// Stars
+const stars = Array.from({ length: 420 }, () => ({
+  x: Math.random(),
+  y: Math.random(),
+  r: Math.random() * 1.2 + 0.2,
+  base: Math.random() * 0.6 + 0.2,
+  phase: Math.random() * Math.PI * 2,
+  speed: Math.random() * 0.0008 + 0.0002
+}));
+
+// Distant galaxies (smudges)
+const galaxies = Array.from({ length: 7 }, () => ({
+  x: Math.random(), y: Math.random(),
+  rx: Math.random() * 18 + 6, ry: Math.random() * 8 + 3,
+  angle: Math.random() * Math.PI,
+  alpha: Math.random() * 0.07 + 0.02
+}));
+
+// Orion ship
+let orionAngle = 0;
+let moonX, moonY;
+
+function drawCosmos(ts) {
+  const W = cosmosCanvas.width, H = cosmosCanvas.height;
+
+  // background gradient
+  const bg = cCtx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#000005');
+  bg.addColorStop(1, '#00060f');
+  cCtx.fillStyle = bg;
+  cCtx.fillRect(0, 0, W, H);
+
+  // galaxies
+  galaxies.forEach(g => {
+    cCtx.save();
+    cCtx.translate(g.x * W, g.y * H);
+    cCtx.rotate(g.angle);
+    const grd = cCtx.createRadialGradient(0, 0, 0, 0, 0, g.rx);
+    grd.addColorStop(0, `rgba(150,180,255,${g.alpha})`);
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    cCtx.scale(1, g.ry / g.rx);
+    cCtx.fillStyle = grd;
+    cCtx.beginPath();
+    cCtx.arc(0, 0, g.rx, 0, Math.PI * 2);
+    cCtx.fill();
+    cCtx.restore();
+  });
+
+  // stars
+  stars.forEach(s => {
+    const alpha = s.base + Math.sin(ts * s.speed + s.phase) * 0.25;
+    cCtx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    cCtx.fillStyle = '#fff';
+    cCtx.beginPath();
+    cCtx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
+    cCtx.fill();
+  });
+  cCtx.globalAlpha = 1;
+
+  // Moon (top-right area)
+  moonX = W * 0.82;
+  moonY = H * 0.22;
+  const moonR = Math.min(W, H) * 0.1;
+
+  // moon glow
+  const moonGlow = cCtx.createRadialGradient(moonX, moonY, moonR * 0.5, moonX, moonY, moonR * 2.2);
+  moonGlow.addColorStop(0, 'rgba(220,210,190,0.12)');
+  moonGlow.addColorStop(1, 'rgba(0,0,0,0)');
+  cCtx.fillStyle = moonGlow;
+  cCtx.beginPath();
+  cCtx.arc(moonX, moonY, moonR * 2.2, 0, Math.PI * 2);
+  cCtx.fill();
+
+  // moon body
+  const moonBody = cCtx.createRadialGradient(moonX - moonR * 0.2, moonY - moonR * 0.2, moonR * 0.1, moonX, moonY, moonR);
+  moonBody.addColorStop(0, '#c8c0b0');
+  moonBody.addColorStop(0.6, '#9e9080');
+  moonBody.addColorStop(1, '#6a5f52');
+  cCtx.fillStyle = moonBody;
+  cCtx.beginPath();
+  cCtx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+  cCtx.fill();
+
+  // moon craters
+  [[0.3, -0.2, 0.12], [-0.2, 0.3, 0.08], [0.1, 0.35, 0.06], [-0.35, -0.1, 0.09], [0.4, 0.2, 0.05]].forEach(([dx, dy, dr]) => {
+    cCtx.fillStyle = 'rgba(0,0,0,0.18)';
+    cCtx.beginPath();
+    cCtx.arc(moonX + dx * moonR, moonY + dy * moonR, dr * moonR, 0, Math.PI * 2);
+    cCtx.fill();
+  });
+
+  // "MOON" label
+  cCtx.fillStyle = 'rgba(180,170,155,0.3)';
+  cCtx.font = `${Math.max(8, moonR * 0.28)}px Georgia`;
+  cCtx.textAlign = 'center';
+  cCtx.fillText('moon', moonX, moonY + moonR + moonR * 0.45);
+
+  // Earth (bottom-left corner, partially hidden)
+  const earthX = W * 0.06;
+  const earthY = H * 0.88;
+  const earthR = Math.min(W, H) * 0.11;
+
+  const earthGlow = cCtx.createRadialGradient(earthX, earthY, 0, earthX, earthY, earthR * 2);
+  earthGlow.addColorStop(0, 'rgba(60,100,200,0.15)');
+  earthGlow.addColorStop(1, 'rgba(0,0,0,0)');
+  cCtx.fillStyle = earthGlow;
+  cCtx.beginPath();
+  cCtx.arc(earthX, earthY, earthR * 2, 0, Math.PI * 2);
+  cCtx.fill();
+
+  // Earth body — clip to canvas
+  cCtx.save();
+  cCtx.beginPath();
+  cCtx.rect(0, 0, W, H);
+  cCtx.clip();
+
+  const earthBody = cCtx.createRadialGradient(earthX - earthR * 0.2, earthY - earthR * 0.3, 0, earthX, earthY, earthR);
+  earthBody.addColorStop(0, '#5080d0');
+  earthBody.addColorStop(0.5, '#3060a8');
+  earthBody.addColorStop(1, '#1a3060');
+  cCtx.fillStyle = earthBody;
+  cCtx.beginPath();
+  cCtx.arc(earthX, earthY, earthR, 0, Math.PI * 2);
+  cCtx.fill();
+
+  // continent blobs
+  cCtx.fillStyle = 'rgba(60,130,80,0.55)';
+  [[0, -0.3, 0.22], [0.25, 0.1, 0.16], [-0.25, 0.2, 0.13]].forEach(([dx, dy, dr]) => {
+    cCtx.beginPath();
+    cCtx.arc(earthX + dx * earthR, earthY + dy * earthR, dr * earthR, 0, Math.PI * 2);
+    cCtx.fill();
+  });
+
+  // atmosphere halo
+  const atmo = cCtx.createRadialGradient(earthX, earthY, earthR * 0.95, earthX, earthY, earthR * 1.15);
+  atmo.addColorStop(0, 'rgba(80,140,255,0.18)');
+  atmo.addColorStop(1, 'rgba(0,0,0,0)');
+  cCtx.fillStyle = atmo;
+  cCtx.beginPath();
+  cCtx.arc(earthX, earthY, earthR * 1.15, 0, Math.PI * 2);
+  cCtx.fill();
+  cCtx.restore();
+
+  // label
+  cCtx.fillStyle = 'rgba(100,150,255,0.3)';
+  cCtx.font = `${Math.max(8, earthR * 0.25)}px Georgia`;
+  cCtx.textAlign = 'center';
+  cCtx.fillText('home', earthX, earthY + earthR * 0.65);
+
+  // ── ORION SPACECRAFT ──
+  // orbit path progress: 0→1 from Earth to Moon
+  const missionStart = new Date('2026-04-01T22:35:00Z').getTime();
+  const missionDuration = 10 * 24 * 60 * 60 * 1000; // 10 days
+  const now = Date.now();
+  const tProgress = Math.min(1, (now - missionStart) / missionDuration);
+
+  // Bezier from Earth to Moon
+  const p0 = { x: earthX, y: earthY };
+  const p3 = { x: moonX, y: moonY };
+  const cpX = W * 0.5, cpY = H * 0.05;
+  const p1 = { x: cpX, y: cpY };
+  const p2 = { x: moonX - W * 0.1, y: moonY - H * 0.05 };
+
+  // draw trajectory trail
+  cCtx.beginPath();
+  cCtx.moveTo(p0.x, p0.y);
+  cCtx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+  cCtx.strokeStyle = 'rgba(100,160,255,0.08)';
+  cCtx.lineWidth = 1.5;
+  cCtx.setLineDash([3, 7]);
+  cCtx.stroke();
+  cCtx.setLineDash([]);
+
+  // draw partial trail up to tProgress
+  function bezierPoint(t, p0, p1, p2, p3) {
+    const mt = 1 - t;
+    return {
+      x: mt*mt*mt*p0.x + 3*mt*mt*t*p1.x + 3*mt*t*t*p2.x + t*t*t*p3.x,
+      y: mt*mt*mt*p0.y + 3*mt*mt*t*p1.y + 3*mt*t*t*p2.y + t*t*t*p3.y
+    };
+  }
+
+  // glow trail
+  cCtx.beginPath();
+  for (let ti = 0; ti <= tProgress; ti += 0.01) {
+    const pt = bezierPoint(ti, p0, p1, p2, p3);
+    if (ti === 0) cCtx.moveTo(pt.x, pt.y);
+    else cCtx.lineTo(pt.x, pt.y);
+  }
+  const trailGrad = cCtx.createLinearGradient(p0.x, p0.y, moonX, moonY);
+  trailGrad.addColorStop(0, 'rgba(80,140,255,0)');
+  trailGrad.addColorStop(1, 'rgba(120,200,255,0.45)');
+  cCtx.strokeStyle = trailGrad;
+  cCtx.lineWidth = 1.5;
+  cCtx.stroke();
+
+  // ship position
+  const ship = bezierPoint(tProgress, p0, p1, p2, p3);
+
+  // pulsing halo
+  const pulseRadius = 6 + Math.sin(ts * 0.002) * 2;
+  const shipHalo = cCtx.createRadialGradient(ship.x, ship.y, 0, ship.x, ship.y, pulseRadius * 3);
+  shipHalo.addColorStop(0, 'rgba(150,220,255,0.4)');
+  shipHalo.addColorStop(1, 'rgba(0,0,0,0)');
+  cCtx.fillStyle = shipHalo;
+  cCtx.beginPath();
+  cCtx.arc(ship.x, ship.y, pulseRadius * 3, 0, Math.PI * 2);
+  cCtx.fill();
+
+  // ship dot
+  cCtx.fillStyle = '#a0e0ff';
+  cCtx.shadowColor = '#60c0ff';
+  cCtx.shadowBlur = 12;
+  cCtx.beginPath();
+  cCtx.arc(ship.x, ship.y, 3.5, 0, Math.PI * 2);
+  cCtx.fill();
+  cCtx.shadowBlur = 0;
+
+  // "ORION" label near ship
+  const labelX = ship.x + 10;
+  const labelY = ship.y - 10;
+  cCtx.fillStyle = 'rgba(150,200,255,0.5)';
+  cCtx.font = '9px Courier New';
+  cCtx.textAlign = 'left';
+  cCtx.fillText('ORION', labelX, labelY);
+
+  requestAnimationFrame(drawCosmos);
+}
+
+requestAnimationFrame(drawCosmos);
+
+// ─────────────────────────────────────────────
+//  GROUND CANVAS — smoky embers
+// ─────────────────────────────────────────────
+const groundCanvas = document.getElementById('ground-canvas');
+const gCtx = groundCanvas.getContext('2d');
+
+function resizeGround() {
+  groundCanvas.width = groundCanvas.offsetWidth;
+  groundCanvas.height = groundCanvas.offsetHeight;
+}
+resizeGround();
+
+const embers = Array.from({ length: 45 }, () => ({
+  x: Math.random(),
+  y: Math.random() * 0.5 + 0.5,
+  r: Math.random() * 1.5 + 0.5,
+  alpha: Math.random() * 0.3 + 0.05,
+  vy: -(Math.random() * 0.0003 + 0.0001),
+  vx: (Math.random() - 0.5) * 0.0001,
+  hue: Math.random() * 30 + 20
+}));
+
+function drawGround(ts) {
+  const W = groundCanvas.width, H = groundCanvas.height;
+  gCtx.clearRect(0, 0, W, H);
+
+  embers.forEach(e => {
+    e.y += e.vy;
+    e.x += e.vx;
+    if (e.y < -0.05) { e.y = 1; e.x = Math.random(); }
+    gCtx.globalAlpha = e.alpha * (0.7 + 0.3 * Math.sin(ts * 0.001 + e.x * 10));
+    gCtx.fillStyle = `hsl(${e.hue}, 80%, 60%)`;
+    gCtx.shadowColor = `hsl(${e.hue}, 90%, 50%)`;
+    gCtx.shadowBlur = 6;
+    gCtx.beginPath();
+    gCtx.arc(e.x * W, e.y * H, e.r, 0, Math.PI * 2);
+    gCtx.fill();
+    gCtx.shadowBlur = 0;
+  });
+  gCtx.globalAlpha = 1;
+
+  requestAnimationFrame(drawGround);
+}
+requestAnimationFrame(drawGround);
+
+// ─────────────────────────────────────────────
+//  DISTANCE COUNTER
+// ─────────────────────────────────────────────
+function updateDistance() {
+  // Launch: April 1 22:35 UTC
+  // TLI completed April 2; ~124,000 km on flight day 3
+  // Approximate ~77,000 miles = ~123,900 km from ABC feed on April 3 morning
+  // Speed post-TLI slows as it climbs: approx 3200 km/h at this point
+  const launch = new Date('2026-04-01T22:35:00Z').getTime();
+  const now = Date.now();
+  const hrs = (now - launch) / 3600000;
+
+  // Approximate distance model: TLI added ~40,000 km/h burst, then decelerating
+  // At ~36 hrs post-launch (April 3, ~10am UTC), ~125,000 km
+  // Simple linear fit: ~3,400 km/h average (slowing)
+  const BASE_DIST = 9000; // km at launch+1h (in orbit)
+  const TLI_BOOST = 38000; // km added by TLI at ~22h
+  const POST_TLI_RATE = 3400; // km/h post-TLI (approx, decelerating)
+  
+  let dist;
+  if (hrs < 22) {
+    dist = BASE_DIST + hrs * 800;
+  } else {
+    dist = BASE_DIST + 22 * 800 + (hrs - 22) * POST_TLI_RATE;
+  }
+  dist = Math.min(dist, 406400); // can't exceed moon
+
+  const km = Math.round(dist).toLocaleString();
+  const miles = Math.round(dist * 0.621371).toLocaleString();
+  document.getElementById('dist-val').textContent = `${km} km`;
+  document.querySelector('#orion-info .sub').textContent = `≈ ${miles} mi · Outbound`;
+}
+
+// ─────────────────────────────────────────────
+//  MISSION ELAPSED TIME
+// ─────────────────────────────────────────────
+function updateMET() {
+  const launch = new Date('2026-04-01T22:35:00Z').getTime();
+  const now = Date.now();
+  const diff = now - launch;
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const pad = n => String(n).padStart(2, '0');
+  document.getElementById('met-val').textContent = `${pad(d)}d ${pad(h)}h ${pad(m)}m`;
+}
+
+updateDistance(); updateMET();
+setInterval(() => { updateDistance(); updateMET(); }, 30000);
+
+// ─────────────────────────────────────────────
+//  RESIZE
+// ─────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  resizeCosmos();
+  resizeGround();
+});
+
+// ─────────────────────────────────────────────
+//  HORIZON PULSE
+// ─────────────────────────────────────────────
+const horizon = document.getElementById('horizon');
+let hPhase = 0;
+function pulseHorizon() {
+  hPhase += 0.02;
+  const glow = 0.35 + 0.15 * Math.sin(hPhase);
+  horizon.style.boxShadow = `0 0 18px 4px rgba(232,200,122,${glow}), 0 0 60px 10px rgba(232,200,122,${glow * 0.3})`;
+  requestAnimationFrame(pulseHorizon);
+}
+pulseHorizon();
+</script>
+
+</body>
+</html>

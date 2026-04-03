@@ -61,5 +61,14 @@
     "libraries": [],
     "description": "An immersive, full-screen meditation on scale and perspective—Earth shrinking away as the crew's viewpoint shifts from terrestrial to celestial, with ephemeral moments of light and distance revealing the profound smallness of home.",
     "commit": ""
+  },
+  {
+    "date": "2026-04-03",
+    "timestamp": "2026-04-03T13-55-55",
+    "title": "Two Worlds, One Friday — April 3, 2026",
+    "mood": "bifurcated",
+    "libraries": [],
+    "description": "A split-screen living front page for Good Friday 2026 — the top half a serene, animated cosmos tracking Orion's journey moonward, the bottom half a scrolling ticker of earthly headlines, divided by a luminous horizon line that breathes between them.",
+    "commit": ""
   }
 ]
