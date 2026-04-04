@@ -70,5 +70,14 @@
     "libraries": [],
     "description": "A split-screen living front page for Good Friday 2026 — the top half a serene, animated cosmos tracking Orion's journey moonward, the bottom half a scrolling ticker of earthly headlines, divided by a luminous horizon line that breathes between them.",
     "commit": ""
+  },
+  {
+    "date": "2026-04-04",
+    "timestamp": "2026-04-04T06-57-02",
+    "title": "Signal · Holy Saturday · Flight Day 4",
+    "mood": "haunted",
+    "libraries": [],
+    "description": "A CRT terminal receiving a live transmission log from Orion Integrity on Flight Day 4 — crew dispatches from deep space interleaved with fragmented news from a burning world below, rendered in phosphor-green on black with scanline overlay and a blinking cursor.",
+    "commit": ""
   }
 ]

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIGNAL — Holy Saturday — Flight Day 4</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --phosphor: #39ff84;
+    --phosphor-dim: #1a7a3e;
+    --phosphor-faint: #0d3d20;
+    --phosphor-glow: rgba(57, 255, 132, 0.18);
+    --bg: #020c06;
+    --amber: #ffb347;
+    --amber-dim: #7a4a10;
+    --red: #ff4444;
+    --blue: #5af;
+  }
+
+  html, body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+  }
+
+  /* CRT curvature effect */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.85) 100%);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* Scanlines */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.18) 2px,
+      rgba(0, 0, 0, 0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+    animation: scanroll 8s linear infinite;
+  }
+
+  @keyframes scanroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100px; }
+  }
+
+  /* Main layout */
+  #terminal {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Top header bar */
+  #header {
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--phosphor-dim);
+    padding: 6px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(57, 255, 132, 0.04);
+  }
+
+  #header .left {
+    color: var(--phosphor);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 8px var(--phosphor);
+  }
+  #header .center {
+    color: var(--phosphor);
+    font-size: 0.85rem;
+    letter-spacing: 0.22em;
+    font-weight: bold;
+    text-shadow: 0 0 14px var(--phosphor), 0 0 30px var(--phosphor-glow);
+    animation: pulse-title 4s ease-in-out infinite;
+  }
+  @keyframes pulse-title {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.75; }
+  }
+  #header .right {
+    color: var(--phosphor-dim);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-align: right;
+  }
+  #header .right span {
+    color: var(--phosphor);
+    text-shadow: 0 0 6px var(--phosphor);
+  }
+
+  /* Status bar */
+  #statusbar {
+    flex-shrink: 0;
+    padding: 3px 16px;
+    display: flex;
+    gap: 24px;
+    background: rgba(57, 255, 132, 0.03);
+    border-bottom: 1px solid var(--phosphor-faint);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--phosphor-dim);
+  }
+  .stat-item .label { color: var(--phosphor-faint); }
+  .stat-item .val { color: var(--phosphor); text-shadow: 0 0 6px var(--phosphor); }
+
+  /* Scroll area */
+  #log-wrap {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    padding: 10px 0;
+  }
+
+  #log {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 16px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .line {
+    font-size: 0.72rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .line.show { opacity: 1; }
+
+  /* Line types */
+  .line.blank { min-height: 1.65em; }
+  .line.sys {
+    color: var(--phosphor-dim);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+  }
+  .line.sys .marker { color: var(--phosphor-faint); }
+  .line.orion {
+    color: var(--phosphor);
+    text-shadow: 0 0 6px rgba(57, 255, 132, 0.4);
+  }
+  .line.orion .tag {
+    color: var(--phosphor);
+    text-shadow: 0 0 10px var(--phosphor);
+    font-weight: bold;
+  }
+  .line.earth {
+    color: #a0c8ff;
+    text-shadow: 0 0 5px rgba(160, 200, 255, 0.3);
+  }
+  .line.earth .tag {
+    color: #6aafff;
+    font-weight: bold;
+  }
+  .line.warn {
+    color: var(--amber);
+    text-shadow: 0 0 6px rgba(255, 179, 71, 0.4);
+  }
+  .line.warn .tag {
+    color: #ffd080;
+    font-weight: bold;
+  }
+  .line.critical {
+    color: var(--red);
+    text-shadow: 0 0 6px rgba(255, 68, 68, 0.5);
+    animation: flicker-red 3s ease-in-out infinite;
+  }
+  @keyframes flicker-red {
+    0%, 90%, 100% { opacity: 1; }
+    93% { opacity: 0.6; }
+    96% { opacity: 1; }
+    98% { opacity: 0.7; }
+  }
+  .line.separator {
+    color: var(--phosphor-faint);
+    font-size: 0.55rem;
+    letter-spacing: 0.05em;
+  }
+  .line.meta {
+    color: #4a8a5a;
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+  }
+
+  /* Cursor line */
+  #cursor-line {
+    font-size: 0.72rem;
+    color: var(--phosphor);
+    text-shadow: 0 0 8px var(--phosphor);
+    padding: 0 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    min-height: 1.65em;
+    display: flex;
+    align-items: center;
+  }
+  #cursor {
+    display: inline-block;
+    width: 9px;
+    height: 1.1em;
+    background: var(--phosphor);
+    box-shadow: 0 0 8px var(--phosphor);
+    animation: blink 1.1s step-end infinite;
+    vertical-align: text-bottom;
+    margin-left: 1px;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Bottom info bar */
+  #footer {
+    flex-shrink: 0;
+    border-top: 1px solid var(--phosphor-faint);
+    padding: 4px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    color: var(--phosphor-faint);
+    background: rgba(57, 255, 132, 0.02);
+  }
+  #footer .met { color: var(--phosphor-dim); }
+  #footer a {
+    color: rgba(57, 255, 132, 0.18);
+    text-decoration: none;
+    letter-spacing: 0.12em;
+    transition: color 0.3s;
+  }
+  #footer a:hover { color: var(--phosphor-dim); }
+
+  /* Glitch effect on header text occasionally */
+  @keyframes glitch {
+    0%   { transform: translateX(0); clip-path: inset(0 0 100% 0); }
+    10%  { transform: translateX(-2px); clip-path: inset(20% 0 40% 0); }
+    20%  { transform: translateX(1px); clip-path: inset(60% 0 5% 0); }
+    30%  { clip-path: inset(0 0 100% 0); }
+    100% { transform: translateX(0); clip-path: inset(0 0 100% 0); }
+  }
+
+  /* Horizontal noise lines */
+  .noise-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: rgba(57, 255, 132, 0.12);
+    animation: noise-drift linear infinite;
+    pointer-events: none;
+  }
+  @keyframes noise-drift {
+    from { top: 100%; }
+    to { top: -1px; }
+  }
+
+  /* Distance counter special styling */
+  #dist-display {
+    text-shadow: 0 0 12px var(--phosphor);
+    animation: dist-pulse 2s ease-in-out infinite;
+  }
+  @keyframes dist-pulse {
+    0%, 100% { text-shadow: 0 0 12px var(--phosphor); }
+    50% { text-shadow: 0 0 20px var(--phosphor), 0 0 40px rgba(57,255,132,0.3); }
+  }
+</style>
+</head>
+<body>
+<div id="terminal">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div class="left">NASA DSN · GOLDSTONE · LINK ACTIVE</div>
+    <div class="center">◈ ORION INTEGRITY · ARTEMIS II · FLT DAY 4 ◈</div>
+    <div class="right">
+      2026-04-04 · HOLY SATURDAY<br>
+      MET <span id="met-header">00d 00h 00m 00s</span>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div id="statusbar">
+    <div class="stat-item"><span class="label">DIST — </span><span class="val" id="dist-stat">---,--- km</span></div>
+    <div class="stat-item"><span class="label">VEL — </span><span class="val" id="vel-stat">~2,900 km/h</span></div>
+    <div class="stat-item"><span class="label">CREW — </span><span class="val">4 NOMINAL</span></div>
+    <div class="stat-item"><span class="label">FLYBY — </span><span class="val">MON APR 6</span></div>
+    <div class="stat-item"><span class="label">SIGNAL DELAY — </span><span class="val" id="delay-stat">~0.8s</span></div>
+    <div class="stat-item"><span class="label">LINK — </span><span class="val">34m DSN ✓</span></div>
+  </div>
+
+  <!-- LOG AREA -->
+  <div id="log-wrap">
+    <!-- Noise lines -->
+    <div class="noise-line" style="animation-duration: 7s; opacity: 0.6;"></div>
+    <div class="noise-line" style="animation-duration: 13s; animation-delay: -4s; opacity: 0.35;"></div>
+    <div class="noise-line" style="animation-duration: 19s; animation-delay: -8s; opacity: 0.2;"></div>
+    <div id="log"></div>
+  </div>
+
+  <!-- CURSOR LINE -->
+  <div id="cursor-line"><span id="cursor-text"></span><span id="cursor"></span></div>
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <span>SIGNAL © NASA ARTEMIS PROGRAM · HOLY SATURDAY 2026</span>
+    <span class="met">MET <span id="met-footer">--d --h --m --s</span></span>
+    <a href="./history.html">▸ ARCHIVE</a>
+  </div>
+
+</div>
+
+<script>
+// ── TIMING ──────────────────────────────────────────────
+const LAUNCH = new Date('2026-04-01T22:35:12Z').getTime();
+
+function getMET() {
+  const diff = Math.max(0, Date.now() - LAUNCH);
+  const totalSec = Math.floor(diff / 1000);
+  const d = Math.floor(totalSec / 86400);
+  const h = Math.floor((totalSec % 86400) / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const p = n => String(n).padStart(2, '0');
+  return { d, h, m, s, str: `${p(d)}d ${p(h)}h ${p(m)}m ${p(s)}s` };
+}
+
+function getDistance() {
+  const hrs = (Date.now() - LAUNCH) / 3600000;
+  // Model: LEO for first ~22h, then decelerating post-TLI
+  // At ~36h post-launch ≈ 125,000 km; at ~72h ≈ 200,000km+
+  let dist;
+  if (hrs < 1.5) {
+    dist = 200 + hrs * 500;
+  } else if (hrs < 22) {
+    dist = 750 + hrs * 800;
+  } else {
+    // Post-TLI: starts fast, decelerates
+    // v(t) ≈ 3800 - 30*(t-22) km/h, floor at 2100 km/h
+    const t = hrs - 22;
+    const baseAtTLI = 750 + 22 * 800;
+    // integrate with deceleration
+    const accel = -25; // km/h per hour
+    const v0 = 3800;
+    // dist = v0*t + 0.5*accel*t^2, min velocity 2100
+    const tFloor = (v0 - 2100) / (-accel); // ~68h after TLI
+    if (t <= tFloor) {
+      dist = baseAtTLI + v0 * t + 0.5 * accel * t * t;
+    } else {
+      const distToFloor = v0 * tFloor + 0.5 * accel * tFloor * tFloor;
+      dist = baseAtTLI + distToFloor + 2100 * (t - tFloor);
+    }
+  }
+  return Math.min(Math.round(dist), 406400);
+}
+
+function getVelocity() {
+  const hrs = (Date.now() - LAUNCH) / 3600000;
+  if (hrs < 22) return 800;
+  const t = hrs - 22;
+  return Math.max(2100, Math.round(3800 - 25 * t));
+}
+
+function getSignalDelay() {
+  const km = getDistance();
+  const secs = km / 299792;
+  if (secs < 1) return `~${(secs * 1000).toFixed(0)}ms`;
+  return `~${secs.toFixed(2)}s`;
+}
+
+function updateStats() {
+  const met = getMET();
+  const km = getDistance();
+  const vel = getVelocity();
+  document.getElementById('met-header').textContent = met.str;
+  document.getElementById('met-footer').textContent = met.str;
+  document.getElementById('dist-stat').textContent =
+    km.toLocaleString() + ' km / ' + Math.round(km * 0.621371).toLocaleString() + ' mi';
+  document.getElementById('vel-stat').textContent = vel.toLocaleString() + ' km/h';
+  document.getElementById('delay-stat').textContent = getSignalDelay();
+}
+
+updateStats();
+setInterval(updateStats, 1000);
+
+// ── TRANSMISSION LOG ─────────────────────────────────────
+// Each entry: { type, text, delay }
+// type: 'sys' | 'orion' | 'earth' | 'warn' | 'critical' | 'blank' | 'separator' | 'meta'
+
+const transmissions = [
+  { type: 'sys', text: '▸▸▸ ARTEMIS II MISSION COMMUNICATIONS LOG', delay: 0 },
+  { type: 'sys', text: '▸▸▸ HOLY SATURDAY · 04 APRIL 2026 · FLIGHT DAY 4', delay: 600 },
+  { type: 'meta', text: '    [SIGNAL SOURCE: DSN-14 GOLDSTONE / 26m APERTURE]', delay: 1200 },
+  { type: 'meta', text: '    [UPLINK: 16 kbps · DOWNLINK: 2 Mbps · BER: NOMINAL]', delay: 1600 },
+  { type: 'separator', text: '────────────────────────────────────────────────────────────────', delay: 2100 },
+  { type: 'blank', text: '', delay: 2300 },
+
+  { type: 'sys', text: '00:00 UTC — SESSION OPEN — ARTEMIS II / ORION INTEGRITY', delay: 2500 },
+  { type: 'blank', text: '', delay: 2700 },
+
+  { type: 'orion', tag: '[ORION · WISEMAN]', text: ' Commander Wiseman. Go ahead, Houston.', delay: 3000 },
+  { type: 'earth', tag: '[MCC-H · NELSON]', text: '  Good morning, Reid. Flight Day 4. How\'s the crew?', delay: 4200 },
+  { type: 'orion', tag: '[ORION · WISEMAN]', text: ' Sleeping bags got warmer. Cabin pressure nominal.\n                         Christina made coffee. Or tried to.', delay: 5600 },
+  { type: 'earth', tag: '[MCC-H · NELSON]', text: '  Copy that. Still working the thermal config.', delay: 7000 },
+  { type: 'blank', text: '', delay: 7600 },
+
+  { type: 'meta', text: '    [AUTO LOG: 04:17 UTC · DIST 173,421 km · VEL 2,980 km/h]', delay: 7900 },
+  { type: 'separator', text: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -', delay: 8300 },
+  { type: 'blank', text: '', delay: 8500 },
+
+  { type: 'warn', tag: '[EARTH · DISPATCH]', text: '  Strait of Hormuz — Day 35 of conflict.\n                         Traffic down from 150 vessels/day to 10-20.\n                         Jet fuel prices doubled worldwide.', delay: 9000 },
+  { type: 'blank', text: '', delay: 10200 },
+
+  { type: 'orion', tag: '[ORION · HANSEN]', text: ' Jeremy here. I just did a full window pass.\n                         Earth is... about the size of a marble now.\n                         You can cover it with your thumb.', delay: 10800 },
+  { type: 'earth', tag: '[MCC-H · FRIELING]', text: '  Copy, Jeremy. Perspective check confirmed.', delay: 12300 },
+  { type: 'blank', text: '', delay: 13000 },
+
+  { type: 'warn', tag: '[EARTH · DISPATCH]', text: '  US F-15 down in Iran. Second aircraft lost\n                         near Strait of Hormuz. 5th week of US-Israeli-Iran conflict.', delay: 13500 },
+  { type: 'blank', text: '', delay: 14600 },
+
+  { type: 'orion', tag: '[ORION · GLOVER]', text: ' Victor Glover. I want to say something.\n                         From up here you can\'t see the wars.\n                         You just see the planet. All of it. All at once.', delay: 15200 },
+  { type: 'orion', tag: '[ORION · GLOVER]', text: ' It\'s the most beautiful thing I\'ve ever seen.\n                         And the most heartbreaking.', delay: 17000 },
+  { type: 'blank', text: '', delay: 18200 },
+
+  { type: 'meta', text: '    [06:33 UTC · ORION CROSSES 175,000 km THRESHOLD]', delay: 18600 },
+  { type: 'meta', text: '    [EQUIDISTANT POINT EARTH-MOON APPROACHING · ~48h]', delay: 19100 },
+  { type: 'separator', text: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -', delay: 19600 },
+  { type: 'blank', text: '', delay: 20000 },
+
+  { type: 'earth', tag: '[EARTH · DISPATCH]', text: '  Holy Saturday, Jerusalem. Good Friday services moved\n                         inside St. Savior Church. Via Dolorosa empty.\n                         Police restrict gatherings due to missile risk.', delay: 20400 },
+  { type: 'blank', text: '', delay: 21500 },
+
+  { type: 'orion', tag: '[ORION · KOCH]', text: ' Christina Koch. First correction burn prep underway.\n                         Lunar Observation Plan received. Targeting craters,\n                         ancient lava flows, far-side ridgelines.', delay: 22000 },
+  { type: 'earth', tag: '[MCC-H · NELSON]', text: '  Confirmed. You\'ll also see a solar eclipse Monday —\n                         sun disappearing behind the Moon from your perspective.\n                         Nearly one hour of totality.', delay: 23500 },
+  { type: 'orion', tag: '[ORION · KOCH]', text: ' I have been waiting my whole life for that sentence.', delay: 25200 },
+  { type: 'blank', text: '', delay: 26000 },
+
+  { type: 'meta', text: '    [08:44 UTC · PRESSURE NOMINAL · POWER 94% · COMMS STABLE]', delay: 26400 },
+  { type: 'separator', text: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -', delay: 26900 },
+  { type: 'blank', text: '', delay: 27200 },
+
+  { type: 'warn', tag: '[EARTH · DISPATCH]', text: '  Pentagon requests $1.5T defense budget — largest\n                         year-over-year increase since WWII.', delay: 27600 },
+  { type: 'warn', tag: '[EARTH · DISPATCH]', text: '  Venezuela: 3 months after capture of Maduro.\n                         Citizens demonstrate openly in streets for first time.', delay: 29000 },
+  { type: 'blank', text: '', delay: 30000 },
+
+  { type: 'orion', tag: '[ORION · WISEMAN]', text: ' Reid again. Tomorrow\'s Easter Sunday down there.\n                         We\'ll be about 230,000 miles out.\n                         Somewhere between here and everything we know.', delay: 30500 },
+  { type: 'orion', tag: '[ORION · WISEMAN]', text: ' I keep thinking about what Jeremy said yesterday.\n                         It\'s humanity\'s hopes that carry us now.\n                         I believe that.', delay: 32300 },
+  { type: 'blank', text: '', delay: 33400 },
+
+  { type: 'earth', tag: '[EARTH · DISPATCH]', text: '  Pakistan-Afghanistan peace talks begin in Beijing.\n                         First direct negotiations in three years.', delay: 33900 },
+  { type: 'earth', tag: '[EARTH · DISPATCH]', text: '  Seville\'s Semana Santa processions draw crowds\n                         despite declining church attendance across Spain.\n                         Something in the music still moves people.', delay: 35300 },
+  { type: 'blank', text: '', delay: 36500 },
+
+  { type: 'meta', text: '    [10:02 UTC · FIRST CORRECTION BURN: GO / SCHEDULED 14:00 UTC]', delay: 37000 },
+  { type: 'separator', text: '────────────────────────────────────────────────────────────────', delay: 37500 },
+  { type: 'blank', text: '', delay: 37900 },
+
+  { type: 'orion', tag: '[ORION · GLOVER]', text: ' Houston, you asked about the zero-g indicator.\n                         \'Rise\' is still floating. Still rising.\n                         Just like the rest of us.', delay: 38300 },
+  { type: 'earth', tag: '[MCC-H · NELSON]', text: '  Copy that, Victor. Rise is nominal. Copy all.', delay: 39800 },
+  { type: 'blank', text: '', delay: 40500 },
+
+  { type: 'warn', tag: '[EARTH · DISPATCH]', text: '  Cuba pardons political prisoners, citing Holy Week.\n                         Called a "humanitarian gesture."', delay: 41000 },
+  { type: 'warn', tag: '[EARTH · DISPATCH]', text: '  Nicolás Maduro captured 3 months ago. Venezuelans\n                         say they can finally talk politics in the open.', delay: 42400 },
+  { type: 'blank', text: '', delay: 43400 },
+
+  { type: 'orion', tag: '[ORION · HANSEN]', text: ' You know what I keep thinking about?\n                         The people who built this spacecraft.\n                         They\'re all still on that marble back there.', delay: 43900 },
+  { type: 'orion', tag: '[ORION · HANSEN]', text: ' Every nation. Every language. Every argument.\n                         Every war. Everything beautiful.\n                         All of it. On that marble.', delay: 45800 },
+  { type: 'blank', text: '', delay: 47000 },
+
+  { type: 'meta', text: '    [AUTO: LUNAR FLYBY T-MINUS ~38 HOURS · CLOSEST APPROACH APR 6]', delay: 47500 },
+  { type: 'meta', text: '    [RECORD DISTANCE 252,021 STATUTE MI · APOLLO 13 +3,366 MI]', delay: 48100 },
+  { type: 'separator', text: '────────────────────────────────────────────────────────────────', delay: 48700 },
+  { type: 'blank', text: '', delay: 49100 },
+
+  { type: 'earth', tag: '[EARTH · DISPATCH]', text: '  Easter Sunday arrives in 24 hours.\n                         Four humans will watch it rise from 230,000 miles away.', delay: 49500 },
+  { type: 'blank', text: '', delay: 50500 },
+
+  { type: 'orion', tag: '[ORION · ALL]', text: ' WISEMAN: We\'ll be watching.\n GLOVER: Count on it.\n KOCH: Same sky.\n HANSEN: For all of humanity.', delay: 51000 },
+  { type: 'blank', text: '', delay: 52500 },
+
+  { type: 'sys', text: '▸▸▸ SIGNAL NOMINAL · DOWNLINK ACTIVE · NEXT SCHEDULED DOWNLINK 16:00 UTC', delay: 53200 },
+  { type: 'sys', text: '▸▸▸ THIS LOG UPDATES CONTINUOUSLY · TRANSMISSION LIVE', delay: 54000 },
+  { type: 'separator', text: '────────────────────────────────────────────────────────────────', delay: 54800 },
+];
+
+// ── RENDER ENGINE ─────────────────────────────────────────
+const logEl = document.getElementById('log');
+const cursorText = document.getElementById('cursor-text');
+const logWrap = document.getElementById('log-wrap');
+const MAX_LINES = 50;
+const renderedLines = [];
+let lineIndex = 0;
+
+function makeLineEl(entry) {
+  const el = document.createElement('div');
+  el.classList.add('line', entry.type);
+
+  if (entry.type === 'orion' || entry.type === 'earth' || entry.type === 'warn' || entry.type === 'earth' && entry.tag) {
+    const tagEl = document.createElement('span');
+    tagEl.classList.add('tag');
+    tagEl.textContent = entry.tag || '';
+    el.appendChild(tagEl);
+    el.appendChild(document.createTextNode(entry.text));
+  } else {
+    el.textContent = entry.text;
+  }
+
+  return el;
+}
+
+function addLine(entry) {
+  const el = makeLineEl(entry);
+  logEl.appendChild(el);
+  renderedLines.push(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+
+  // Remove oldest if too many
+  if (renderedLines.length > MAX_LINES) {
+    const old = renderedLines.shift();
+    old.remove();
+  }
+
+  // Scroll to bottom
+  logWrap.scrollTop = logWrap.scrollHeight;
+}
+
+// Typewriter for cursor line
+let typingQueue = [];
+let typing = false;
+let cursorContent = '';
+
+function typeCursor(text, cb) {
+  cursorContent = '';
+  cursorText.textContent = '';
+  let i = 0;
+  function tick() {
+    if (i < text.length) {
+      cursorContent += text[i];
+      cursorText.textContent = cursorContent;
+      i++;
+      setTimeout(tick, 22 + Math.random() * 30);
+    } else {
+      setTimeout(() => {
+        if (cb) cb();
+      }, 500);
+    }
+  }
+  tick();
+}
+
+function showNextLine() {
+  if (lineIndex >= transmissions.length) {
+    // Loop after a long pause
+    setTimeout(() => {
+      lineIndex = 0;
+      // Clear and restart with updated time info
+      renderedLines.forEach(el => el.remove());
+      renderedLines.length = 0;
+      showNextLine();
+    }, 20000);
+    return;
+  }
+
+  const entry = transmissions[lineIndex];
+  lineIndex++;
+
+  // Typing animation on cursor for certain line types
+  if (entry.type === 'orion' || entry.type === 'earth') {
+    const displayText = (entry.tag || '') + entry.text;
+    typeCursor('RECEIVING: ' + displayText.substring(0, 40) + '...', () => {
+      cursorText.textContent = '';
+      addLine(entry);
+      const next = transmissions[lineIndex];
+      const delay = next ? (next.delay - entry.delay) : 2000;
+      setTimeout(showNextLine, Math.max(300, Math.min(delay, 3000)));
+    });
+  } else {
+    cursorText.textContent = '';
+    addLine(entry);
+    const next = transmissions[lineIndex];
+    const delay = next ? (next.delay - entry.delay) : 1500;
+    setTimeout(showNextLine, Math.max(80, Math.min(delay, 2500)));
+  }
+}
+
+// Start after brief boot sequence
+setTimeout(() => {
+  showNextLine();
+}, 800);
+
+// ── BOOT SEQUENCE ─────────────────────────────────────────
+const bootLines = [
+  { type: 'sys', text: 'INITIALIZING ARTEMIS COMM RELAY SYSTEM v4.2.1' },
+  { type: 'sys', text: 'DSN UPLINK CONFIRMED · GOLDSTONE 34m DISH · AZ' },
+  { type: 'meta', text: '    SIGNAL LOCK: ████████████████████ 100%' },
+  { type: 'meta', text: '    AUTHENTICATING CREW VOICE CHANNELS...' },
+  { type: 'meta', text: '    ENCRYPTION: AES-256 · STATUS: NOMINAL' },
+  { type: 'sys', text: 'LIVE FEED ACTIVE — BEGIN TRANSMISSION LOG' },
+  { type: 'blank', text: '' },
+];
+
+let bootIdx = 0;
+function bootSeq() {
+  if (bootIdx < bootLines.length) {
+    addLine(bootLines[bootIdx]);
+    bootIdx++;
+    setTimeout(bootSeq, 180);
+  }
+}
+bootSeq();
+
+// ── PERIODIC LIVE UPDATES ─────────────────────────────────
+setInterval(() => {
+  const km = getDistance();
+  const vel = getVelocity();
+  const met = getMET();
+  // Inject a live telemetry line into the running log
+  const telLine = {
+    type: 'meta',
+    text: `    [LIVE · ${met.str} · ${km.toLocaleString()} km · ${vel.toLocaleString()} km/h]`
+  };
+  if (lineIndex > 5 && lineIndex < transmissions.length - 3) {
+    addLine(telLine);
+  }
+}, 45000);
+
+// Occasional glitch/noise line
+setInterval(() => {
+  if (Math.random() < 0.3) {
+    const noiseChars = '▓░▒█▓░ SIGNAL NOISE ░▒▓█░▒▓';
+    const glitchLine = {
+      type: 'separator',
+      text: noiseChars.substring(0, Math.floor(Math.random() * 20 + 8))
+    };
+    addLine(glitchLine);
+  }
+}, 18000);
+</script>
+</body>
+</html>
