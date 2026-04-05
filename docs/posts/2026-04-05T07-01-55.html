@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Earthrise — Easter · Flight Day 5</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #02020e;
+    overflow: hidden;
+    font-family: 'Georgia', 'Times New Roman', serif;
+  }
+  canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  #ui {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  #top {
+    padding: 28px 36px 0;
+    text-align: center;
+  }
+  #title {
+    font-size: clamp(0.7rem, 2vw, 1.05rem);
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: rgba(255,230,180,0.85);
+    text-shadow: 0 0 30px rgba(255,200,100,0.5);
+    animation: fadePulse 6s ease-in-out infinite;
+  }
+  #subtitle {
+    margin-top: 8px;
+    font-size: clamp(0.55rem, 1.4vw, 0.75rem);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(160,180,255,0.6);
+    font-family: 'Courier New', monospace;
+  }
+  @keyframes fadePulse {
+    0%,100% { opacity:0.85; }
+    50% { opacity:0.55; }
+  }
+  #bottom {
+    padding: 0 36px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  #left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 240px;
+  }
+  .stat {
+    font-size: clamp(0.45rem, 1.1vw, 0.6rem);
+    letter-spacing: 0.18em;
+    font-family: 'Courier New', monospace;
+    color: rgba(180,220,255,0.55);
+    text-transform: uppercase;
+  }
+  .stat span {
+    color: rgba(220,240,255,0.88);
+    text-shadow: 0 0 10px rgba(150,200,255,0.4);
+  }
+  #center-verse {
+    text-align: center;
+    flex: 1;
+    padding: 0 20px 6px;
+  }
+  #verse-text {
+    font-size: clamp(0.5rem, 1.3vw, 0.72rem);
+    color: rgba(255,235,190,0.5);
+    font-style: italic;
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+    text-shadow: 0 0 20px rgba(255,200,100,0.2);
+    animation: verseFade 12s ease-in-out infinite;
+  }
+  @keyframes verseFade {
+    0%,100% { opacity: 0.5; }
+    40%,60% { opacity: 0.85; }
+  }
+  #right-panel {
+    text-align: right;
+    max-width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #archive-link {
+    pointer-events: all;
+    font-size: 0.5rem;
+    letter-spacing: 0.2em;
+    font-family: 'Courier New', monospace;
+    color: rgba(150,170,220,0.25);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.4s;
+  }
+  #archive-link:hover { color: rgba(150,170,220,0.6); }
+  #flyby-counter {
+    font-size: clamp(0.55rem, 1.3vw, 0.7rem);
+    letter-spacing: 0.15em;
+    font-family: 'Courier New', monospace;
+    color: rgba(200,230,255,0.7);
+    text-shadow: 0 0 14px rgba(150,200,255,0.4);
+  }
+  #flyby-counter .num {
+    color: rgba(255,220,120,0.9);
+    font-size: 1.2em;
+    text-shadow: 0 0 20px rgba(255,200,80,0.6);
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">
+  <div id="top">
+    <div id="title">Earthrise &nbsp;·&nbsp; Easter Sunday &nbsp;·&nbsp; Flight Day 5</div>
+    <div id="subtitle">April 5, 2026 &nbsp;·&nbsp; Artemis II &nbsp;·&nbsp; Orion Integrity &nbsp;·&nbsp; Lunar Flyby T−<span id="hours-out">--</span>h</div>
+  </div>
+  <div id="bottom">
+    <div id="left-panel">
+      <div class="stat">Distance &nbsp;<span id="dist-val">---,--- km</span></div>
+      <div class="stat">Velocity &nbsp;<span id="vel-val">~2,200 km/h</span></div>
+      <div class="stat">MET &nbsp;<span id="met-val">0d 0h 0m</span></div>
+      <div class="stat">Crew &nbsp;<span>4 · Nominal</span></div>
+    </div>
+    <div id="center-verse">
+      <div id="verse-text" id="verse"></div>
+    </div>
+    <div id="right-panel">
+      <div id="flyby-counter">Flyby in<br><span class="num" id="flyby-h">--</span> hours</div>
+      <a href="./history.html" id="archive-link">▸ Archive</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── constants ──────────────────────────────────────────────────────
+const LAUNCH = new Date('2026-04-01T22:35:12Z').getTime();
+const FLYBY  = new Date('2026-04-06T18:45:00Z').getTime(); // ~2:45 PM EDT = 18:45 UTC
+
+const verses = [
+  '"He is not here; he has risen." — Matthew 28:6',
+  '"Today, for the first time since 1972, humans have departed Earth orbit." — NASA',
+  '"From up here you cannot see the wars. You just see the planet." — Victor Glover',
+  '"The heavens declare the glory of God; the skies proclaim the work of his hands." — Psalm 19:1',
+  '"It\'s the most beautiful thing I\'ve ever seen. And the most heartbreaking." — Victor Glover',
+  '"Four humans will watch Easter rise from 200,000 miles away." — Flight Day 5',
+  '"I have been waiting my whole life for that sentence." — Christina Koch',
+  '"He has made everything beautiful in its time." — Ecclesiastes 3:11',
+  '"Every nation. Every language. Every argument. All of it, on that marble." — Jeremy Hansen',
+  '"With the whole creation we groan and wait — for the glory to be revealed." — Romans 8:22',
+];
+let verseIdx = 0;
+const verseEl = document.getElementById('verse-text');
+function cycleVerse() {
+  verseEl.style.opacity = 0;
+  setTimeout(() => {
+    verseEl.textContent = verses[verseIdx % verses.length];
+    verseEl.style.opacity = null;
+    verseIdx++;
+  }, 1200);
+}
+verseEl.style.transition = 'opacity 1.2s ease';
+verseEl.textContent = verses[0]; verseIdx = 1;
+setInterval(cycleVerse, 9000);
+
+// ── telemetry ──────────────────────────────────────────────────────
+function getMET() {
+  const diff = Math.max(0, Date.now() - LAUNCH);
+  const s = Math.floor(diff / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return { d, h, m };
+}
+function getDistance() {
+  const hrs = (Date.now() - LAUNCH) / 3600000;
+  if (hrs < 22) return Math.round(750 + hrs * 800);
+  const t = hrs - 22;
+  const base = 750 + 22 * 800;
+  const v0 = 3800, a = -25;
+  const tFloor = (v0 - 2100) / (-a);
+  let dist;
+  if (t <= tFloor) dist = base + v0*t + 0.5*a*t*t;
+  else { const d2f = v0*tFloor + 0.5*a*tFloor*tFloor; dist = base + d2f + 2100*(t-tFloor); }
+  return Math.min(Math.round(dist), 406400);
+}
+function getVelocity() {
+  const hrs = (Date.now() - LAUNCH) / 3600000;
+  if (hrs < 22) return 800;
+  return Math.max(2100, Math.round(3800 - 25*(hrs-22)));
+}
+function getFlybyHours() {
+  return Math.max(0, (FLYBY - Date.now()) / 3600000);
+}
+function updateUI() {
+  const met = getMET();
+  const km  = getDistance();
+  const vel = getVelocity();
+  const flyH = getFlybyHours();
+  document.getElementById('dist-val').textContent  = km.toLocaleString() + ' km';
+  document.getElementById('vel-val').textContent   = vel.toLocaleString() + ' km/h';
+  document.getElementById('met-val').textContent   = `${met.d}d ${met.h}h ${met.m}m`;
+  document.getElementById('flyby-h').textContent   = flyH.toFixed(1);
+  const hoursOut = Math.max(0, (FLYBY - Date.now())/3600000);
+  document.getElementById('hours-out').textContent = hoursOut.toFixed(1);
+}
+updateUI();
+setInterval(updateUI, 5000);
+
+// ── canvas renderer ────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+
+let W, H, cx, cy, t = 0;
+
+// Star field
+const STAR_COUNT = 900;
+const stars = [];
+function initStars() {
+  stars.length = 0;
+  for (let i = 0; i < STAR_COUNT; i++) {
+    stars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.5 + 0.2,
+      a: Math.random(),
+      speed: Math.random() * 0.004 + 0.001,
+      phase: Math.random() * Math.PI * 2,
+      hue: Math.random() < 0.15 ? (Math.random() < 0.5 ? 210 : 50) : 0,
+      sat: Math.random() < 0.15 ? '60%' : '0%',
+    });
+  }
+}
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  cx = W / 2;
+  cy = H / 2;
+  initStars();
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ── drawing helpers ────────────────────────────────────────────────
+function drawStars(t) {
+  for (const s of stars) {
+    const a = s.a * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `hsla(${s.hue},${s.sat},100%,${a})`;
+    ctx.fill();
+  }
+}
+
+// Nebula-like soft clouds behind everything
+function drawNebula(t) {
+  const pulse = 0.5 + 0.5 * Math.sin(t * 0.0003);
+  // deep violet cloud
+  let g = ctx.createRadialGradient(cx*0.4, cy*0.7, 0, cx*0.4, cy*0.7, W*0.45);
+  g.addColorStop(0, `rgba(80,20,160,${0.08*pulse})`);
+  g.addColorStop(1, 'transparent');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+  // warm amber cloud
+  g = ctx.createRadialGradient(cx*1.5, cy*1.2, 0, cx*1.5, cy*1.2, W*0.5);
+  g.addColorStop(0, `rgba(160,80,20,${0.06*pulse})`);
+  g.addColorStop(1, 'transparent');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+  // cool blue
+  g = ctx.createRadialGradient(cx*0.8, cy*0.2, 0, cx*0.8, cy*0.2, W*0.4);
+  g.addColorStop(0, `rgba(20,60,160,${0.07*pulse})`);
+  g.addColorStop(1, 'transparent');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+}
+
+// Orbital path: faint arc showing Orion's trajectory
+function drawTrajectory(t) {
+  const progress = Math.min(1, (Date.now() - LAUNCH) / (FLYBY - LAUNCH));
+  // Bezier: Earth (bottom-left) → Moon (top-right)
+  const ex = cx * 0.38, ey = H * 0.78; // Earth pos
+  const mx = cx * 1.55, my = H * 0.22; // Moon pos
+  const cpx = cx * 0.5, cpy = H * 0.1; // control point
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(180,200,255,0.07)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 8]);
+  ctx.beginPath();
+  ctx.moveTo(ex, ey);
+  ctx.quadraticCurveTo(cpx, cpy, mx, my);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Orion dot along the path
+  const qt = progress;
+  const ox = (1-qt)*(1-qt)*ex + 2*(1-qt)*qt*cpx + qt*qt*mx;
+  const oy = (1-qt)*(1-qt)*ey + 2*(1-qt)*qt*cpy + qt*qt*my;
+  // Glow
+  const g2 = ctx.createRadialGradient(ox, oy, 0, ox, oy, 18);
+  g2.addColorStop(0, 'rgba(200,230,255,0.9)');
+  g2.addColorStop(0.3, 'rgba(150,200,255,0.35)');
+  g2.addColorStop(1, 'transparent');
+  ctx.fillStyle = g2;
+  ctx.beginPath();
+  ctx.arc(ox, oy, 18, 0, Math.PI*2);
+  ctx.fill();
+  // Core
+  ctx.fillStyle = 'rgba(220,240,255,0.95)';
+  ctx.beginPath();
+  ctx.arc(ox, oy, 2.5, 0, Math.PI*2);
+  ctx.fill();
+  // Label
+  ctx.fillStyle = 'rgba(180,210,255,0.65)';
+  ctx.font = `${Math.max(9,W*0.009)}px 'Courier New'`;
+  ctx.letterSpacing = '0.12em';
+  ctx.fillText('ORION', ox+8, oy-8);
+  ctx.restore();
+}
+
+// Earth — crescent-lit sphere, bottom-left quadrant
+function drawEarth(t) {
+  const ex = W * 0.19;
+  const ey = H * 0.76;
+  const R  = Math.min(W, H) * 0.13;
+  const breathe = 1 + 0.012 * Math.sin(t * 0.0006);
+
+  ctx.save();
+  ctx.translate(ex, ey);
+  ctx.scale(breathe, breathe);
+
+  // Outer glow (atmosphere)
+  const atmo = ctx.createRadialGradient(0,0,R*0.88, 0,0,R*1.55);
+  atmo.addColorStop(0, 'rgba(60,120,255,0.22)');
+  atmo.addColorStop(0.5,'rgba(30,80,200,0.08)');
+  atmo.addColorStop(1,  'transparent');
+  ctx.fillStyle = atmo;
+  ctx.beginPath();
+  ctx.arc(0,0,R*1.55,0,Math.PI*2);
+  ctx.fill();
+
+  // Earth body gradient (dark side mostly — seen from far away)
+  const body = ctx.createRadialGradient(-R*0.25,-R*0.2, 0, 0,0, R);
+  body.addColorStop(0,  'rgba(20,60,180,0.92)');
+  body.addColorStop(0.4,'rgba(10,40,120,0.9)');
+  body.addColorStop(1,  'rgba(2,8,30,0.97)');
+  ctx.fillStyle = body;
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,Math.PI*2);
+  ctx.fill();
+
+  // Crescent illumination (right edge lit by Sun)
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,Math.PI*2);
+  ctx.clip();
+  const crescent = ctx.createLinearGradient(-R, 0, R, 0);
+  crescent.addColorStop(0, 'transparent');
+  crescent.addColorStop(0.55,'transparent');
+  crescent.addColorStop(0.72,'rgba(100,160,255,0.25)');
+  crescent.addColorStop(0.88,'rgba(160,210,255,0.55)');
+  crescent.addColorStop(1,  'rgba(200,230,255,0.7)');
+  ctx.fillStyle = crescent;
+  ctx.fillRect(-R,-R,R*2,R*2);
+  ctx.restore();
+
+  // City lights on night side
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,Math.PI*2);
+  ctx.clip();
+  const lights = [
+    [-0.25*R,-0.15*R, 0.04], [0.1*R,0.05*R, 0.05],
+    [-0.4*R,0.1*R, 0.06],   [-0.1*R,0.28*R,0.04],
+    [0.2*R,-0.3*R,0.03],    [-0.35*R,-0.3*R,0.035],
+    [-0.15*R, 0.0, 0.04],   [0.05*R, 0.18*R, 0.035],
+  ];
+  for (const [lx,ly,la] of lights) {
+    const lg = ctx.createRadialGradient(lx,ly,0,lx,ly,R*0.12);
+    lg.addColorStop(0, `rgba(255,230,160,${la*0.9})`);
+    lg.addColorStop(1, 'transparent');
+    ctx.fillStyle = lg;
+    ctx.fillRect(lx-R*0.15, ly-R*0.15, R*0.3, R*0.3);
+  }
+  ctx.restore();
+
+  // Clouds (faint)
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,Math.PI*2);
+  ctx.clip();
+  for (let i=0;i<7;i++){
+    const angle = (i/7)*Math.PI*2 + t*0.00005;
+    const cx2 = Math.cos(angle)*R*0.5;
+    const cy2 = Math.sin(angle)*R*0.3;
+    const cg = ctx.createRadialGradient(cx2,cy2,0,cx2,cy2,R*0.28);
+    cg.addColorStop(0,'rgba(220,235,255,0.6)');
+    cg.addColorStop(1,'transparent');
+    ctx.fillStyle = cg;
+    ctx.fillRect(cx2-R*0.3,cy2-R*0.3,R*0.6,R*0.6);
+  }
+  ctx.restore();
+
+  // Limb highlight
+  const limb = ctx.createRadialGradient(-R*0.05,-R*0.05,R*0.7, 0,0, R);
+  limb.addColorStop(0, 'transparent');
+  limb.addColorStop(0.85, 'transparent');
+  limb.addColorStop(1, 'rgba(100,160,255,0.35)');
+  ctx.fillStyle = limb;
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.restore();
+
+  // "EARTH" label
+  ctx.save();
+  ctx.font = `${Math.max(8,W*0.008)}px 'Courier New'`;
+  ctx.fillStyle = 'rgba(140,180,255,0.45)';
+  ctx.letterSpacing = '0.2em';
+  ctx.textAlign = 'center';
+  ctx.fillText('EARTH', ex, ey + R * 1.75);
+  ctx.restore();
+}
+
+// Moon — large, pale, nearly full (will be full tomorrow), upper right
+function drawMoon(t) {
+  const mx  = W * 0.78;
+  const my  = H * 0.26;
+  const R   = Math.min(W,H) * 0.175;
+  const breathe = 1 + 0.008 * Math.sin(t * 0.0004 + 1.2);
+
+  ctx.save();
+  ctx.translate(mx, my);
+  ctx.scale(breathe, breathe);
+
+  // Outer glow
+  const glow = ctx.createRadialGradient(0,0,R*0.9, 0,0,R*2.0);
+  glow.addColorStop(0, 'rgba(240,230,200,0.12)');
+  glow.addColorStop(0.5,'rgba(200,190,160,0.04)');
+  glow.addColorStop(1,  'transparent');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(0,0,R*2.0,0,Math.PI*2);
+  ctx.fill();
+
+  // Moon body
+  const body = ctx.createRadialGradient(-R*0.2,-R*0.2, 0, 0,0, R);
+  body.addColorStop(0,  'rgba(230,222,205,0.97)');
+  body.addColorStop(0.5,'rgba(200,192,175,0.96)');
+  body.addColorStop(0.85,'rgba(160,152,138,0.95)');
+  body.addColorStop(1,  'rgba(80,75,68,0.9)');
+  ctx.fillStyle = body;
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,Math.PI*2);
+  ctx.fill();
+
+  // Craters (subtle)
+  const craters = [
+    {cx:-0.22,cy:-0.18,r:0.09,a:0.13},
+    {cx:0.3,cy:0.12,r:0.12,a:0.10},
+    {cx:-0.05,cy:0.32,r:0.08,a:0.09},
+    {cx:0.18,cy:-0.35,r:0.07,a:0.08},
+    {cx:-0.38,cy:0.25,r:0.06,a:0.07},
+    {cx:0.42,cy:-0.18,r:0.05,a:0.06},
+    {cx:-0.1, cy:0.05, r:0.14, a:0.08},
+    {cx:0.08, cy:0.15, r:0.06, a:0.07},
+    {cx:-0.28,cy:-0.38,r:0.06,a:0.06},
+  ];
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,Math.PI*2);
+  ctx.clip();
+  for (const cr of craters) {
+    const cg = ctx.createRadialGradient(cr.cx*R, cr.cy*R, 0, cr.cx*R, cr.cy*R, cr.r*R);
+    cg.addColorStop(0, `rgba(100,95,88,${cr.a})`);
+    cg.addColorStop(0.6,`rgba(140,135,125,${cr.a*0.4})`);
+    cg.addColorStop(1, 'transparent');
+    ctx.fillStyle = cg;
+    ctx.fillRect((cr.cx-cr.r)*R, (cr.cy-cr.r)*R, cr.r*2*R, cr.r*2*R);
+  }
+  // Mare regions (dark patches)
+  const mares = [
+    {cx:-0.1,cy:-0.08,rx:0.38,ry:0.22,a:0.09},
+    {cx:0.18,cy:0.22,rx:0.18,ry:0.12,a:0.07},
+    {cx:-0.25,cy:0.3,rx:0.14,ry:0.1,a:0.06},
+  ];
+  for (const m of mares) {
+    ctx.save();
+    ctx.scale(m.rx*R, m.ry*R);
+    ctx.translate(m.cx/m.rx, m.cy/m.ry);
+    const mg = ctx.createRadialGradient(0,0,0,0,0,1);
+    mg.addColorStop(0,`rgba(60,55,50,${m.a})`);
+    mg.addColorStop(1,'transparent');
+    ctx.fillStyle = mg;
+    ctx.beginPath();
+    ctx.arc(0,0,1,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+
+  // Nearly-full shadow (very thin crescent shadow on left)
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,Math.PI*2);
+  ctx.clip();
+  const shadow = ctx.createLinearGradient(-R,0,R,0);
+  shadow.addColorStop(0,  'rgba(2,4,12,0.82)');
+  shadow.addColorStop(0.12,'rgba(2,4,12,0.6)');
+  shadow.addColorStop(0.22,'rgba(2,4,12,0.1)');
+  shadow.addColorStop(0.3, 'transparent');
+  shadow.addColorStop(1,   'transparent');
+  ctx.fillStyle = shadow;
+  ctx.fillRect(-R,-R,R*2,R*2);
+  ctx.restore();
+
+  // Limb
+  const limb = ctx.createRadialGradient(0,0,R*0.82, 0,0,R);
+  limb.addColorStop(0,'transparent');
+  limb.addColorStop(1,'rgba(240,225,195,0.15)');
+  ctx.fillStyle = limb;
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.restore();
+
+  // Label
+  ctx.save();
+  ctx.font = `${Math.max(8,W*0.008)}px 'Courier New'`;
+  ctx.fillStyle = 'rgba(220,210,185,0.4)';
+  ctx.letterSpacing = '0.2em';
+  ctx.textAlign = 'center';
+  ctx.fillText('MOON · T−' + getFlybyHours().toFixed(1) + 'h', mx, my + R * 1.3);
+  ctx.restore();
+}
+
+// Distant stars / cross-shapes for bright stars
+function drawBrightStars(t) {
+  const bStars = [
+    {x:0.12,y:0.08},{x:0.68,y:0.06},{x:0.9,y:0.45},
+    {x:0.05,y:0.55},{x:0.55,y:0.92},{x:0.38,y:0.15},
+    {x:0.82,y:0.7},{x:0.22,y:0.9},
+  ];
+  for (const s of bStars) {
+    const px = s.x*W, py = s.y*H;
+    const pulse = 0.4 + 0.4*Math.sin(t*0.0015 + s.x*7 + s.y*5);
+    const size = 1.5 + pulse;
+    ctx.save();
+    ctx.globalAlpha = 0.35 * pulse;
+    // Cross flare
+    for (let a=0; a<4; a++) {
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(a * Math.PI/4);
+      const lg = ctx.createLinearGradient(0,0,size*8,0);
+      lg.addColorStop(0,'rgba(240,235,220,0.7)');
+      lg.addColorStop(1,'transparent');
+      ctx.fillStyle = lg;
+      ctx.fillRect(0,-0.5,size*8,1);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = `rgba(255,248,235,${0.5+pulse*0.4})`;
+    ctx.beginPath();
+    ctx.arc(px,py,size*0.6,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+// Vignette
+function drawVignette() {
+  const g = ctx.createRadialGradient(cx,cy,Math.min(W,H)*0.3, cx,cy,Math.max(W,H)*0.85);
+  g.addColorStop(0,'transparent');
+  g.addColorStop(1,'rgba(0,0,5,0.72)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+}
+
+// Easter light rays (subtle, warm) emanating from horizon
+function drawEasterLight(t) {
+  const shimmer = 0.4 + 0.4*Math.sin(t*0.0005);
+  const rays = 8;
+  const originX = W*0.5;
+  const originY = H*1.05;
+  for (let i=0; i<rays; i++) {
+    const angle = (Math.PI * (-0.4 + 0.8*(i/(rays-1)))) + Math.PI/2;
+    const spread = 0.025 + 0.01*Math.sin(t*0.001 + i);
+    const len = Math.max(W,H)*1.4;
+    const x1 = originX + Math.cos(angle - spread)*0.01*len;
+    const y1 = originY + Math.sin(angle - spread)*0.01*len;
+    const x2 = originX + Math.cos(angle + spread)*0.01*len;
+    const y2 = originY + Math.sin(angle + spread)*0.01*len;
+    const ex = originX + Math.cos(angle)*len;
+    const ey = originY + Math.sin(angle)*len;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(ex,ey);
+    ctx.lineTo(x2,y2);
+    ctx.closePath();
+    const hue = 35 + i*4;
+    const alpha = shimmer * (0.018 + 0.008*Math.sin(t*0.002+i*1.3));
+    const rg = ctx.createLinearGradient(originX,originY,ex,ey);
+    rg.addColorStop(0, `hsla(${hue},80%,75%,${alpha*1.2})`);
+    rg.addColorStop(0.6,`hsla(${hue},80%,75%,${alpha*0.4})`);
+    rg.addColorStop(1, 'transparent');
+    ctx.fillStyle = rg;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+// ── main loop ──────────────────────────────────────────────────────
+function frame(ts) {
+  t = ts;
+  ctx.clearRect(0,0,W,H);
+
+  // Deep space background
+  ctx.fillStyle = '#02020e';
+  ctx.fillRect(0,0,W,H);
+
+  drawNebula(t);
+  drawEasterLight(t);
+  drawStars(t);
+  drawBrightStars(t);
+  drawTrajectory(t);
+  drawMoon(t);
+  drawEarth(t);
+  drawVignette();
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -79,5 +79,14 @@
     "libraries": [],
     "description": "A CRT terminal receiving a live transmission log from Orion Integrity on Flight Day 4 — crew dispatches from deep space interleaved with fragmented news from a burning world below, rendered in phosphor-green on black with scanline overlay and a blinking cursor.",
     "commit": ""
+  },
+  {
+    "date": "2026-04-05",
+    "timestamp": "2026-04-05T07-01-55",
+    "title": "Earthrise — Easter · Flight Day 5",
+    "mood": "luminous",
+    "libraries": [],
+    "description": "A living canvas where a crescent Earth and a rising Moon drift through a hand-painted cosmos — the whole screen breathing with Easter light on the morning Orion is one day from its closest approach.",
+    "commit": ""
   }
 ]
