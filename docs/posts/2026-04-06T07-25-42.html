@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two Frequencies — April 6, 2026</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  width:100%; height:100%;
+  background:#060409;
+  overflow:hidden;
+  font-family:'Courier New', monospace;
+}
+canvas {
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+#ui {
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+}
+
+/* ── header ── */
+#header {
+  position:absolute;
+  top:0; left:0; right:0;
+  padding:18px 28px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+.head-block {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.head-label {
+  font-size:clamp(0.38rem,0.9vw,0.55rem);
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.2);
+}
+.head-title {
+  font-size:clamp(0.62rem,1.5vw,0.9rem);
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+}
+.head-title.sky { color:rgba(100,200,255,0.85); text-shadow:0 0 18px rgba(80,180,255,0.5); }
+.head-title.earth { color:rgba(255,120,80,0.85); text-shadow:0 0 18px rgba(255,100,60,0.5); }
+
+/* ── centre label ── */
+#centre-head {
+  position:absolute;
+  top:14px;
+  left:50%;
+  transform:translateX(-50%);
+  text-align:center;
+}
+#centre-date {
+  font-size:clamp(0.42rem,1vw,0.58rem);
+  letter-spacing:0.35em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.18);
+}
+#centre-title {
+  font-size:clamp(0.7rem,1.8vw,1.1rem);
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.55);
+  margin-top:3px;
+}
+
+/* ── divider label ── */
+#divider-label {
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  top:50%;
+  margin-top:-10px;
+  font-size:clamp(0.38rem,0.85vw,0.5rem);
+  letter-spacing:0.4em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.12);
+  pointer-events:none;
+  white-space:nowrap;
+}
+
+/* ── milestone sidebar (right) ── */
+#milestones {
+  position:absolute;
+  right:22px;
+  top:80px;
+  bottom:80px;
+  width:clamp(160px,18vw,240px);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:9px;
+  overflow:hidden;
+}
+.ms {
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  border-left:2px solid;
+  padding-left:10px;
+  opacity:0.6;
+  transition:opacity 0.5s, border-color 0.5s;
+}
+.ms.past { border-color:rgba(100,200,255,0.25); opacity:0.3; }
+.ms.now  { border-color:rgba(100,200,255,0.9);  opacity:1.0; }
+.ms.future { border-color:rgba(255,255,255,0.12); opacity:0.4; }
+.ms-time { font-size:0.52rem; letter-spacing:0.2em; color:rgba(100,200,255,0.7); }
+.ms-time.earth-time { color:rgba(255,120,80,0.7); }
+.ms-desc { font-size:0.48rem; letter-spacing:0.1em; color:rgba(255,255,255,0.65); line-height:1.4; }
+.ms.now .ms-desc { color:rgba(255,255,255,0.95); }
+
+/* ── bottom status bar ── */
+#statusbar {
+  position:absolute;
+  bottom:0; left:0; right:0;
+  padding:0 28px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+}
+.stat-group {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.stat-row {
+  font-size:clamp(0.4rem,0.95vw,0.56rem);
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:rgba(160,210,255,0.45);
+}
+.stat-row span {
+  color:rgba(200,235,255,0.85);
+  text-shadow:0 0 10px rgba(100,180,255,0.35);
+}
+.stat-row.earth-stat { color:rgba(255,160,120,0.45); }
+.stat-row.earth-stat span { color:rgba(255,200,180,0.85); text-shadow:0 0 10px rgba(255,120,80,0.3); }
+
+/* ── ticker ── */
+#ticker-wrap {
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:28px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  background:rgba(0,0,0,0.35);
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+#ticker {
+  white-space:nowrap;
+  font-size:0.46rem;
+  letter-spacing:0.18em;
+  color:rgba(255,200,150,0.45);
+  animation:tickerScroll 60s linear infinite;
+}
+@keyframes tickerScroll {
+  0%   { transform:translateX(100vw); }
+  100% { transform:translateX(-100%); }
+}
+
+/* ── archive link ── */
+#archive {
+  position:absolute;
+  bottom:36px;
+  left:28px;
+  font-size:0.44rem;
+  letter-spacing:0.22em;
+  color:rgba(255,255,255,0.12);
+  text-decoration:none;
+  pointer-events:all;
+  transition:color 0.3s;
+  text-transform:uppercase;
+}
+#archive:hover { color:rgba(255,255,255,0.4); }
+
+/* ── signal name labels ── */
+.sig-name {
+  position:absolute;
+  left:28px;
+  font-size:clamp(0.5rem,1.1vw,0.65rem);
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+}
+#sig-sky { top:50%; margin-top:-80px; color:rgba(80,180,255,0.5); }
+#sig-earth { top:50%; margin-top:50px; color:rgba(255,100,60,0.5); }
+
+/* interference flash */
+#interference {
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+  background:rgba(255,255,255,0.015);
+  transition:opacity 0.08s;
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="interference"></div>
+
+<div id="ui">
+  <!-- header -->
+  <div id="header">
+    <div class="head-block">
+      <div class="head-label">Signal A · Space</div>
+      <div class="head-title sky">Artemis II · Flight Day 6</div>
+    </div>
+    <div class="head-block" style="text-align:right;">
+      <div class="head-label">Signal B · Earth</div>
+      <div class="head-title earth">Strait of Hormuz · T−0</div>
+    </div>
+  </div>
+
+  <!-- centre -->
+  <div id="centre-head">
+    <div id="centre-date">Monday · April 6, 2026 · Day 96</div>
+    <div id="centre-title">Two Frequencies</div>
+  </div>
+
+  <!-- signal labels -->
+  <div class="sig-name" id="sig-sky">Sky</div>
+  <div class="sig-name" id="sig-earth">Earth</div>
+
+  <!-- divider -->
+  <div id="divider-label">────── signal boundary ──────</div>
+
+  <!-- milestones right sidebar -->
+  <div id="milestones">
+    <!-- filled by JS -->
+  </div>
+
+  <!-- bottom left stats -->
+  <div id="statusbar">
+    <div class="stat-group">
+      <div class="stat-row">MET &nbsp;<span id="met-val">5d 0h 0m</span></div>
+      <div class="stat-row">Distance &nbsp;<span id="dist-val">--- km</span></div>
+      <div class="stat-row">Velocity &nbsp;<span id="vel-val">--- km/h</span></div>
+      <div class="stat-row">Closest approach &nbsp;<span style="color:rgba(255,230,100,0.9);text-shadow:0 0 10px rgba(255,200,50,0.5)" id="approach-val">7:02 PM EDT · 4,070 mi</span></div>
+      <div class="stat-row earth-stat" style="margin-top:4px;">Iran deadline &nbsp;<span id="deadline-val">--</span></div>
+      <div class="stat-row earth-stat">Middle East conflict &nbsp;<span>Day 37</span></div>
+    </div>
+  </div>
+
+  <!-- archive link -->
+  <a href="./history.html" id="archive">▸ Archive</a>
+
+  <!-- ticker -->
+  <div id="ticker-wrap">
+    <div id="ticker">
+      ARTEMIS II · ORION CLOSEST LUNAR APPROACH 7:02 PM EDT · 4,070 MILES FROM SURFACE · DISTANCE RECORD BROKEN 1:56 PM EDT · 252,757 MI FROM EARTH · COMM BLACKOUT 40 MIN · FAR SIDE OF MOON · SOLAR ECLIPSE FOR CREW 8:35 PM EDT · CREW: WISEMAN · GLOVER · KOCH · HANSEN · ··· IRAN DEADLINE 8PM EDT TONIGHT · F-15E CREW RESCUED · STRAIT OF HORMUZ TENSIONS · NATO IN CRISIS · OIL MARKETS VOLATILE · ··· ARTEMIS II · SPLASHDOWN APRIL 10 · SAN DIEGO PACIFIC · ··· "THAT WE CAN DO THIS RIGHT NOW MEANS WE COULD DO SO MUCH MORE" — VICTOR GLOVER · ··· PHYSICS TAKES OVER · PHYSICS WILL GET US HOME
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ──────────────────────────────────────────────────────────────
+const LAUNCH   = new Date('2026-04-01T22:35:12Z').getTime();
+const APPROACH = new Date('2026-04-06T23:02:00Z').getTime(); // 7:02 PM EDT = 23:02 UTC
+const BLACKOUT_START = new Date('2026-04-06T22:44:00Z').getTime();
+const BLACKOUT_END   = new Date('2026-04-06T23:25:00Z').getTime();
+const ECLIPSE_START  = new Date('2026-04-07T00:35:00Z').getTime();
+const RECORD_BREAK   = new Date('2026-04-06T17:56:00Z').getTime();
+const IRAN_DEADLINE  = new Date('2026-04-07T00:00:00Z').getTime(); // 8 PM EDT = midnight UTC
+
+// ── CANVAS ────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+const iface  = document.getElementById('interference');
+
+let W, H, t = 0;
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ── WAVEFORM STATE ────────────────────────────────────────────────────────
+// Sky waveform params
+let skyAmp = 1, skyFreq = 1, skyColor = [80, 180, 255];
+// Earth waveform params
+let earthAmp = 1, earthFreq = 1, earthColor = [255, 100, 60];
+
+// Noise seeds for organic feel
+const noise = (i, seed) => Math.sin(i * 0.013 + seed) * Math.cos(i * 0.007 - seed * 0.5);
+
+// ── MISSION MILESTONES ─────────────────────────────────────────────────────
+const milestones = [
+  { utc: new Date('2026-04-06T17:00:00Z'), label: 'Live coverage begins', type:'sky' },
+  { utc: new Date('2026-04-06T17:30:00Z'), label: 'Crew science briefing w/ Mission Control', type:'sky' },
+  { utc: RECORD_BREAK, label: 'Distance record broken — 252,757 mi from Earth', type:'sky' },
+  { utc: new Date('2026-04-06T18:45:00Z'), label: 'Lunar flyby window opens (2:45 PM EDT)', type:'sky' },
+  { utc: BLACKOUT_START, label: 'COMM BLACKOUT — behind the Moon (~40 min)', type:'sky' },
+  { utc: APPROACH, label: '★ CLOSEST APPROACH — 4,070 mi from surface', type:'sky' },
+  { utc: BLACKOUT_END, label: 'Earthrise · Comms restored', type:'sky' },
+  { utc: ECLIPSE_START, label: 'Solar eclipse visible to crew', type:'sky' },
+  { utc: new Date('2026-04-07T01:32:00Z'), label: 'Lunar flyby window closes', type:'sky' },
+  { utc: IRAN_DEADLINE, label: 'IRAN DEADLINE — Trump 8 PM EDT ultimatum', type:'earth' },
+];
+
+function buildMilestones() {
+  const el = document.getElementById('milestones');
+  el.innerHTML = '';
+  const now = Date.now();
+  // show nearest 8
+  const scored = milestones.map((m,i)=>({...m,i,delta:Math.abs(m.utc.getTime()-now)}));
+  scored.sort((a,b)=>a.utc-b.utc);
+  // pick window: last 2 past + up to 6 future
+  const past = scored.filter(m=>m.utc.getTime()<now).slice(-2);
+  const future = scored.filter(m=>m.utc.getTime()>=now).slice(0,6);
+  const show = [...past, ...future];
+
+  for(const m of show){
+    const div = document.createElement('div');
+    const now2 = Date.now();
+    const dt = m.utc.getTime() - now2;
+    let cls = dt < 0 ? 'past' : (dt < 600000 ? 'now' : 'future');
+    div.className = `ms ${cls}`;
+
+    // format time
+    const ed = new Date(m.utc.getTime() - 4*3600000); // EDT offset
+    const hh = ed.getUTCHours().toString().padStart(2,'0');
+    const mm = ed.getUTCMinutes().toString().padStart(2,'0');
+    const timeStr = `${hh}:${mm} EDT`;
+
+    const tDiv = document.createElement('div');
+    tDiv.className = 'ms-time' + (m.type==='earth'?' earth-time':'');
+    tDiv.textContent = timeStr;
+
+    const dDiv = document.createElement('div');
+    dDiv.className = 'ms-desc';
+    dDiv.textContent = m.label;
+
+    div.appendChild(tDiv);
+    div.appendChild(dDiv);
+    el.appendChild(div);
+  }
+}
+
+// ── TELEMETRY ─────────────────────────────────────────────────────────────
+function getMET() {
+  const diff = Math.max(0, Date.now() - LAUNCH);
+  const s = Math.floor(diff/1000);
+  const d = Math.floor(s/86400);
+  const h = Math.floor((s%86400)/3600);
+  const m = Math.floor((s%3600)/60);
+  return `${d}d ${h}h ${m}m`;
+}
+function getDistance() {
+  const hrs = (Date.now() - LAUNCH)/3600000;
+  // rough model: accelerating toward moon, peak ~252,757 mi = 406,721 km
+  const t5 = 5*24; // hours at 5 days
+  const t6 = t5 + 24; // day 6
+  const base = 380000; // km at start of day 5
+  const v = 3200; // km/h approaching
+  const d = Math.min(406721, Math.round(base + (hrs - t5)*v));
+  return d.toLocaleString();
+}
+function getVelocity() {
+  const hrs = (Date.now()-LAUNCH)/3600000;
+  // approaching Moon, speed increases ~3000-3600 km/h
+  const base = 3000 + (hrs-5*24)*20;
+  return Math.round(Math.min(3600, Math.max(3000, base))).toLocaleString();
+}
+
+function updateUI() {
+  document.getElementById('met-val').textContent = getMET();
+  document.getElementById('dist-val').textContent = getDistance() + ' km';
+  document.getElementById('vel-val').textContent = getVelocity() + ' km/h';
+  const now = Date.now();
+  const dl = IRAN_DEADLINE - now;
+  if(dl <= 0) {
+    document.getElementById('deadline-val').textContent = 'PASSED';
+  } else {
+    const dh = Math.floor(dl/3600000);
+    const dm = Math.floor((dl%3600000)/60000);
+    document.getElementById('deadline-val').textContent = `T−${dh}h ${dm}m`;
+  }
+  buildMilestones();
+}
+updateUI();
+setInterval(updateUI, 5000);
+
+// ── DRAW ──────────────────────────────────────────────────────────────────
+// Sky waveform: smooth sine-based, blue-white, upper half
+// Earth waveform: chaotic, jagged, orange-red, lower half
+
+function sampleSky(x, t) {
+  const phase = x * 0.015 - t * 0.0009;
+  const w1 = Math.sin(phase) * 0.6;
+  const w2 = Math.sin(phase * 2.3 + t * 0.0004) * 0.2;
+  const w3 = Math.sin(phase * 0.4 - t * 0.0002) * 0.15;
+  const w4 = Math.sin(phase * 5.7 + t * 0.002) * 0.05;
+  // special: near approach, amplitude increases
+  const now2 = Date.now();
+  const approachDist = Math.abs(now2 - APPROACH)/3600000;
+  const nearBoost = Math.max(0, 1.5 - approachDist*0.8);
+  // comm blackout: signal goes fuzzy
+  const inBlackout = now2 >= BLACKOUT_START && now2 <= BLACKOUT_END;
+  const fuzz = inBlackout ? (Math.random()-0.5)*0.4 : 0;
+  return (w1+w2+w3+w4+fuzz) * (1.0 + nearBoost * 0.4);
+}
+
+function sampleEarth(x, t) {
+  const phase = x * 0.018 - t * 0.0012;
+  // base chaos
+  const w1 = Math.sin(phase * 1.7) * 0.35;
+  const w2 = Math.sin(phase * 3.1 + t*0.003) * 0.25;
+  const w3 = Math.sin(phase * 0.6 - t*0.0008) * 0.2;
+  // spikes (tension/news events)
+  const spike = Math.abs(Math.sin(phase * 8 + t*0.005)) > 0.92 ? (Math.random()-0.5)*0.6 : 0;
+  // deadline proximity spike
+  const now2 = Date.now();
+  const dlDist = Math.abs(now2 - IRAN_DEADLINE)/3600000;
+  const dlBoost = Math.max(0, 2 - dlDist) * 0.25;
+  return (w1+w2+w3+spike) * (1 + dlBoost);
+}
+
+// Per-channel scan lines
+let scanSky = 0, scanEarth = H/2;
+const SCAN_SPEED_SKY = 0.18, SCAN_SPEED_EARTH = 0.22;
+
+function drawGrid(yOff, height, color, alpha) {
+  ctx.save();
+  ctx.strokeStyle = `rgba(${color},${alpha})`;
+  ctx.lineWidth = 0.5;
+  // horizontal lines
+  for(let y=yOff; y<yOff+height; y+=height/6){
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(W,y);
+    ctx.stroke();
+  }
+  // vertical lines
+  for(let x=0; x<W; x+=W/12){
+    ctx.beginPath();
+    ctx.moveTo(x,yOff);
+    ctx.lineTo(x,yOff+height);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawWaveform(yCenter, halfH, sampleFn, r, g, b, glowR, glowG, glowB, lineW, t2) {
+  // Draw glow trails (multiple passes, decreasing alpha)
+  const passes = [
+    {w:lineW+6, a:0.04},
+    {w:lineW+3, a:0.09},
+    {w:lineW+1, a:0.25},
+    {w:lineW,   a:0.95},
+  ];
+
+  for(const pass of passes){
+    ctx.beginPath();
+    ctx.lineWidth = pass.w;
+    for(let x=0; x<W; x++){
+      const s = sampleFn(x, t2);
+      const y = yCenter + s * halfH * 0.75;
+      if(x===0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    if(pass.a > 0.5){
+      ctx.strokeStyle = `rgb(${r},${g},${b})`;
+    } else {
+      ctx.strokeStyle = `rgba(${glowR},${glowG},${glowB},${pass.a})`;
+    }
+    ctx.stroke();
+  }
+}
+
+function drawScanLine(y, r, g, b) {
+  ctx.save();
+  const grad = ctx.createLinearGradient(0, y-4, 0, y+4);
+  grad.addColorStop(0, 'transparent');
+  grad.addColorStop(0.5, `rgba(${r},${g},${b},0.6)`);
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, y-4, W, 8);
+  ctx.restore();
+}
+
+function drawChannelLabel(text, x, y, r, g, b) {
+  ctx.save();
+  ctx.font = `${Math.max(9, W*0.008)}px 'Courier New'`;
+  ctx.letterSpacing = '0.25em';
+  ctx.fillStyle = `rgba(${r},${g},${b},0.35)`;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+// Interference zone — where the two signals interact visually
+function drawInterference(t2) {
+  const now2 = Date.now();
+  const inBlackout = now2 >= BLACKOUT_START && now2 <= BLACKOUT_END;
+  const nearApproach = Math.abs(now2 - APPROACH) < 2*3600000;
+  const nearDeadline = Math.abs(now2 - IRAN_DEADLINE) < 2*3600000;
+
+  if(!nearApproach && !nearDeadline && !inBlackout) return;
+
+  // Shared zone: thin region around the horizontal divider
+  const divY = H/2;
+  const bandwidth = 30 + 20*Math.sin(t2*0.001);
+  for(let x=0; x<W; x+=2){
+    const sk = sampleSky(x, t2);
+    const ea = sampleEarth(x, t2);
+    const mid = (sk + ea) * 0.5;
+    const conflict = Math.abs(sk - ea);
+    if(conflict > 0.3){
+      const hue = sk > ea ? '180,220,255' : '255,150,80';
+      const alpha = Math.min(0.3, conflict * 0.2);
+      ctx.fillStyle = `rgba(${hue},${alpha})`;
+      ctx.fillRect(x, divY - bandwidth, 2, bandwidth*2);
+    }
+  }
+}
+
+function drawVignette() {
+  const g = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.25, W/2,H/2,Math.max(W,H)*0.8);
+  g.addColorStop(0,'transparent');
+  g.addColorStop(1,'rgba(0,0,0,0.75)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+}
+
+function drawDivider(t2) {
+  ctx.save();
+  ctx.setLineDash([3,9]);
+  ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, H/2);
+  ctx.lineTo(W, H/2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+// CRT overlay
+function drawCRT() {
+  // Scanline overlay
+  for(let y=0; y<H; y+=4){
+    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.fillRect(0,y,W,2);
+  }
+  // Radial bright centre
+  const g = ctx.createRadialGradient(W/2,H/2,0, W/2,H/2,Math.max(W,H)*0.6);
+  g.addColorStop(0,'rgba(255,255,255,0.025)');
+  g.addColorStop(1,'transparent');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+}
+
+// Phosphor fade
+let lastFrame = null;
+function drawPhosphor() {
+  if(!lastFrame) return;
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.drawImage(lastFrame, 0, 0);
+  ctx.restore();
+}
+
+// occasional glitch frames
+let glitchTimer = 0;
+function triggerGlitch() {
+  iface.style.opacity = '1';
+  setTimeout(()=>{ iface.style.opacity = '0'; }, 80);
+}
+
+// ── MAIN LOOP ─────────────────────────────────────────────────────────────
+function frame(ts) {
+  t = ts;
+
+  // Background
+  ctx.fillStyle = 'rgba(6,4,9,1)';
+  ctx.fillRect(0,0,W,H);
+
+  const skyH  = H/2;
+  const earthH = H/2;
+
+  // Grid backgrounds
+  drawGrid(0, skyH, '60,140,255', 0.06);
+  drawGrid(skyH, earthH, '255,90,50', 0.06);
+
+  // Divider
+  drawDivider(t);
+
+  // Interference zone
+  drawInterference(t);
+
+  // Sky waveform
+  drawWaveform(skyH*0.5, skyH*0.38, sampleSky, 120, 210, 255, 80, 160, 255, 1.5, t);
+
+  // Earth waveform
+  drawWaveform(skyH + earthH*0.5, earthH*0.38, sampleEarth, 255, 140, 90, 255, 90, 50, 1.5, t);
+
+  // Scan lines
+  scanSky   = (scanSky   + SCAN_SPEED_SKY)   % skyH;
+  scanEarth = (scanEarth + SCAN_SPEED_EARTH) % earthH;
+  drawScanLine(scanSky, 100, 200, 255);
+  drawScanLine(skyH + scanEarth, 255, 100, 60);
+
+  drawCRT();
+  drawVignette();
+
+  // Glitch trigger
+  glitchTimer++;
+  const now2 = Date.now();
+  const inBlackout = now2 >= BLACKOUT_START && now2 <= BLACKOUT_END;
+  const nearDL = Math.abs(now2 - IRAN_DEADLINE) < 3600000;
+  const glitchRate = inBlackout ? 30 : (nearDL ? 80 : 240);
+  if(glitchTimer > glitchRate && Math.random() < (inBlackout ? 0.2 : 0.04)){
+    triggerGlitch();
+    glitchTimer = 0;
+  }
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
