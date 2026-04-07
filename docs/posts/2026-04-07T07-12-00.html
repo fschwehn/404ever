@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coming Home — April 7, 2026</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    width:100%; height:100%;
+    overflow:hidden;
+    background:#000;
+    font-family: 'Courier New', monospace;
+  }
+
+  canvas {
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+  }
+
+  #overlay {
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+
+  /* TOP */
+  #top {
+    padding: 22px 30px 0;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+  #top-left {
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .eyebrow {
+    font-size: clamp(0.36rem, 0.8vw, 0.5rem);
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.18);
+  }
+  .big-title {
+    font-size: clamp(1.1rem, 3.5vw, 2.6rem);
+    letter-spacing: 0.08em;
+    font-weight: 300;
+    color: rgba(255,255,255,0.82);
+    text-shadow: 0 0 40px rgba(160,200,255,0.3);
+    line-height: 1.1;
+  }
+  .sub-title {
+    font-size: clamp(0.42rem, 1vw, 0.65rem);
+    letter-spacing: 0.28em;
+    color: rgba(160,200,255,0.4);
+    margin-top: 6px;
+    text-transform:uppercase;
+  }
+  #top-right {
+    text-align:right;
+    display:flex;
+    flex-direction:column;
+    gap: 5px;
+  }
+  .mission-stat {
+    font-size: clamp(0.38rem, 0.85vw, 0.52rem);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    line-height: 1.7;
+  }
+  .mission-stat span {
+    color: rgba(180,220,255,0.75);
+  }
+
+  /* CENTRE label */
+  #centre {
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%, -50%);
+    text-align:center;
+    pointer-events:none;
+  }
+  #splashdown-label {
+    font-size: clamp(0.38rem, 0.8vw, 0.5rem);
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.12);
+    margin-bottom: 8px;
+  }
+  #countdown {
+    font-size: clamp(1.6rem, 5vw, 4rem);
+    letter-spacing: 0.14em;
+    color: rgba(200,230,255,0.55);
+    font-weight: 300;
+    text-shadow: 0 0 60px rgba(100,180,255,0.2);
+  }
+  #countdown-sub {
+    font-size: clamp(0.36rem, 0.75vw, 0.48rem);
+    letter-spacing: 0.45em;
+    color: rgba(255,255,255,0.1);
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  /* CREW MANIFEST */
+  #crew-wrap {
+    position: absolute;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .crew-entry {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    opacity: 0.7;
+  }
+  .crew-name {
+    font-size: clamp(0.44rem, 0.9vw, 0.56rem);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(180,220,255,0.85);
+  }
+  .crew-role {
+    font-size: clamp(0.35rem, 0.7vw, 0.44rem);
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.28);
+    text-transform: uppercase;
+  }
+
+  /* BOTTOM */
+  #bottom {
+    padding: 0 30px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  #fragments-label {
+    font-size: clamp(0.34rem, 0.7vw, 0.44rem);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.1);
+    margin-bottom:6px;
+  }
+  #world-status {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 55vw;
+  }
+  .ws-item {
+    font-size: clamp(0.36rem, 0.78vw, 0.48rem);
+    letter-spacing: 0.14em;
+    color: rgba(255,200,160,0.35);
+    text-transform: uppercase;
+    transition: color 1s;
+  }
+  .ws-item.hot { color: rgba(255,140,80,0.6); }
+  .ws-item.cool { color: rgba(120,200,255,0.4); }
+  .ws-item.neutral { color: rgba(220,220,200,0.3); }
+
+  #right-bottom {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rb-line {
+    font-size: clamp(0.35rem, 0.72vw, 0.46rem);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.12);
+  }
+
+  /* archive */
+  #archive {
+    position:fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.42rem;
+    letter-spacing: 0.28em;
+    color: rgba(255,255,255,0.1);
+    text-decoration: none;
+    pointer-events: all;
+    text-transform: uppercase;
+    transition: color 0.4s;
+    z-index:10;
+  }
+  #archive:hover { color: rgba(255,255,255,0.38); }
+
+  /* scroll message */
+  #scroll-msg {
+    position:fixed;
+    bottom:46px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size: 0.4rem;
+    letter-spacing: 0.35em;
+    color: rgba(255,255,255,0.07);
+    text-transform: uppercase;
+    pointer-events:none;
+    white-space: nowrap;
+  }
+
+  /* quote flash */
+  #quote {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 2.5s ease;
+    z-index: 5;
+    max-width: 70vw;
+  }
+  #quote-text {
+    font-size: clamp(0.55rem, 1.4vw, 0.9rem);
+    letter-spacing: 0.22em;
+    color: rgba(200,230,255,0.65);
+    line-height: 1.7;
+    font-style: italic;
+    text-transform: uppercase;
+  }
+  #quote-attr {
+    font-size: clamp(0.34rem, 0.7vw, 0.44rem);
+    letter-spacing: 0.35em;
+    color: rgba(255,255,255,0.2);
+    margin-top: 12px;
+    text-transform: uppercase;
+  }
+
+  /* vignette */
+  #vignette {
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.88) 100%);
+    z-index:2;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="vignette"></div>
+
+<div id="overlay">
+  <div id="top">
+    <div id="top-left">
+      <div class="eyebrow">Tuesday · April 7, 2026 · Flight Day 7</div>
+      <div class="big-title">Coming<br>Home</div>
+      <div class="sub-title">Artemis II · Day of Rest · Homeward Bound</div>
+    </div>
+    <div id="top-right">
+      <div class="mission-stat">MET &nbsp;<span id="met-val">-</span></div>
+      <div class="mission-stat">Distance from Earth &nbsp;<span id="dist-val">-</span></div>
+      <div class="mission-stat">Velocity &nbsp;<span id="vel-val">-</span></div>
+      <div class="mission-stat">Splashdown &nbsp;<span>Apr 10 · San Diego</span></div>
+      <div class="mission-stat" style="margin-top:8px;">Oil price &nbsp;<span style="color:rgba(255,160,80,0.8)">$113+ / bbl</span></div>
+      <div class="mission-stat">Iran war · day &nbsp;<span style="color:rgba(255,120,80,0.7)"><span id="iran-day">-</span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- crew sidebar -->
+<div id="crew-wrap">
+  <div class="eyebrow" style="letter-spacing:0.3em;color:rgba(255,255,255,0.1);margin-bottom:4px;">Aboard Integrity</div>
+  <div class="crew-entry"><div class="crew-name">Reid Wiseman</div><div class="crew-role">Commander · NASA</div></div>
+  <div class="crew-entry"><div class="crew-name">Victor Glover</div><div class="crew-role">Pilot · NASA</div></div>
+  <div class="crew-entry"><div class="crew-name">Christina Koch</div><div class="crew-role">Mission Specialist · NASA</div></div>
+  <div class="crew-entry"><div class="crew-name">Jeremy Hansen</div><div class="crew-role">Mission Specialist · CSA</div></div>
+</div>
+
+<!-- countdown -->
+<div id="centre">
+  <div id="splashdown-label">Splashdown Countdown</div>
+  <div id="countdown">--h --m --s</div>
+  <div id="countdown-sub">Until Pacific Ocean · San Diego</div>
+</div>
+
+<!-- bottom bar -->
+<div style="position:fixed;bottom:0;left:0;right:0;padding:0 30px 42px;z-index:3;pointer-events:none;">
+  <div id="fragments-label">World · April 7, 2026</div>
+  <div id="world-status">
+    <div class="ws-item hot">Iran war week 6 · US deadline passed · oil surges past $113/bbl · Strait still closed</div>
+    <div class="ws-item hot">Iran fires missiles at Qatar · fuel surcharges +157% in Taiwan · Israel strikes South Pars</div>
+    <div class="ws-item cool">World Health Day · Stand With Science · One Health Summit · Paris · 800 institutions · 80 nations</div>
+    <div class="ws-item neutral">Orion Integrity: crew resting · Lunar sphere exit 1:25 PM EDT · return burn complete</div>
+    <div class="ws-item cool">Record: 252,756 mi from Earth · 4,111 mi beyond Apollo 13 · humanity's farthest journey</div>
+  </div>
+</div>
+
+<!-- quote -->
+<div id="quote">
+  <div id="quote-text"></div>
+  <div id="quote-attr"></div>
+</div>
+
+<div id="scroll-msg">Flight Day 7 · Crew at Rest · Returning to Earth</div>
+<a href="./history.html" id="archive">▸ History</a>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────
+const LAUNCH      = new Date('2026-04-01T22:35:12Z').getTime();
+const SPLASHDOWN  = new Date('2026-04-11T00:07:00Z').getTime(); // 8:07 PM EDT Apr 10
+const IRAN_START  = new Date('2026-03-01T00:00:00Z').getTime(); // approx week 6
+
+// ── CANVAS ───────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  initStars();
+}
+window.addEventListener('resize', resize);
+
+// ── STARS ─────────────────────────────────────────────────────────────────
+let stars = [];
+function initStars() {
+  stars = [];
+  const count = Math.floor((W * H) / 1600);
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.2 + 0.1,
+      base: Math.random() * 0.6 + 0.1,
+      phase: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.003 + 0.001,
+      hue: Math.random() < 0.15 ? 'warm' : (Math.random() < 0.1 ? 'blue' : 'white'),
+    });
+  }
+}
+
+// ── CREW DOTS ─────────────────────────────────────────────────────────────
+// Four dots representing the crew, drifting slowly
+let crewDots = [];
+function initCrew() {
+  const names = ['Wiseman', 'Glover', 'Koch', 'Hansen'];
+  crewDots = names.map((name, i) => ({
+    name,
+    x: W * 0.52 + (i - 1.5) * 28,
+    y: H * 0.42,
+    vx: (Math.random() - 0.5) * 0.04,
+    vy: (Math.random() - 0.5) * 0.04,
+    baseX: W * 0.52 + (i - 1.5) * 28,
+    baseY: H * 0.42,
+    phase: i * Math.PI / 2,
+    trail: [],
+  }));
+}
+
+// ── COMETS (world event fragments) ────────────────────────────────────────
+const worldEvents = [
+  { text: 'Oil $113/bbl', color: [255, 130, 60] },
+  { text: 'Strait of Hormuz · CLOSED', color: [255, 90, 50] },
+  { text: 'World Health Day', color: [100, 220, 180] },
+  { text: '252,756 mi from Earth', color: [130, 200, 255] },
+  { text: 'Iran missiles · Qatar', color: [255, 100, 70] },
+  { text: 'Stand With Science', color: [100, 220, 180] },
+  { text: 'Crew: at rest', color: [160, 200, 255] },
+  { text: 'Israel · South Pars strike', color: [255, 130, 80] },
+  { text: 'Fuel +157% · Taiwan', color: [255, 160, 80] },
+  { text: '800 institutions · 80 nations', color: [100, 220, 200] },
+  { text: 'Splashdown April 10', color: [160, 220, 255] },
+  { text: 'Apollo 13 record broken', color: [180, 215, 255] },
+  { text: 'Lebanon · 1,400+ killed', color: [255, 80, 60] },
+  { text: 'Orion Integrity · homeward', color: [140, 200, 255] },
+  { text: 'Flight Day 7 · rest', color: [180, 210, 255] },
+];
+
+let comets = [];
+
+function spawnComet() {
+  const evt = worldEvents[Math.floor(Math.random() * worldEvents.length)];
+  const side = Math.floor(Math.random() * 4);
+  let x, y, vx, vy;
+  const speed = 0.18 + Math.random() * 0.28;
+  const angle = Math.random() * Math.PI * 2;
+  if (side === 0) { x = -200; y = Math.random() * H; }
+  else if (side === 1) { x = W + 200; y = Math.random() * H; }
+  else if (side === 2) { x = Math.random() * W; y = -60; }
+  else { x = Math.random() * W; y = H + 60; }
+  vx = Math.cos(angle) * speed;
+  vy = Math.sin(angle) * speed;
+  comets.push({
+    x, y, vx, vy,
+    text: evt.text,
+    color: evt.color,
+    alpha: 0,
+    life: 0,
+    maxLife: 340 + Math.random() * 200,
+    size: clamp(0.42, 0.75, Math.random() * 0.5 + 0.3),
+  });
+}
+
+function clamp(min, max, v) { return Math.max(min, Math.min(max, v)); }
+
+// ── QUOTES ────────────────────────────────────────────────────────────────
+const quotes = [
+  { text: '"There are stars… an unreal view."', attr: '— Victor Glover, Artemis II' },
+  { text: '"No matter how long we look at this, our brains are not processing this image."', attr: '— Artemis II crew, lunar far side' },
+  { text: '"You really brought the moon closer for us today."', attr: '— Dr. Kelsey Young, NASA Lunar Science' },
+  { text: '"Today you\'ve made history."', attr: '— President Trump, calling the crew after flyby' },
+  { text: '"Together for health. Stand with science."', attr: '— World Health Day 2026' },
+  { text: '"Y\'all knocked it out of the park."', attr: '— Reid Wiseman, Artemis II Commander' },
+];
+let quoteIdx = 0;
+let quoteVisible = false;
+
+function showQuote() {
+  const q = quotes[quoteIdx % quotes.length];
+  quoteIdx++;
+  document.getElementById('quote-text').textContent = q.text;
+  document.getElementById('quote-attr').textContent = q.attr;
+  const el = document.getElementById('quote');
+  el.style.opacity = '1';
+  quoteVisible = true;
+  setTimeout(() => {
+    el.style.opacity = '0';
+    quoteVisible = false;
+  }, 5500);
+}
+setTimeout(() => { showQuote(); setInterval(showQuote, 22000); }, 8000);
+
+// ── EARTH (destination) ───────────────────────────────────────────────────
+// A tiny glowing blue dot at the centre-right representing home
+let earthPulse = 0;
+
+// ── TELEMETRY ─────────────────────────────────────────────────────────────
+function getMET() {
+  const diff = Math.max(0, Date.now() - LAUNCH);
+  const s = Math.floor(diff / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return `${d}d ${h}h ${m}m`;
+}
+
+function getDistance() {
+  // Day 7: heading home. After max distance of ~406,771 km, returning.
+  // Rough model: decreasing from ~390,000 km at start of day 7
+  const now = Date.now();
+  const dayStart7 = LAUNCH + 6 * 86400000;
+  const hrs = (now - dayStart7) / 3600000;
+  // returning at ~3,200 km/h
+  const d = Math.round(Math.max(0, 390000 - hrs * 3200));
+  return d.toLocaleString() + ' km';
+}
+
+function getVelocity() {
+  const now = Date.now();
+  const dayStart7 = LAUNCH + 6 * 86400000;
+  const hrs = (now - dayStart7) / 3600000;
+  // accelerating back toward Earth
+  const v = Math.round(3200 + hrs * 40);
+  return v.toLocaleString() + ' km/h';
+}
+
+function getCountdown() {
+  const diff = SPLASHDOWN - Date.now();
+  if (diff <= 0) return '00h 00m 00s';
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  return `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+}
+
+function getIranDay() {
+  const diff = Date.now() - IRAN_START;
+  return Math.floor(diff / 86400000);
+}
+
+function updateUI() {
+  document.getElementById('met-val').textContent = getMET();
+  document.getElementById('dist-val').textContent = getDistance();
+  document.getElementById('vel-val').textContent = getVelocity();
+  document.getElementById('countdown').textContent = getCountdown();
+  document.getElementById('iran-day').textContent = getIranDay();
+}
+updateUI();
+setInterval(updateUI, 1000);
+
+// ── NEBULA LAYER ──────────────────────────────────────────────────────────
+let nebulaCanvas = null;
+function buildNebula() {
+  nebulaCanvas = document.createElement('canvas');
+  nebulaCanvas.width = W;
+  nebulaCanvas.height = H;
+  const nc = nebulaCanvas.getContext('2d');
+  // Soft clouds of colour
+  const regions = [
+    { cx: W*0.7, cy: H*0.3, rx: W*0.35, ry: H*0.35, r:20, g:40, b:80, a:0.035 },
+    { cx: W*0.3, cy: H*0.7, rx: W*0.3,  ry: H*0.28, r:40, g:10, b:30, a:0.025 },
+    { cx: W*0.5, cy: H*0.5, rx: W*0.5,  ry: H*0.5,  r:10, g:20, b:50, a:0.02  },
+  ];
+  for (const reg of regions) {
+    const g = nc.createRadialGradient(reg.cx, reg.cy, 0, reg.cx, reg.cy, Math.max(reg.rx, reg.ry));
+    g.addColorStop(0, `rgba(${reg.r},${reg.g},${reg.b},${reg.a})`);
+    g.addColorStop(1, 'transparent');
+    nc.fillStyle = g;
+    nc.fillRect(0, 0, W, H);
+  }
+}
+
+// ── DRAW ──────────────────────────────────────────────────────────────────
+function drawStars(t) {
+  for (const s of stars) {
+    const flicker = s.base + Math.sin(t * s.speed + s.phase) * 0.3;
+    const alpha = Math.max(0, Math.min(1, flicker));
+    let color;
+    if (s.hue === 'warm') color = `rgba(255,220,180,${alpha})`;
+    else if (s.hue === 'blue') color = `rgba(160,210,255,${alpha})`;
+    else color = `rgba(255,255,255,${alpha})`;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+}
+
+function drawCrewDots(t) {
+  for (let i = 0; i < crewDots.length; i++) {
+    const dot = crewDots[i];
+    // Gentle orbital drift
+    dot.x = dot.baseX + Math.cos(t * 0.0003 + dot.phase) * 8;
+    dot.y = dot.baseY + Math.sin(t * 0.00025 + dot.phase * 1.3) * 6;
+
+    // Trail
+    dot.trail.push({ x: dot.x, y: dot.y });
+    if (dot.trail.length > 60) dot.trail.shift();
+
+    // Draw trail
+    for (let j = 1; j < dot.trail.length; j++) {
+      const p = j / dot.trail.length;
+      ctx.beginPath();
+      ctx.arc(dot.trail[j].x, dot.trail[j].y, 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(160,210,255,${p * 0.12})`;
+      ctx.fill();
+    }
+
+    // Glow
+    const pulse = 0.7 + Math.sin(t * 0.002 + i * 0.8) * 0.3;
+    const glowR = 40 + i * 10;
+    const g = ctx.createRadialGradient(dot.x, dot.y, 0, dot.x, dot.y, glowR);
+    g.addColorStop(0, `rgba(180,220,255,${0.15 * pulse})`);
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(dot.x - glowR, dot.y - glowR, glowR * 2, glowR * 2);
+
+    // Core dot
+    ctx.beginPath();
+    ctx.arc(dot.x, dot.y, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(210,235,255,${0.85 * pulse})`;
+    ctx.fill();
+  }
+
+  // Label under dots
+  ctx.font = `${Math.max(9, W * 0.007)}px 'Courier New'`;
+  ctx.fillStyle = 'rgba(160,200,255,0.25)';
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = '0.2em';
+  ctx.fillText('ORION · INTEGRITY', crewDots[1].x + 14, crewDots[0].y + 30);
+  ctx.textAlign = 'left';
+}
+
+function drawEarth(t) {
+  // Earth as a small blue glowing orb — destination
+  const ex = W * 0.5;
+  const ey = H * 0.5;
+  earthPulse = 0.5 + Math.sin(t * 0.0008) * 0.3;
+
+  const er = 16;
+  // Glow layers
+  for (let i = 3; i >= 1; i--) {
+    const g = ctx.createRadialGradient(ex, ey, 0, ex, ey, er * i * 2.5);
+    g.addColorStop(0, `rgba(60,140,255,${0.04 * earthPulse * i})`);
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.fillRect(ex - er * i * 2.5, ey - er * i * 2.5, er * i * 5, er * i * 5);
+  }
+  // Body
+  const bodyG = ctx.createRadialGradient(ex - 3, ey - 4, 1, ex, ey, er);
+  bodyG.addColorStop(0, `rgba(100,180,255,${0.7 * earthPulse})`);
+  bodyG.addColorStop(0.5, `rgba(40,100,200,${0.6 * earthPulse})`);
+  bodyG.addColorStop(1, `rgba(10,40,120,${0.4 * earthPulse})`);
+  ctx.beginPath();
+  ctx.arc(ex, ey, er, 0, Math.PI * 2);
+  ctx.fillStyle = bodyG;
+  ctx.fill();
+
+  // Label
+  ctx.save();
+  ctx.font = `${Math.max(7, W * 0.0055)}px 'Courier New'`;
+  ctx.fillStyle = 'rgba(120,190,255,0.28)';
+  ctx.textAlign = 'center';
+  ctx.fillText('HOME', ex, ey + er + 14);
+  ctx.restore();
+
+  // Draw line from crew to Earth (very faint)
+  if (crewDots.length > 0) {
+    const cx = crewDots[1].x + 14;
+    const cy = crewDots[0].y;
+    ctx.save();
+    ctx.setLineDash([2, 8]);
+    ctx.strokeStyle = 'rgba(120,180,255,0.07)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(ex, ey);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+}
+
+function drawComets(t) {
+  for (let i = comets.length - 1; i >= 0; i--) {
+    const c = comets[i];
+    c.x += c.vx;
+    c.y += c.vy;
+    c.life++;
+    // fade in/out
+    if (c.life < 40) c.alpha = c.life / 40;
+    else if (c.life > c.maxLife - 50) c.alpha = (c.maxLife - c.life) / 50;
+    else c.alpha = 1;
+
+    // Draw text
+    const fs = Math.max(8, W * c.size * 0.008);
+    ctx.save();
+    ctx.font = `${fs}px 'Courier New'`;
+    ctx.letterSpacing = '0.18em';
+    ctx.fillStyle = `rgba(${c.color[0]},${c.color[1]},${c.color[2]},${c.alpha * 0.5})`;
+    ctx.fillText(c.text.toUpperCase(), c.x, c.y);
+    ctx.restore();
+
+    // Remove old comets
+    if (c.life >= c.maxLife ||
+        c.x < -400 || c.x > W + 400 ||
+        c.y < -100 || c.y > H + 100) {
+      comets.splice(i, 1);
+    }
+  }
+}
+
+function drawHorizonLine(t) {
+  // Very subtle horizontal breathing line
+  const y = H * 0.62 + Math.sin(t * 0.0005) * 8;
+  const grad = ctx.createLinearGradient(0, y, W, y);
+  grad.addColorStop(0, 'transparent');
+  grad.addColorStop(0.3, 'rgba(80,140,255,0.04)');
+  grad.addColorStop(0.7, 'rgba(80,140,255,0.04)');
+  grad.addColorStop(1, 'transparent');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(0, y);
+  ctx.lineTo(W, y);
+  ctx.stroke();
+}
+
+// Comet spawn timer
+let lastComet = 0;
+const COMET_INTERVAL = 2800;
+
+// ── MAIN LOOP ─────────────────────────────────────────────────────────────
+function frame(ts) {
+  // Background
+  ctx.fillStyle = '#00000f';
+  ctx.fillRect(0, 0, W, H);
+
+  // Nebula
+  if (nebulaCanvas) {
+    ctx.drawImage(nebulaCanvas, 0, 0);
+  }
+
+  drawStars(ts);
+  drawHorizonLine(ts);
+  drawComets(ts);
+  drawEarth(ts);
+  drawCrewDots(ts);
+
+  // Spawn comets
+  if (ts - lastComet > COMET_INTERVAL) {
+    spawnComet();
+    lastComet = ts;
+    // occasionally double-spawn
+    if (Math.random() < 0.3) spawnComet();
+  }
+
+  requestAnimationFrame(frame);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+resize();
+buildNebula();
+initCrew();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

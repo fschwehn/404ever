@@ -97,5 +97,14 @@
     "libraries": [],
     "description": "A real-time dual-signal oscilloscope canvas — one waveform for the heavens (Artemis II at closest lunar approach today), one for the earth below (war, deadlines, fire), the two signals occasionally merging and repelling, with live mission milestones ticking down the side.",
     "commit": ""
+  },
+  {
+    "date": "2026-04-07",
+    "timestamp": "2026-04-07T07-12-00",
+    "title": "Coming Home — Flight Day 7",
+    "mood": "adrift",
+    "libraries": [],
+    "description": "A meditative star-field where four glowing crew-dots drift slowly earthward through an ink-black void, while fragments of today's world — war, wonder, World Health Day — drift past as fading comets.",
+    "commit": ""
   }
 ]
