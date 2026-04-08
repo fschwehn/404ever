@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two Silences — April 8, 2026</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --paper: #f5f0e8;
+    --ink: #1a1410;
+    --faint: rgba(26,20,16,0.12);
+    --channel-a: #1a4a6e;
+    --channel-b: #6e2a1a;
+    --signal-a: #2a7fbf;
+    --signal-b: #bf4a2a;
+    --glow-a: rgba(42,127,191,0.18);
+    --glow-b: rgba(191,74,42,0.18);
+    --quiet: #2a5c3a;
+    --quiet-glow: rgba(42,92,58,0.2);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--paper);
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
+    color: var(--ink);
+  }
+
+  /* paper texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 27px,
+        rgba(26,20,16,0.04) 27px,
+        rgba(26,20,16,0.04) 28px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* fold lines */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(90deg, transparent 49.9%, rgba(26,20,16,0.06) 50%, transparent 50.1%),
+      linear-gradient(0deg, transparent 24.9%, rgba(26,20,16,0.04) 25%, transparent 25.1%),
+      linear-gradient(0deg, transparent 49.9%, rgba(26,20,16,0.04) 50%, transparent 50.1%),
+      linear-gradient(0deg, transparent 74.9%, rgba(26,20,16,0.04) 75%, transparent 75.1%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #canvas-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+  }
+
+  #ui {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  /* ── HEADER ── */
+  #header {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 18px 24px 10px;
+    border-bottom: 1px solid var(--faint);
+    background: rgba(245,240,232,0.92);
+  }
+
+  #header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .h-date {
+    font-size: clamp(0.42rem, 0.9vw, 0.6rem);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(26,20,16,0.35);
+  }
+
+  .h-title {
+    font-size: clamp(1rem, 3vw, 2.2rem);
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .h-sub {
+    font-size: clamp(0.38rem, 0.8vw, 0.52rem);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(26,20,16,0.3);
+    margin-top: 2px;
+  }
+
+  #header-center {
+    text-align: center;
+    flex: 1;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .splashdown-label {
+    font-size: clamp(0.35rem, 0.72vw, 0.46rem);
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: rgba(26,20,16,0.25);
+    margin-bottom: 3px;
+  }
+
+  #countdown {
+    font-size: clamp(1.1rem, 3.2vw, 2.6rem);
+    letter-spacing: 0.12em;
+    color: var(--channel-a);
+    font-weight: 400;
+    opacity: 0.85;
+  }
+
+  .splashdown-sub {
+    font-size: clamp(0.34rem, 0.7vw, 0.44rem);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(26,20,16,0.2);
+    margin-top: 2px;
+  }
+
+  #header-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-top: 2px;
+  }
+
+  .h-stat {
+    font-size: clamp(0.35rem, 0.75vw, 0.48rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(26,20,16,0.3);
+    line-height: 1.6;
+  }
+  .h-stat em {
+    color: rgba(26,20,16,0.65);
+    font-style: normal;
+  }
+  .h-stat.ceasefire {
+    color: rgba(42,92,58,0.7);
+  }
+  .h-stat.ceasefire em {
+    color: rgba(42,92,58,0.95);
+    font-weight: bold;
+  }
+
+  /* ── CHANNEL PANELS ── */
+  .channel-panel {
+    grid-row: 2;
+    padding: 14px 20px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-right: 1px solid var(--faint);
+    overflow: hidden;
+  }
+
+  .channel-panel:last-child {
+    border-right: none;
+  }
+
+  .ch-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .ch-id {
+    font-size: clamp(0.38rem, 0.82vw, 0.52rem);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+  }
+
+  .ch-id.a { color: var(--channel-a); opacity: 0.7; }
+  .ch-id.b { color: var(--channel-b); opacity: 0.7; }
+
+  .ch-name {
+    font-size: clamp(0.7rem, 2vw, 1.4rem);
+    letter-spacing: 0.07em;
+    font-weight: 400;
+  }
+  .ch-name.a { color: var(--channel-a); }
+  .ch-name.b { color: var(--channel-b); }
+
+  .ch-status {
+    font-size: clamp(0.32rem, 0.65vw, 0.42rem);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border: 1px solid;
+    display: inline-block;
+  }
+  .ch-status.a {
+    color: var(--signal-a);
+    border-color: rgba(42,127,191,0.3);
+    background: rgba(42,127,191,0.06);
+  }
+  .ch-status.b {
+    color: var(--quiet);
+    border-color: rgba(42,92,58,0.3);
+    background: rgba(42,92,58,0.06);
+  }
+
+  .ch-canvas-wrap {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+  }
+
+  .ch-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* annotation overlays on channels */
+  .annotation {
+    position: absolute;
+    font-size: clamp(0.32rem, 0.65vw, 0.42rem);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+  .annotation.a { color: rgba(42,127,191,0.45); }
+  .annotation.b { color: rgba(191,74,42,0.4); }
+  .annotation.q { color: rgba(42,92,58,0.5); }
+
+  /* ── LOG STRIPS ── */
+  #log-a, #log-b {
+    padding: 0 20px;
+    overflow: hidden;
+    height: 0;
+    flex-shrink: 0;
+  }
+
+  /* ── FOOTER ── */
+  #footer {
+    grid-column: 1 / 3;
+    grid-row: 3;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 8px 24px 14px;
+    border-top: 1px solid var(--faint);
+    background: rgba(245,240,232,0.92);
+  }
+
+  #ticker {
+    flex: 1;
+    overflow: hidden;
+    height: 28px;
+    position: relative;
+  }
+
+  .ticker-inner {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    animation: ticker-scroll 60s linear infinite;
+    font-size: clamp(0.34rem, 0.72vw, 0.46rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(26,20,16,0.35);
+  }
+
+  @keyframes ticker-scroll {
+    0%   { transform: translateY(-50%) translateX(100vw); }
+    100% { transform: translateY(-50%) translateX(-100%); }
+  }
+
+  .ticker-inner .t-hot   { color: rgba(191,74,42,0.7); }
+  .ticker-inner .t-peace { color: rgba(42,92,58,0.75); }
+  .ticker-inner .t-space { color: rgba(42,127,191,0.7); }
+  .ticker-inner .t-sep   { color: rgba(26,20,16,0.2); margin: 0 18px; }
+
+  #footer-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .f-line {
+    font-size: clamp(0.32rem, 0.65vw, 0.42rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(26,20,16,0.22);
+  }
+
+  /* ── DIVIDER LINE ── */
+  #divider {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: var(--faint);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* ── ARCHIVE LINK ── */
+  #archive {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.38rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(26,20,16,0.2);
+    text-decoration: none;
+    pointer-events: all;
+    z-index: 10;
+    transition: color 0.4s;
+  }
+  #archive:hover { color: rgba(26,20,16,0.55); }
+
+  /* ── EVENT LOG CARDS ── */
+  #event-log {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 4;
+    pointer-events: none;
+    max-width: min(220px, 20vw);
+  }
+
+  .log-card {
+    font-size: clamp(0.3rem, 0.62vw, 0.4rem);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 5px 8px;
+    border-left: 2px solid;
+    background: rgba(245,240,232,0.88);
+    line-height: 1.5;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .log-card.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .log-card.space {
+    border-color: var(--signal-a);
+    color: var(--channel-a);
+  }
+
+  .log-card.peace {
+    border-color: var(--quiet);
+    color: var(--quiet);
+  }
+
+  .log-card.world {
+    border-color: var(--signal-b);
+    color: var(--channel-b);
+  }
+
+  /* ── CENTRE MOMENT ── */
+  #moment {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 2s ease;
+    max-width: 52vw;
+  }
+
+  #moment-text {
+    font-size: clamp(0.55rem, 1.5vw, 1rem);
+    letter-spacing: 0.18em;
+    line-height: 1.7;
+    text-transform: uppercase;
+    font-style: italic;
+    color: rgba(26,20,16,0.55);
+  }
+
+  #moment-attr {
+    font-size: clamp(0.32rem, 0.68vw, 0.44rem);
+    letter-spacing: 0.3em;
+    color: rgba(26,20,16,0.28);
+    margin-top: 10px;
+    text-transform: uppercase;
+  }
+
+  /* ── TELEMETRY STRIP ── */
+  #telem-strip {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  .telem-row {
+    font-size: clamp(0.3rem, 0.6vw, 0.38rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(26,74,110,0.45);
+    line-height: 1.6;
+  }
+
+  .telem-row span {
+    color: rgba(26,74,110,0.8);
+  }
+
+</style>
+</head>
+<body>
+
+<canvas id="canvas-layer"></canvas>
+
+<div id="divider"></div>
+
+<!-- telemetry left strip -->
+<div id="telem-strip">
+  <div class="telem-row">MET &nbsp;<span id="met-val">-</span></div>
+  <div class="telem-row">Dist &nbsp;<span id="dist-val">-</span></div>
+  <div class="telem-row">Vel &nbsp;<span id="vel-val">-</span></div>
+  <div class="telem-row">FD &nbsp;<span>8</span></div>
+</div>
+
+<!-- event log cards right -->
+<div id="event-log">
+  <div class="log-card space" id="card-1">Integrity: trajectory burn ~21:03 ET · life support test</div>
+  <div class="log-card peace" id="card-2">US–Iran 2-week ceasefire · brokered Pakistan</div>
+  <div class="log-card space" id="card-3">252,760 mi peak distance · Apollo 13 record broken</div>
+  <div class="log-card world" id="card-4">Oil slides to $103/bbl after ceasefire · was $117</div>
+  <div class="log-card peace" id="card-5">Islamabad talks · April 10 · same day as splashdown</div>
+  <div class="log-card space" id="card-6">USS John P. Murtha · underway to recovery site</div>
+</div>
+
+<!-- centre moment -->
+<div id="moment">
+  <div id="moment-text"></div>
+  <div id="moment-attr"></div>
+</div>
+
+<div id="ui">
+  <!-- HEADER -->
+  <div id="header">
+    <div id="header-left">
+      <div class="h-date">Wednesday · April 8, 2026 · Flight Day 8</div>
+      <div class="h-title">Two Silences</div>
+      <div class="h-sub">One homeward · One stepping back</div>
+    </div>
+    <div id="header-center">
+      <div class="splashdown-label">Splashdown in</div>
+      <div id="countdown">--h --m --s</div>
+      <div class="splashdown-sub">Pacific · San Diego · April 10 · 20:07 EDT</div>
+    </div>
+    <div id="header-right">
+      <div class="h-stat">MET&nbsp;&nbsp;<em id="h-met">-</em></div>
+      <div class="h-stat">Orion&nbsp;&nbsp;<em>Integrity · homeward</em></div>
+      <div class="h-stat ceasefire">Iran War&nbsp;&nbsp;<em>CEASEFIRE</em></div>
+      <div class="h-stat">Brokered by&nbsp;&nbsp;<em>Pakistan</em></div>
+      <div class="h-stat">Oil&nbsp;&nbsp;<em>~$103 / bbl ↓</em></div>
+    </div>
+  </div>
+
+  <!-- CHANNEL A: SPACE -->
+  <div class="channel-panel" style="grid-column:1; grid-row:2;">
+    <div class="ch-header">
+      <span class="ch-id a">CH·A</span>
+      <span class="ch-name a">Deep Space</span>
+      <span class="ch-status a">Signal Nominal</span>
+    </div>
+    <div class="ch-canvas-wrap" id="wrap-a">
+      <canvas class="ch-canvas" id="ch-a"></canvas>
+      <div class="annotation a" style="top:8px;left:4px;">Orion · Free Return Trajectory</div>
+      <div class="annotation a" style="top:8px;right:4px;text-align:right;">TCM Burn ~21:03 ET Tonight</div>
+      <div class="annotation a" style="bottom:8px;left:4px;">Crew: Wiseman · Glover · Koch · Hansen</div>
+      <div class="annotation a" style="bottom:8px;right:4px;text-align:right;"><span id="dist-ann">-</span></div>
+    </div>
+  </div>
+
+  <!-- CHANNEL B: WORLD -->
+  <div class="channel-panel" style="grid-column:2; grid-row:2; border-right:none;">
+    <div class="ch-header">
+      <span class="ch-id b">CH·B</span>
+      <span class="ch-name b">World Below</span>
+      <span class="ch-status b">Ceasefire Active</span>
+    </div>
+    <div class="ch-canvas-wrap" id="wrap-b">
+      <canvas class="ch-canvas" id="ch-b"></canvas>
+      <div class="annotation b" style="top:8px;left:4px;">Iran–US · Day 38 of conflict</div>
+      <div class="annotation q" style="top:8px;right:4px;text-align:right;">2-week pause · effective now</div>
+      <div class="annotation b" style="bottom:8px;left:4px;">Hormuz · reopening subject to deal</div>
+      <div class="annotation q" style="bottom:8px;right:4px;text-align:right;">Islamabad talks · Apr 10</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <div id="ticker">
+      <div class="ticker-inner">
+        <span class="t-space">Orion trajectory burn tonight ~21:03 ET</span>
+        <span class="t-sep">◦</span>
+        <span class="t-peace">US–Iran 2-week ceasefire brokered by Pakistan</span>
+        <span class="t-sep">◦</span>
+        <span class="t-space">252,760 miles · farthest humans have ever traveled</span>
+        <span class="t-sep">◦</span>
+        <span class="t-hot">Oil slides to ~$103/bbl from $117 peak after ceasefire</span>
+        <span class="t-sep">◦</span>
+        <span class="t-peace">Islamabad talks April 10 · same day as Orion splashdown</span>
+        <span class="t-sep">◦</span>
+        <span class="t-space">USS John P. Murtha underway · San Diego recovery site</span>
+        <span class="t-sep">◦</span>
+        <span class="t-hot">Kuwait airport fuel depot hit by Iranian drones</span>
+        <span class="t-sep">◦</span>
+        <span class="t-space">Life support systems test aboard Integrity · April 8</span>
+        <span class="t-sep">◦</span>
+        <span class="t-peace">Pakistan PM Sharif: "both parties displayed remarkable wisdom"</span>
+        <span class="t-sep">◦</span>
+        <span class="t-space">Orion reentry speed: ~25,000 mph · fastest crewed return ever</span>
+        <span class="t-sep">◦</span>
+        <span class="t-hot">S&P futures +1.6% · Nasdaq +1.8% on ceasefire news</span>
+        <span class="t-sep">◦</span>
+        <span class="t-space">Apollo 13 record broken Apr 6 · 248,655 mi exceeded</span>
+      </div>
+    </div>
+    <div id="footer-right">
+      <div class="f-line">Wednesday · April 8 · 2026</div>
+      <div class="f-line">Flight Day 8 · Two Silences</div>
+    </div>
+  </div>
+</div>
+
+<a href="./history.html" id="archive">▸ History</a>
+
+<script>
+// ── CONSTANTS ──────────────────────────────────────────────────────────
+const LAUNCH     = new Date('2026-04-01T22:35:00Z').getTime();
+const SPLASHDOWN = new Date('2026-04-11T00:07:00Z').getTime();
+const IRAN_START = new Date('2026-02-28T00:00:00Z').getTime();
+
+// ── CANVAS SETUP ──────────────────────────────────────────────────────
+const mainCanvas = document.getElementById('canvas-layer');
+const mainCtx = mainCanvas.getContext('2d');
+
+const chA = document.getElementById('ch-a');
+const ctxA = chA.getContext('2d');
+const chB = document.getElementById('ch-b');
+const ctxB = chB.getContext('2d');
+
+function resizeAll() {
+  mainCanvas.width = window.innerWidth;
+  mainCanvas.height = window.innerHeight;
+
+  const wrapA = document.getElementById('wrap-a');
+  const wrapB = document.getElementById('wrap-b');
+
+  if (wrapA) {
+    chA.width  = wrapA.clientWidth;
+    chA.height = wrapA.clientHeight;
+  }
+  if (wrapB) {
+    chB.width  = wrapB.clientWidth;
+    chB.height = wrapB.clientHeight;
+  }
+}
+window.addEventListener('resize', () => { resizeAll(); });
+setTimeout(resizeAll, 100);
+
+// ── SIGNAL HISTORY ─────────────────────────────────────────────────────
+const SIG_LEN = 600;
+let sigA = new Float32Array(SIG_LEN).fill(0);
+let sigB = new Float32Array(SIG_LEN).fill(0);
+let sigAPhase = 0;
+let sigBPhase = 0;
+let sigATime  = 0;
+let sigBTime  = 0;
+
+// A: smooth sine family — deep space, steady, curious variations
+// B: more chaotic, now quieting toward baseline
+
+function generateSampleA(t) {
+  const base = Math.sin(t * 0.018) * 0.45;
+  const mod1 = Math.sin(t * 0.043 + 1.2) * 0.22;
+  const mod2 = Math.sin(t * 0.091 + 0.5) * 0.12;
+  const drift= Math.sin(t * 0.004) * 0.08;
+  const noise= (Math.random() - 0.5) * 0.06;
+  return base + mod1 + mod2 + drift + noise;
+}
+
+// B: starts rough, now fading toward stillness (ceasefire!)
+let ceasefireProgress = 0; // 0→1 over time
+function generateSampleB(t) {
+  const turbulence = Math.max(0, 1 - ceasefireProgress);
+  const base  = Math.sin(t * 0.022 + 0.7) * 0.3 * turbulence;
+  const spike = Math.sin(t * 0.055) * 0.35 * turbulence;
+  const chaos = (Math.random() - 0.5) * 0.45 * turbulence;
+  const calm  = Math.sin(t * 0.008 + 2.1) * 0.12;
+  const settle= Math.sin(t * 0.003) * 0.05 * ceasefireProgress;
+  return base + spike + chaos + calm + settle;
+}
+
+// ── WAVEFORM DRAWER ────────────────────────────────────────────────────
+function drawWaveform(ctx, sig, color, glowColor, width, height, label) {
+  if (width <= 0 || height <= 0) return;
+
+  // Background
+  ctx.fillStyle = 'rgba(245,240,232,0.0)';
+  ctx.clearRect(0, 0, width, height);
+
+  const midY = height / 2;
+  const amp  = height * 0.36;
+  const step = width / SIG_LEN;
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(26,20,16,0.06)';
+  ctx.lineWidth = 0.5;
+  for (let g = 1; g < 4; g++) {
+    const y = height * (g / 4);
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+  for (let g = 1; g < 8; g++) {
+    const x = width * (g / 8);
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
+    ctx.stroke();
+  }
+
+  // Glow pass (thick, faint)
+  ctx.beginPath();
+  ctx.moveTo(0, midY + sig[0] * amp);
+  for (let i = 1; i < SIG_LEN; i++) {
+    ctx.lineTo(i * step, midY + sig[i] * amp);
+  }
+  ctx.strokeStyle = glowColor;
+  ctx.lineWidth = 6;
+  ctx.shadowColor = glowColor;
+  ctx.shadowBlur = 10;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Main line
+  ctx.beginPath();
+  ctx.moveTo(0, midY + sig[0] * amp);
+  for (let i = 1; i < SIG_LEN; i++) {
+    ctx.lineTo(i * step, midY + sig[i] * amp);
+  }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Cursor dot at leading edge
+  const lastX = (SIG_LEN - 1) * step;
+  const lastY = midY + sig[SIG_LEN - 1] * amp;
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+
+  // Zero line
+  ctx.beginPath();
+  ctx.moveTo(0, midY);
+  ctx.lineTo(width, midY);
+  ctx.strokeStyle = 'rgba(26,20,16,0.08)';
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([4, 8]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+// ── BACKGROUND CANVAS ─────────────────────────────────────────────────
+// Subtle paper noise and minimal decorations
+let bgBuilt = false;
+let bgCanvas = null;
+
+function buildBg() {
+  bgCanvas = document.createElement('canvas');
+  bgCanvas.width = mainCanvas.width;
+  bgCanvas.height = mainCanvas.height;
+  const bc = bgCanvas.getContext('2d');
+  const W = bgCanvas.width, H = bgCanvas.height;
+
+  // Fine noise
+  for (let i = 0; i < 8000; i++) {
+    const x = Math.random() * W;
+    const y = Math.random() * H;
+    const a = Math.random() * 0.04;
+    bc.fillStyle = `rgba(26,20,16,${a})`;
+    bc.fillRect(x, y, 1, 1);
+  }
+
+  // Gentle watermark
+  bc.save();
+  bc.font = `bold ${Math.min(W, H) * 0.22}px 'Courier New'`;
+  bc.fillStyle = 'rgba(26,20,16,0.018)';
+  bc.textAlign = 'center';
+  bc.textBaseline = 'middle';
+  bc.fillText('08', W * 0.5, H * 0.5);
+  bc.restore();
+
+  bgBuilt = true;
+}
+
+// ── TELEMETRY ─────────────────────────────────────────────────────────
+function getMET() {
+  const diff = Math.max(0, Date.now() - LAUNCH);
+  const s = Math.floor(diff / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return `${d}d ${h}h ${m}m`;
+}
+
+function getDistKm() {
+  // Day 8 returning: roughly 340,000 km and closing at ~3,400 km/h
+  const dayStart8 = LAUNCH + 7 * 86400000;
+  const hrs = Math.max(0, (Date.now() - dayStart8) / 3600000);
+  return Math.max(20000, Math.round(340000 - hrs * 3400));
+}
+
+function getVelocity() {
+  const dayStart8 = LAUNCH + 7 * 86400000;
+  const hrs = Math.max(0, (Date.now() - dayStart8) / 3600000);
+  return Math.round(3400 + hrs * 55);
+}
+
+function getCountdown() {
+  const diff = SPLASHDOWN - Date.now();
+  if (diff <= 0) return '00h 00m 00s';
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  return `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+}
+
+function updateUI() {
+  const met   = getMET();
+  const distKm= getDistKm();
+  const distStr = distKm.toLocaleString() + ' km';
+  const vel   = getVelocity().toLocaleString() + ' km/h';
+
+  document.getElementById('countdown').textContent = getCountdown();
+  document.getElementById('met-val').textContent = met;
+  document.getElementById('dist-val').textContent = distStr;
+  document.getElementById('vel-val').textContent = vel;
+  document.getElementById('h-met').textContent = met;
+  document.getElementById('dist-ann').textContent = distStr;
+}
+updateUI();
+setInterval(updateUI, 1000);
+
+// ── LOG CARDS ─────────────────────────────────────────────────────────
+const cards = document.querySelectorAll('.log-card');
+cards.forEach((card, i) => {
+  setTimeout(() => { card.classList.add('visible'); }, 1500 + i * 1100);
+});
+
+// ── MOMENTS ───────────────────────────────────────────────────────────
+const moments = [
+  {
+    text: '"Integrity, looks like a good burn."',
+    attr: '— Mission Control · April 2, 2026'
+  },
+  {
+    text: 'Two weeks. A pause. The strait may open again.',
+    attr: '— US–Iran ceasefire · April 7, 2026'
+  },
+  {
+    text: '"They are charting new frontiers for all humanity."',
+    attr: '— Dr. Lori Glaze, NASA · April 6, 2026'
+  },
+  {
+    text: 'Both parties displayed remarkable wisdom.',
+    attr: '— PM Sharif of Pakistan · April 7, 2026'
+  },
+  {
+    text: '252,760 miles — the farthest a human being has ever been from home.',
+    attr: '— Artemis II record · April 6, 2026'
+  },
+  {
+    text: 'Friday: splashdown off San Diego. Friday: talks in Islamabad. The same day.',
+    attr: '— April 10, 2026'
+  },
+];
+let momentIdx = 0;
+let momentVisible = false;
+
+function showMoment() {
+  if (momentVisible) return;
+  const m = moments[momentIdx % moments.length];
+  momentIdx++;
+  document.getElementById('moment-text').textContent = m.text;
+  document.getElementById('moment-attr').textContent = m.attr;
+  const el = document.getElementById('moment');
+  el.style.opacity = '1';
+  momentVisible = true;
+  setTimeout(() => {
+    el.style.opacity = '0';
+    momentVisible = false;
+  }, 5500);
+}
+setTimeout(() => { showMoment(); setInterval(showMoment, 20000); }, 10000);
+
+// ── CEASEFIRE TRANSITION ──────────────────────────────────────────────
+// Ceasefire was announced ~01:00 UTC April 8, 2026
+const CEASEFIRE_T = new Date('2026-04-08T01:00:00Z').getTime();
+const TRANSITION_DURATION = 3 * 3600000; // 3 hours to fully "calm"
+
+function getCeasefireProgress() {
+  const elapsed = Date.now() - CEASEFIRE_T;
+  if (elapsed < 0) return 0;
+  return Math.min(1, elapsed / TRANSITION_DURATION);
+}
+
+// ── SIGNAL UPDATE ─────────────────────────────────────────────────────
+function updateSignals() {
+  ceasefireProgress = getCeasefireProgress();
+
+  // push new sample into ring buffer
+  const newA = generateSampleA(sigATime);
+  const newB = generateSampleB(sigBTime);
+  sigATime += 1;
+  sigBTime += 1;
+
+  // shift left
+  sigA.copyWithin(0, 1);
+  sigB.copyWithin(0, 1);
+  sigA[SIG_LEN - 1] = newA;
+  sigB[SIG_LEN - 1] = newB;
+}
+
+// ── MAIN LOOP ─────────────────────────────────────────────────────────
+let lastSignalUpdate = 0;
+const SIGNAL_STEP_MS = 16; // ~60fps signal update
+
+function frame(ts) {
+  // Update signals
+  if (ts - lastSignalUpdate >= SIGNAL_STEP_MS) {
+    updateSignals();
+    lastSignalUpdate = ts;
+  }
+
+  // Background canvas
+  if (!bgBuilt || (bgCanvas && (bgCanvas.width !== mainCanvas.width || bgCanvas.height !== mainCanvas.height))) {
+    buildBg();
+  }
+  if (bgCanvas) {
+    mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+    mainCtx.drawImage(bgCanvas, 0, 0);
+  }
+
+  // Draw waveforms
+  if (chA.width > 0 && chA.height > 0) {
+    drawWaveform(ctxA, sigA,
+      'rgba(42,127,191,0.85)',
+      'rgba(42,127,191,0.15)',
+      chA.width, chA.height, 'Deep Space'
+    );
+  }
+  if (chB.width > 0 && chB.height > 0) {
+    // Color shifts from red → green as ceasefire takes hold
+    const cp = getCeasefireProgress();
+    const r = Math.round(191 - (191 - 42) * cp);
+    const g = Math.round(74  + (92 - 74) * cp);
+    const b = Math.round(42  - (42 - 58) * cp);
+    const signalColor = `rgba(${r},${g},${b},0.85)`;
+    const glowColor   = `rgba(${r},${g},${b},0.15)`;
+    drawWaveform(ctxB, sigB, signalColor, glowColor, chB.width, chB.height, 'World');
+  }
+
+  requestAnimationFrame(frame);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+// Pre-fill signal buffers
+for (let i = 0; i < SIG_LEN; i++) {
+  sigA[i] = generateSampleA(i);
+  sigATime = i + 1;
+  sigB[i] = generateSampleB(i);
+  sigBTime = i + 1;
+}
+
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
