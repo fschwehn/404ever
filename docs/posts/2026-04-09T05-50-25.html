@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Fragile Planet Gazette — April 9, 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --parchment: #f2ead8;
+    --aged: #e8dfc8;
+    --ink: #1c1308;
+    --faded: rgba(28,19,8,0.38);
+    --veryfaded: rgba(28,19,8,0.14);
+    --red: #8c1a0a;
+    --blue: #0a2a5c;
+    --gold: #7a5c0a;
+    --green: #1a4a24;
+    --rule: rgba(28,19,8,0.2);
+  }
+
+  html, body {
+    width:100%; height:100%;
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: 'IM Fell English', serif;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  /* Paper texture overlay */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+    pointer-events:none;
+    z-index:999;
+    opacity:0.5;
+  }
+
+  /* ── MASTHEAD ── */
+  #masthead {
+    border-bottom: 3px double var(--ink);
+    padding: 0 0 6px;
+    margin: 10px 16px 0;
+    text-align: center;
+    position: relative;
+  }
+
+  .issue-line {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:'Courier Prime', monospace;
+    font-size:0.55rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--faded);
+    padding: 6px 0 4px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 5px;
+  }
+
+  .gazette-name {
+    font-family:'UnifrakturMaguntia', cursive;
+    font-size: clamp(2rem, 7vw, 5.2rem);
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    text-shadow: 2px 2px 0 rgba(28,19,8,0.08);
+  }
+
+  .gazette-tagline {
+    font-family:'IM Fell English', serif;
+    font-style:italic;
+    font-size: clamp(0.52rem, 1.2vw, 0.82rem);
+    color:var(--faded);
+    margin-top:3px;
+    letter-spacing:0.1em;
+  }
+
+  .price-line {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:'Courier Prime', monospace;
+    font-size:0.5rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--faded);
+    padding: 5px 0 0;
+    border-top: 1px solid var(--rule);
+    margin-top: 4px;
+  }
+
+  /* ── SUBHEAD BANNER ── */
+  #banner {
+    background: var(--ink);
+    color: var(--parchment);
+    text-align:center;
+    padding: 4px 16px;
+    font-family:'Courier Prime', monospace;
+    font-size: clamp(0.45rem, 1vw, 0.62rem);
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+    margin: 0;
+  }
+
+  #banner span { opacity:0.7; margin:0 14px; }
+  #banner .hot { color: #ffcaa0; }
+  #banner .peace { color: #a0ffca; }
+  #banner .space { color: #a0c8ff; }
+
+  /* ── MAIN GRID ── */
+  #paper {
+    display:grid;
+    grid-template-columns: 1fr 2px 2fr 2px 1fr;
+    gap: 0;
+    margin: 0 16px;
+    padding-top: 10px;
+  }
+
+  .col-rule {
+    background: var(--rule);
+    margin: 0 3px;
+  }
+
+  /* ── COLUMNS ── */
+  .col {
+    padding: 0 10px;
+    min-width:0;
+  }
+
+  /* ── ARTICLE BLOCKS ── */
+  .article {
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 12px;
+  }
+
+  .article:last-child {
+    border-bottom: none;
+  }
+
+  .kicker {
+    font-family:'Courier Prime', monospace;
+    font-size:0.44rem;
+    letter-spacing:0.28em;
+    text-transform:uppercase;
+    color:var(--faded);
+    margin-bottom: 4px;
+  }
+  .kicker.red { color:var(--red); }
+  .kicker.blue { color:var(--blue); }
+  .kicker.green { color:var(--green); }
+  .kicker.gold { color:var(--gold); }
+
+  .headline {
+    font-family:'IM Fell English', serif;
+    font-size: clamp(0.85rem, 2.5vw, 1.65rem);
+    line-height:1.18;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+
+  .headline.small { font-size: clamp(0.72rem, 1.8vw, 1.1rem); }
+  .headline.large { font-size: clamp(1.1rem, 3.5vw, 2.4rem); }
+  .headline.huge  { font-size: clamp(1.4rem, 5vw, 3.5rem); }
+
+  .deck {
+    font-family:'IM Fell English', serif;
+    font-style:italic;
+    font-size: clamp(0.55rem, 1.2vw, 0.78rem);
+    line-height:1.45;
+    color:var(--faded);
+    margin-bottom:7px;
+  }
+
+  .byline {
+    font-family:'Courier Prime', monospace;
+    font-size:0.42rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--veryfaded);
+    margin-bottom:7px;
+  }
+
+  .body-text {
+    font-family:'IM Fell English', serif;
+    font-size: clamp(0.58rem, 1.15vw, 0.74rem);
+    line-height:1.65;
+    color:var(--ink);
+    text-align:justify;
+    hyphens:auto;
+  }
+
+  .body-text .drop-cap::first-letter {
+    float:left;
+    font-size:3.2em;
+    line-height:0.82;
+    margin: 0.04em 0.08em -0.02em 0;
+    font-family:'UnifrakturMaguntia', cursive;
+    color:var(--ink);
+  }
+
+  /* ── CENTRE COLUMN SPECIAL ── */
+  .centre-col .headline.huge {
+    text-align:center;
+    margin-bottom:8px;
+  }
+
+  .centre-col .deck {
+    text-align:center;
+    font-size: clamp(0.62rem, 1.4vw, 0.9rem);
+  }
+
+  /* centre divider within centre col */
+  .centre-split {
+    display:grid;
+    grid-template-columns:1fr 1px 1fr;
+    gap:0;
+    margin-top:10px;
+  }
+
+  .centre-split .inner-rule {
+    background:var(--rule);
+    margin:0 4px;
+  }
+
+  .centre-split .inner-col {
+    padding:0 6px;
+  }
+
+  /* ── COUNTER / LIVE DATA ── */
+  .live-box {
+    border: 1px solid var(--rule);
+    padding: 8px 10px;
+    margin: 8px 0;
+    text-align:center;
+    background: rgba(28,19,8,0.03);
+    position:relative;
+  }
+
+  .live-box::before {
+    content:'LIVE';
+    position:absolute;
+    top:-6px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--red);
+    color:var(--parchment);
+    font-family:'Courier Prime', monospace;
+    font-size:0.38rem;
+    letter-spacing:0.3em;
+    padding:1px 6px;
+  }
+
+  .live-label {
+    font-family:'Courier Prime', monospace;
+    font-size:0.42rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--faded);
+    margin-bottom:4px;
+  }
+
+  .live-value {
+    font-family:'Courier Prime', monospace;
+    font-size: clamp(1rem, 3vw, 2rem);
+    letter-spacing:0.12em;
+    color:var(--blue);
+    font-weight:700;
+  }
+
+  .live-sub {
+    font-family:'Courier Prime', monospace;
+    font-size:0.4rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--veryfaded);
+    margin-top:3px;
+  }
+
+  /* ── PULL QUOTE ── */
+  .pull-quote {
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    padding: 8px 4px;
+    margin: 10px 0;
+    text-align:center;
+  }
+
+  .pull-quote q {
+    font-family:'IM Fell English', serif;
+    font-style:italic;
+    font-size: clamp(0.68rem, 1.6vw, 1.05rem);
+    line-height:1.4;
+    color:var(--ink);
+    quotes:'\201C''\201D''\2018''\2019';
+  }
+
+  .pull-quote .attr {
+    font-family:'Courier Prime', monospace;
+    font-size:0.4rem;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--faded);
+    margin-top:5px;
+    display:block;
+  }
+
+  /* ── RULING LINES ── */
+  .rule-heavy { border-bottom: 2px solid var(--ink); margin: 6px 0; }
+  .rule-light { border-bottom: 1px solid var(--rule); margin: 6px 0; }
+  .rule-double { border-bottom: 3px double var(--ink); margin: 6px 0; }
+
+  /* ── ORBIT DIAGRAM ── */
+  #orbit-box {
+    text-align:center;
+    margin: 8px 0;
+    padding: 6px 0;
+  }
+
+  #orbit-canvas {
+    display:block;
+    margin:0 auto;
+  }
+
+  /* ── CEASEFIRE BOX ── */
+  .cf-box {
+    border: 2px solid var(--green);
+    padding: 8px 10px;
+    margin: 8px 0;
+    background: rgba(26,74,36,0.04);
+  }
+
+  .cf-head {
+    font-family:'IM Fell English', serif;
+    font-size: clamp(0.75rem, 2vw, 1.2rem);
+    color:var(--green);
+    text-align:center;
+    margin-bottom:4px;
+  }
+
+  .cf-detail {
+    font-family:'Courier Prime', monospace;
+    font-size:0.45rem;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color:var(--green);
+    opacity:0.75;
+    line-height:1.7;
+    text-align:center;
+  }
+
+  /* ── TICKER FOOTER ── */
+  #footer {
+    margin-top:12px;
+    border-top: 3px double var(--ink);
+    border-bottom: 3px double var(--ink);
+    overflow:hidden;
+    height:22px;
+    display:flex;
+    align-items:center;
+    background: var(--aged);
+    position:relative;
+  }
+
+  #footer::before {
+    content:'DISPATCH:';
+    font-family:'Courier Prime', monospace;
+    font-size:0.45rem;
+    letter-spacing:0.2em;
+    color:var(--red);
+    padding: 0 10px;
+    white-space:nowrap;
+    position:relative;
+    z-index:2;
+    background:var(--aged);
+    border-right:1px solid var(--rule);
+  }
+
+  .ticker-scroll {
+    white-space:nowrap;
+    animation: tickerMove 90s linear infinite;
+    font-family:'Courier Prime', monospace;
+    font-size:0.45rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--faded);
+    padding-left:20px;
+  }
+
+  @keyframes tickerMove {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .t-r { color:var(--red); }
+  .t-b { color:var(--blue); }
+  .t-g { color:var(--green); }
+  .t-sep { color:var(--veryfaded); margin:0 16px; }
+
+  /* ── COLOPHON ── */
+  #colophon {
+    margin:4px 16px 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  #colophon a {
+    font-family:'Courier Prime', monospace;
+    font-size:0.4rem;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--veryfaded);
+    text-decoration:none;
+    transition:color 0.4s;
+  }
+
+  #colophon a:hover { color:var(--faded); }
+
+  #colophon .col-r {
+    font-family:'Courier Prime', monospace;
+    font-size:0.4rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--veryfaded);
+  }
+
+  /* ── ANIMATED INK BLEED ── */
+  .ink-bleed {
+    display:inline-block;
+    animation: inkBleed 8s ease-in-out infinite;
+  }
+
+  @keyframes inkBleed {
+    0%, 100% { opacity:1; text-shadow: none; }
+    50% { opacity:0.88; text-shadow: 0 0 18px rgba(28,19,8,0.22); }
+  }
+
+  /* ── SPLASHDOWN COUNTDOWN ── */
+  #countdown-big {
+    font-family:'Courier Prime', monospace;
+    font-size: clamp(1.3rem, 4vw, 2.8rem);
+    font-weight:700;
+    letter-spacing:0.1em;
+    color:var(--blue);
+    text-align:center;
+    line-height:1;
+  }
+
+  /* ── FADE-IN ANIMATION for articles ── */
+  @keyframes fadeInUp {
+    from { opacity:0; transform:translateY(12px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .col { animation: fadeInUp 1.2s ease both; }
+  .col:nth-child(1) { animation-delay:0.1s; }
+  .col:nth-child(3) { animation-delay:0.3s; }
+  .col:nth-child(5) { animation-delay:0.5s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    #paper {
+      grid-template-columns: 1fr;
+    }
+    .col-rule { display:none; }
+    .centre-split { grid-template-columns:1fr; }
+    .centre-split .inner-rule { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div id="masthead">
+  <div class="issue-line">
+    <span>Thursday · April 9 · 2026</span>
+    <span>Flight Day 9 of 10 · Artemis II</span>
+    <span>Vol. CCLXIII · No. 99</span>
+  </div>
+  <div class="gazette-name ink-bleed">The Fragile Planet Gazette</div>
+  <div class="gazette-tagline">Printing the news from Earth orbit to deep space and back again since the universe began</div>
+  <div class="price-line">
+    <span>One Penny — or the weight of a prayer</span>
+    <span id="live-time">--:--:-- UTC</span>
+    <span>Ceasefire Active · Strait Opening · Crew Homeward</span>
+  </div>
+</div>
+
+<!-- BREAKING BANNER -->
+<div id="banner">
+  <span class="space">▲ Orion "Integrity" · Flight Day 9 · 1 Day to Splashdown</span>
+  <span>◆</span>
+  <span class="peace">▲ Iran–US Ceasefire · Day 2 · Strait of Hormuz Reopening</span>
+  <span>◆</span>
+  <span class="hot">▲ Islamabad Talks Tomorrow · Same Hour as Splashdown</span>
+</div>
+
+<!-- MAIN PAPER GRID -->
+<div id="paper">
+
+  <!-- LEFT COLUMN -->
+  <div class="col">
+
+    <div class="article">
+      <div class="kicker red">BREAKING · WORLD</div>
+      <div class="headline">"A Big Day for World Peace"</div>
+      <div class="deck">The ceasefire holds through its second morning. The Strait stirs with cautious traffic.</div>
+      <div class="byline">By our Gulf Correspondent · Islamabad Bureau</div>
+      <div class="body-text drop-cap">
+        <p>President Trump declared a two-week suspension of hostilities against Iran, contingent upon the reopening of the Strait of Hormuz. Iranian officials confirmed they would allow safe passage of marine traffic. The Strait — through which roughly one-fifth of the world's daily oil supply flows — began cautious operations at dawn on the ninth of April.</p>
+      </div>
+    </div>
+
+    <div class="rule-double"></div>
+
+    <div class="article">
+      <div class="kicker green">CEASEFIRE</div>
+      <div class="cf-box">
+        <div class="cf-head">Silence on the Water</div>
+        <div class="cf-detail">
+          Iran–US Ceasefire<br>
+          Effective April 8 · 01:00 UTC<br>
+          Duration: 14 days<br>
+          Islamabad Talks: April 10<br>
+          Brokered by Pakistan<br>
+          Strait: Reopening
+        </div>
+      </div>
+    </div>
+
+    <div class="rule-light"></div>
+
+    <div class="article">
+      <div class="kicker gold">OIL & MARKETS</div>
+      <div class="headline small">Crude Falls Again as Ships Begin to Move</div>
+      <div class="body-text">
+        <p>Crude oil, which had surged past $117 a barrel at the height of hostilities, retreated toward $103 as the ceasefire held through its second day. Investors cheered the pause in fighting; equity futures gained through the night session. Analysts caution that the fragility of the deal limits any sustained relief.</p>
+      </div>
+    </div>
+
+    <div class="rule-light"></div>
+
+    <div class="article">
+      <div class="kicker red">BEIRUT · ONGOING</div>
+      <div class="headline small">Smoke Still Rises Over Lebanon's Capital</div>
+      <div class="body-text">
+        <p>Even as the primary ceasefire takes hold in the Gulf, Israeli airstrikes continued overnight around Beirut and the nearby district of Khalde. The conflict's peripheral arcs remain unresolved, a reminder that a two-week pause is not yet peace.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-rule"></div>
+
+  <!-- CENTRE COLUMN -->
+  <div class="col centre-col">
+
+    <div class="kicker blue" style="text-align:center;">ARTEMIS II · FLIGHT DAY 9 OF 10</div>
+    <div class="headline huge" style="text-align:center; margin-bottom:4px;">Coming Home</div>
+    <div class="deck" style="text-align:center; margin-bottom:10px;">
+      Four humans return from the farthest reach of our species — 252,756 miles — to a world that has not yet managed to stop fighting. They carry photographs of a crescent Earth on the Moon's horizon.
+    </div>
+
+    <!-- Splashdown countdown -->
+    <div class="live-box" style="margin-bottom:10px;">
+      <div class="live-label">Splashdown in</div>
+      <div id="countdown-big">--h --m --s</div>
+      <div class="live-sub">Pacific · San Diego Coast · April 10 · ~20:07 EDT</div>
+    </div>
+
+    <!-- Orbit diagram -->
+    <div id="orbit-box">
+      <canvas id="orbit-canvas" width="280" height="140"></canvas>
+    </div>
+
+    <!-- Pull quote Glover -->
+    <div class="pull-quote">
+      <q>We live on a fragile planet in the vacuum of space. It absolutely reaffirms it.</q>
+      <span class="attr">— Victor Glover, Pilot · Artemis II · April 8, 2026</span>
+    </div>
+
+    <!-- Centre split for telemetry -->
+    <div class="centre-split">
+      <div class="inner-col">
+        <div class="live-box">
+          <div class="live-label">Distance to Earth</div>
+          <div class="live-value" id="dist-val" style="font-size:clamp(0.75rem,2vw,1.3rem);">—</div>
+          <div class="live-sub">km · closing</div>
+        </div>
+        <div class="live-box" style="margin-top:8px;">
+          <div class="live-label">Mission Elapsed Time</div>
+          <div class="live-value" id="met-val" style="font-size:clamp(0.7rem,1.8vw,1.1rem);">—</div>
+          <div class="live-sub">days · hours · min</div>
+        </div>
+      </div>
+      <div class="inner-rule"></div>
+      <div class="inner-col">
+        <div class="live-box">
+          <div class="live-label">Velocity</div>
+          <div class="live-value" id="vel-val" style="font-size:clamp(0.75rem,2vw,1.3rem);">—</div>
+          <div class="live-sub">km/h · accelerating</div>
+        </div>
+        <div class="live-box" style="margin-top:8px;">
+          <div class="live-label">Crew Status</div>
+          <div class="live-value" style="font-size:0.7rem; color:var(--green); letter-spacing:0.08em;">NOMINAL</div>
+          <div class="live-sub">Wiseman · Glover · Koch · Hansen</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rule-double" style="margin-top:12px;"></div>
+
+    <div class="article" style="margin-top:10px;">
+      <div class="kicker blue">MISSION RECORD</div>
+      <div class="headline" style="text-align:center;">252,756 Miles</div>
+      <div class="deck" style="text-align:center;">The farthest humans have ever traveled from Earth. A record set Monday, April 6, at 12:56 p.m. CDT — and already receding in the rearview mirror of space.</div>
+      <div class="body-text" style="margin-top:6px;">
+        <p>Canadian astronaut Jeremy Hansen, speaking from the cabin of Integrity as they surpassed Apollo 13's record, called upon a generation and the next to make the record short-lived. Wiseman dedicated a newly proposed Moon crater to his late wife, Carroll.</p>
+      </div>
+    </div>
+
+    <div class="rule-light"></div>
+
+    <div class="article">
+      <div class="kicker gold" style="text-align:center;">CREW DISPATCH · April 8</div>
+      <div class="body-text" style="text-align:center; font-style:italic;">
+        Christina Koch on life in Orion: "Yes, it feels bigger in microgravity — and yes, we are bumping into each other 100% of the time."
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-rule"></div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="col">
+
+    <div class="article">
+      <div class="kicker blue">DEEP SPACE</div>
+      <div class="headline">Woken to "Under Pressure"</div>
+      <div class="deck">Mission Control chose the 1981 Queen and David Bowie collaboration to rouse the crew on Flight Day 8. No one noted the irony.</div>
+      <div class="body-text drop-cap">
+        <p>The astronauts awoke Thursday morning to another day of survival tests and a homeward burn. They assembled a radiation shelter from onboard supplies, tested orthostatic intolerance garments designed to help blood flow return in Earth's gravity, and took turns on the flywheel — rowing and squatting against the resistance of nothing, in preparation for the full weight of everything.</p>
+      </div>
+    </div>
+
+    <div class="rule-double"></div>
+
+    <div class="article">
+      <div class="kicker red">WORLD AT WAR · STILL</div>
+      <div class="headline small">Sudan: UN Reopens Khartoum HQ</div>
+      <div class="body-text">
+        <p>The United Nations reopened its Khartoum headquarters for the first time since 2023 — though elsewhere in Sudan, drones struck the Al-Jabalain hospital in White Nile State, killing ten people including seven medical staff. A pause in one theatre, a continuation in another.</p>
+      </div>
+    </div>
+
+    <div class="rule-light"></div>
+
+    <div class="article">
+      <div class="kicker green">DOMESTIC</div>
+      <div class="headline small">Wisconsin Judicial Election: Liberal Majority Expands</div>
+      <div class="body-text">
+        <p>Wisconsin voters elected a new justice to their state supreme court, expanding a liberal-leaning majority — part of a pattern of Democratic overperformance in elections since President Trump took office. The result was noted but swiftly overtaken by ceasefire news.</p>
+      </div>
+    </div>
+
+    <div class="rule-light"></div>
+
+    <div class="article">
+      <div class="kicker blue">TOMORROW</div>
+      <div class="headline">Friday, April 10 — Two Things at Once</div>
+      <div class="deck">Orion splashes down off San Diego. Peace talks open in Islamabad. The same day.</div>
+      <div class="body-text">
+        <p>At approximately 20:07 Eastern, four astronauts will strike the Pacific Ocean at 34,965 feet per second and decelerate into human arms. At approximately the same moment, delegations from the United States and Iran will sit across a table in Islamabad to begin the work of making the ceasefire permanent. The water will be 64 degrees. The weather will be mild.</p>
+      </div>
+    </div>
+
+    <div class="rule-light"></div>
+
+    <div class="article">
+      <div class="kicker gold">NEAR EARTH</div>
+      <div class="headline small">Asteroid 2026 GD Passes Closely by Earth</div>
+      <div class="body-text">
+        <p>Astronomers tracked a close encounter with near-Earth asteroid 2026 GD on April 8, passing safely. Virtual Telescope Project observers also trained their instruments on the returning Orion spacecraft — a bright point gliding across the stars, "one of the most powerful emotions we have experienced in recent years," a researcher wrote.</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- TICKER FOOTER -->
+<div id="footer">
+  <div class="ticker-scroll" id="ticker">
+    <span class="t-b">ORION INTEGRITY · FLIGHT DAY 9 · SPLASHDOWN TOMORROW ~20:07 EDT</span>
+    <span class="t-sep">◆</span>
+    <span class="t-g">CEASEFIRE DAY 2 · STRAIT OF HORMUZ REOPENING</span>
+    <span class="t-sep">◆</span>
+    <span class="t-r">OIL ~$103/BBL · DOWN FROM $117 PEAK</span>
+    <span class="t-sep">◆</span>
+    <span class="t-b">252,756 MILES · FARTHEST HUMANS HAVE EVER TRAVELED</span>
+    <span class="t-sep">◆</span>
+    <span class="t-g">ISLAMABAD TALKS APRIL 10 · SAME DAY AS SPLASHDOWN</span>
+    <span class="t-sep">◆</span>
+    <span class="t-r">BEIRUT STRIKES OVERNIGHT · CEASEFIRE DOES NOT COVER LEBANON</span>
+    <span class="t-sep">◆</span>
+    <span class="t-b">USS JOHN P. MURTHA UNDERWAY · SAN DIEGO RECOVERY ZONE</span>
+    <span class="t-sep">◆</span>
+    <span class="t-g">WISCONSIN SUPREME COURT · LIBERAL MAJORITY EXPANDS</span>
+    <span class="t-sep">◆</span>
+    <span class="t-r">SUDAN: 10 KILLED IN DRONE STRIKE ON HOSPITAL</span>
+    <span class="t-sep">◆</span>
+    <span class="t-b">CREW WOKEN TO "UNDER PRESSURE" · QUEEN &amp; BOWIE · 1981</span>
+    <span class="t-sep">◆</span>
+    <span class="t-g">CREW: "WE LIVE ON A FRAGILE PLANET IN THE VACUUM OF SPACE"</span>
+    <span class="t-sep">◆</span>
+    <!-- repeat for seamless loop -->
+    <span class="t-b">ORION INTEGRITY · FLIGHT DAY 9 · SPLASHDOWN TOMORROW ~20:07 EDT</span>
+    <span class="t-sep">◆</span>
+    <span class="t-g">CEASEFIRE DAY 2 · STRAIT OF HORMUZ REOPENING</span>
+    <span class="t-sep">◆</span>
+    <span class="t-r">OIL ~$103/BBL · DOWN FROM $117 PEAK</span>
+    <span class="t-sep">◆</span>
+    <span class="t-b">252,756 MILES · FARTHEST HUMANS HAVE EVER TRAVELED</span>
+    <span class="t-sep">◆</span>
+    <span class="t-g">ISLAMABAD TALKS APRIL 10 · SAME DAY AS SPLASHDOWN</span>
+    <span class="t-sep">◆</span>
+    <span class="t-r">BEIRUT STRIKES OVERNIGHT · CEASEFIRE DOES NOT COVER LEBANON</span>
+    <span class="t-sep">◆</span>
+    <span class="t-b">USS JOHN P. MURTHA UNDERWAY · SAN DIEGO RECOVERY ZONE</span>
+    <span class="t-sep">◆</span>
+    <span class="t-g">WISCONSIN SUPREME COURT · LIBERAL MAJORITY EXPANDS</span>
+  </div>
+</div>
+
+<!-- COLOPHON -->
+<div id="colophon">
+  <a href="./history.html">▸ Archive of All Editions</a>
+  <div class="col-r">Printed in the Void · April 9 · 2026 · Flight Day 9</div>
+</div>
+
+<script>
+// ── CONSTANTS ──────────────────────────────────────────────────────────
+const LAUNCH     = new Date('2026-04-01T22:35:00Z').getTime();
+const SPLASHDOWN = new Date('2026-04-11T00:07:00Z').getTime();
+
+// ── LIVE CLOCK ─────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2,'0');
+  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const s = String(now.getUTCSeconds()).padStart(2,'0');
+  const el = document.getElementById('live-time');
+  if (el) el.textContent = `${h}:${m}:${s} UTC`;
+}
+
+// ── COUNTDOWN ──────────────────────────────────────────────────────────
+function updateCountdown() {
+  const diff = SPLASHDOWN - Date.now();
+  const el = document.getElementById('countdown-big');
+  if (!el) return;
+  if (diff <= 0) { el.textContent = 'SPLASHDOWN'; return; }
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  el.textContent = `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+}
+
+// ── TELEMETRY ─────────────────────────────────────────────────────────
+function getMET() {
+  const diff = Math.max(0, Date.now() - LAUNCH);
+  const s = Math.floor(diff / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return `${d}d ${h}h ${m}m`;
+}
+
+function getDistKm() {
+  const dayStart9 = LAUNCH + 8 * 86400000;
+  const hrs = Math.max(0, (Date.now() - dayStart9) / 3600000);
+  return Math.max(10000, Math.round(250000 - hrs * 4200));
+}
+
+function getVelocity() {
+  const dayStart9 = LAUNCH + 8 * 86400000;
+  const hrs = Math.max(0, (Date.now() - dayStart9) / 3600000);
+  return Math.round(3900 + hrs * 120);
+}
+
+function updateTelemetry() {
+  const dist = document.getElementById('dist-val');
+  const met  = document.getElementById('met-val');
+  const vel  = document.getElementById('vel-val');
+  if (dist) dist.textContent = getDistKm().toLocaleString() + ' km';
+  if (met)  met.textContent  = getMET();
+  if (vel)  vel.textContent  = getVelocity().toLocaleString() + ' km/h';
+}
+
+// ── ORBIT DIAGRAM ─────────────────────────────────────────────────────
+function drawOrbit() {
+  const canvas = document.getElementById('orbit-canvas');
+  if (!canvas) return;
+
+  // Responsive width
+  const parent = canvas.parentElement;
+  const W = Math.min(parent.clientWidth - 20, 320);
+  const H = Math.round(W * 0.5);
+  canvas.width = W;
+  canvas.height = H;
+
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  const cx = W * 0.35;
+  const cy = H * 0.5;
+  const rx = W * 0.38;
+  const ry = H * 0.38;
+
+  // Draw orbit path
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(28,19,8,0.15)';
+  ctx.lineWidth = 0.8;
+  ctx.setLineDash([3, 5]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Earth
+  const earthR = W * 0.07;
+  const grad = ctx.createRadialGradient(cx, cy, earthR*0.2, cx, cy, earthR);
+  grad.addColorStop(0,'rgba(10,42,92,0.9)');
+  grad.addColorStop(0.5,'rgba(26,74,140,0.8)');
+  grad.addColorStop(1,'rgba(28,50,80,0.4)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, earthR, 0, Math.PI*2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.strokeStyle='rgba(28,19,8,0.25)';
+  ctx.lineWidth=0.5;
+  ctx.stroke();
+
+  // Moon
+  const moonX = cx + rx * 0.98;
+  const moonY = cy;
+  const moonR = W * 0.033;
+  const moonGrad = ctx.createRadialGradient(moonX, moonY, moonR*0.1, moonX, moonY, moonR);
+  moonGrad.addColorStop(0,'rgba(200,195,180,0.95)');
+  moonGrad.addColorStop(1,'rgba(150,140,125,0.5)');
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, moonR, 0, Math.PI*2);
+  ctx.fillStyle = moonGrad;
+  ctx.fill();
+  ctx.strokeStyle='rgba(28,19,8,0.15)';
+  ctx.lineWidth=0.5;
+  ctx.stroke();
+
+  // Orion position on return trajectory (Flight Day 9 of 10 — ~85% of way home from moon)
+  const progress = 0.85;
+  const angle = Math.PI * (1 - progress);
+  const orionX = cx + rx * Math.cos(angle) * 0.55;
+  const orionY = cy + ry * Math.sin(angle) * 0.55;
+
+  // Trail
+  for (let i = 0; i < 12; i++) {
+    const ta = angle + i * 0.08;
+    const tx = cx + rx * Math.cos(ta) * 0.55;
+    const ty = cy + ry * Math.sin(ta) * 0.55;
+    ctx.beginPath();
+    ctx.arc(tx, ty, 1.2 * (1 - i/12), 0, Math.PI*2);
+    ctx.fillStyle = `rgba(10,42,92,${0.4 - i*0.03})`;
+    ctx.fill();
+  }
+
+  // Orion dot
+  ctx.beginPath();
+  ctx.arc(orionX, orionY, 4, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(10,42,92,0.9)';
+  ctx.fill();
+  ctx.strokeStyle='rgba(10,42,92,0.5)';
+  ctx.lineWidth=1;
+  ctx.stroke();
+
+  // Glow ring
+  ctx.beginPath();
+  ctx.arc(orionX, orionY, 7, 0, Math.PI*2);
+  ctx.strokeStyle='rgba(10,42,92,0.2)';
+  ctx.lineWidth=2;
+  ctx.stroke();
+
+  // Labels
+  ctx.font = `bold ${W*0.032}px 'Courier New', monospace`;
+  ctx.fillStyle = 'rgba(28,19,8,0.5)';
+  ctx.textAlign='center';
+  ctx.fillText('EARTH', cx, cy + earthR + W*0.04);
+  ctx.fillText('MOON', moonX, moonY + moonR + W*0.04);
+
+  ctx.font = `bold ${W*0.03}px 'Courier New', monospace`;
+  ctx.fillStyle = 'rgba(10,42,92,0.75)';
+  ctx.fillText('INTEGRITY', orionX, orionY - 10);
+
+  // Direction arrow
+  ctx.font = `${W*0.038}px serif`;
+  ctx.fillStyle = 'rgba(10,42,92,0.5)';
+  ctx.fillText('↺ Homeward', cx - W*0.12, cy - ry - 6);
+
+  ctx.textAlign='left';
+}
+
+// ── UPDATE LOOP ────────────────────────────────────────────────────────
+function tick() {
+  updateClock();
+  updateCountdown();
+  updateTelemetry();
+}
+
+tick();
+setInterval(tick, 1000);
+
+// ── INIT ──────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  drawOrbit();
+  window.addEventListener('resize', drawOrbit);
+});
+
+setTimeout(drawOrbit, 200);
+
+// ── INK DRIP EFFECT ON GAZETTE NAME ──────────────────────────────────
+// Occasional subtle shimmer
+const name = document.querySelector('.gazette-name');
+if (name) {
+  setInterval(() => {
+    const x = Math.floor(Math.random() * 3 - 1);
+    const y = Math.floor(Math.random() * 2);
+    name.style.textShadow = `${x}px ${y}px ${4+Math.random()*8}px rgba(28,19,8,${0.05+Math.random()*0.12})`;
+    setTimeout(() => { name.style.textShadow = ''; }, 600);
+  }, 3500);
+}
+</script>
+</body>
+</html>
