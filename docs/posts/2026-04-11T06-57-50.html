@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signal Recovered — April 11, 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;600&display=swap');
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --deep: #020d0f;
+  --abyss: #010809;
+  --biolum: #00ffc8;
+  --glow: #00e8b5;
+  --dimglow: rgba(0,255,200,0.18);
+  --faintglow: rgba(0,255,200,0.06);
+  --sonar: rgba(0,255,200,0.55);
+  --warn: #ff6b35;
+  --warnfaint: rgba(255,107,53,0.15);
+  --peace: #7affdb;
+  --gold: #ffd166;
+  --text: rgba(0,255,200,0.82);
+  --textfaint: rgba(0,255,200,0.38);
+  --textveryfaint: rgba(0,255,200,0.15);
+  --scan: rgba(0,255,200,0.04);
+}
+
+html, body {
+  width:100%; min-height:100%;
+  background: var(--deep);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  overflow-x: hidden;
+}
+
+/* scanline overlay */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--scan) 2px,
+    var(--scan) 4px
+  );
+  pointer-events:none;
+  z-index:9998;
+}
+
+/* vignette */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(1,5,6,0.75) 100%);
+  pointer-events:none;
+  z-index:9997;
+}
+
+/* ── SONAR CANVAS ── */
+#sonar-wrap {
+  position:fixed;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+  opacity:0.22;
+}
+
+#sonar-canvas {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+}
+
+/* ── LAYOUT ── */
+#app {
+  position:relative;
+  z-index:10;
+  max-width:1100px;
+  margin:0 auto;
+  padding:18px 20px 40px;
+}
+
+/* ── HEADER ── */
+#header {
+  border-bottom: 1px solid var(--biolum);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  position:relative;
+}
+
+.sys-label {
+  font-family:'Share Tech Mono', monospace;
+  font-size:0.55rem;
+  letter-spacing:0.4em;
+  text-transform:uppercase;
+  color:var(--textfaint);
+  margin-bottom:6px;
+}
+
+.station-name {
+  font-family:'Orbitron', monospace;
+  font-size: clamp(1.2rem, 4vw, 2.8rem);
+  font-weight:900;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--biolum);
+  text-shadow: 0 0 30px rgba(0,255,200,0.6), 0 0 60px rgba(0,255,200,0.2);
+  line-height:1;
+}
+
+.station-sub {
+  font-size:0.6rem;
+  letter-spacing:0.35em;
+  color:var(--textfaint);
+  margin-top:6px;
+}
+
+.header-right {
+  position:absolute;
+  top:0; right:0;
+  text-align:right;
+}
+
+.live-dot {
+  display:inline-block;
+  width:7px; height:7px;
+  background:var(--warn);
+  border-radius:50%;
+  box-shadow:0 0 10px var(--warn), 0 0 20px var(--warn);
+  animation: pulse 1.2s ease-in-out infinite;
+  vertical-align:middle;
+  margin-right:5px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity:1; transform:scale(1); }
+  50% { opacity:0.4; transform:scale(0.7); }
+}
+
+.header-time {
+  font-size:0.55rem;
+  letter-spacing:0.3em;
+  color:var(--textfaint);
+  margin-top:4px;
+  display:block;
+}
+
+/* ── HERO BLOCK ── */
+#hero {
+  border: 1px solid var(--dimglow);
+  border-left: 3px solid var(--biolum);
+  padding: 20px 24px;
+  margin-bottom:22px;
+  background: var(--faintglow);
+  position:relative;
+  overflow:hidden;
+}
+
+#hero::before {
+  content:'CONFIRMED RECOVERY';
+  position:absolute;
+  top:10px; right:14px;
+  font-size:0.42rem;
+  letter-spacing:0.35em;
+  color:var(--biolum);
+  opacity:0.5;
+}
+
+.hero-kicker {
+  font-size:0.52rem;
+  letter-spacing:0.45em;
+  color:var(--biolum);
+  opacity:0.7;
+  margin-bottom:8px;
+}
+
+.hero-headline {
+  font-family:'Orbitron', monospace;
+  font-size: clamp(1.5rem, 5vw, 3.6rem);
+  font-weight:900;
+  line-height:1.05;
+  letter-spacing:0.06em;
+  color:#fff;
+  text-shadow: 0 0 40px rgba(0,255,200,0.5);
+  margin-bottom:10px;
+}
+
+.hero-sub {
+  font-size:0.72rem;
+  line-height:1.7;
+  color:var(--textfaint);
+  max-width:700px;
+  letter-spacing:0.06em;
+}
+
+.hero-sub strong { color:var(--biolum); font-weight:normal; }
+
+/* ── STATS ROW ── */
+#stats-row {
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:12px;
+  margin-bottom:22px;
+}
+
+.stat-box {
+  border: 1px solid var(--textveryfaint);
+  padding:14px 12px;
+  text-align:center;
+  position:relative;
+  background: rgba(0,255,200,0.03);
+  transition: border-color 0.3s;
+}
+
+.stat-box:hover { border-color: var(--dimglow); }
+
+.stat-box::after {
+  content:'';
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--biolum), transparent);
+  opacity:0.3;
+}
+
+.stat-label {
+  font-size:0.42rem;
+  letter-spacing:0.35em;
+  color:var(--textfaint);
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.stat-value {
+  font-family:'Orbitron', monospace;
+  font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+  font-weight:700;
+  color:var(--biolum);
+  line-height:1;
+  text-shadow:0 0 20px rgba(0,255,200,0.4);
+}
+
+.stat-unit {
+  font-size:0.38rem;
+  letter-spacing:0.3em;
+  color:var(--textveryfaint);
+  margin-top:5px;
+}
+
+/* ── GRID ── */
+#grid {
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap:14px;
+  margin-bottom:22px;
+}
+
+/* ── CHANNEL CARD ── */
+.channel {
+  border: 1px solid var(--textveryfaint);
+  padding:16px;
+  background: rgba(0,0,0,0.3);
+  position:relative;
+  animation: fadeIn 0.8s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.channel:nth-child(1) { animation-delay:0.1s; border-top-color: var(--biolum); }
+.channel:nth-child(2) { animation-delay:0.25s; border-top-color: var(--warn); }
+.channel:nth-child(3) { animation-delay:0.4s; border-top-color: var(--gold); }
+
+.ch-label {
+  font-size:0.4rem;
+  letter-spacing:0.45em;
+  text-transform:uppercase;
+  margin-bottom:10px;
+  padding-bottom:8px;
+  border-bottom:1px solid var(--textveryfaint);
+}
+
+.ch-label.space { color:var(--biolum); }
+.ch-label.war   { color:var(--warn); }
+.ch-label.world { color:var(--gold); }
+
+.ch-item {
+  margin-bottom:12px;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(0,255,200,0.05);
+}
+
+.ch-item:last-child {
+  border-bottom:none;
+  margin-bottom:0;
+  padding-bottom:0;
+}
+
+.ch-head {
+  font-family:'Space Grotesk', sans-serif;
+  font-size:0.78rem;
+  font-weight:600;
+  line-height:1.3;
+  margin-bottom:5px;
+  color:rgba(255,255,255,0.88);
+  letter-spacing:0.02em;
+}
+
+.ch-body {
+  font-size:0.56rem;
+  line-height:1.8;
+  color:var(--textfaint);
+  letter-spacing:0.04em;
+}
+
+.ch-body .hl { color:var(--biolum); }
+.ch-body .hl-warn { color:var(--warn); }
+.ch-body .hl-gold { color:var(--gold); }
+
+/* ── CREW GRID ── */
+#crew-section {
+  border:1px solid var(--dimglow);
+  padding:18px;
+  margin-bottom:22px;
+  background: rgba(0,255,200,0.02);
+  position:relative;
+}
+
+#crew-section::before {
+  content:'ARTEMIS II · CREW STATUS · POST-MISSION';
+  font-size:0.4rem;
+  letter-spacing:0.4em;
+  color:var(--textfaint);
+  position:absolute;
+  top:-8px;
+  left:16px;
+  background:var(--deep);
+  padding:0 8px;
+}
+
+.crew-grid {
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:10px;
+  margin-top:4px;
+}
+
+.crew-card {
+  text-align:center;
+  border:1px solid var(--textveryfaint);
+  padding:14px 8px;
+  position:relative;
+  background:rgba(0,255,200,0.02);
+}
+
+.crew-icon {
+  font-size:2rem;
+  line-height:1;
+  margin-bottom:6px;
+  display:block;
+}
+
+.crew-name {
+  font-family:'Orbitron', monospace;
+  font-size:0.52rem;
+  letter-spacing:0.15em;
+  color:var(--biolum);
+  font-weight:700;
+  margin-bottom:3px;
+}
+
+.crew-role {
+  font-size:0.4rem;
+  letter-spacing:0.28em;
+  color:var(--textfaint);
+  margin-bottom:6px;
+  text-transform:uppercase;
+}
+
+.crew-badge {
+  font-size:0.38rem;
+  letter-spacing:0.2em;
+  color:var(--deep);
+  background:var(--biolum);
+  padding:2px 6px;
+  display:inline-block;
+}
+
+.crew-badge.first { background:var(--gold); color:var(--deep); }
+
+/* ── TRANSMISSION FEED ── */
+#feed {
+  border:1px solid var(--textveryfaint);
+  border-left:2px solid var(--warn);
+  padding:16px;
+  margin-bottom:22px;
+  max-height:240px;
+  overflow:hidden;
+  position:relative;
+  background: rgba(0,0,0,0.4);
+}
+
+#feed::before {
+  content:'LIVE DISPATCH FEED';
+  font-size:0.4rem;
+  letter-spacing:0.4em;
+  color:var(--warn);
+  display:block;
+  margin-bottom:10px;
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(255,107,53,0.2);
+}
+
+.feed-item {
+  display:flex;
+  gap:12px;
+  margin-bottom:8px;
+  animation: feedIn 0.6s ease both;
+  font-size:0.55rem;
+  line-height:1.6;
+}
+
+@keyframes feedIn {
+  from { opacity:0; transform:translateX(-6px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+.feed-time {
+  color:var(--textveryfaint);
+  white-space:nowrap;
+  flex-shrink:0;
+  font-size:0.48rem;
+}
+
+.feed-text { color:var(--textfaint); }
+.feed-text .ft-hl { color:var(--biolum); }
+.feed-text .ft-warn { color:var(--warn); }
+.feed-text .ft-gold { color:var(--gold); }
+
+#feed::after {
+  content:'';
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:60px;
+  background:linear-gradient(transparent, var(--deep));
+}
+
+/* ── SONAR MINI ── */
+#sonar-mini-wrap {
+  display:flex;
+  gap:14px;
+  margin-bottom:22px;
+  align-items:stretch;
+}
+
+#sonar-mini-canvas-wrap {
+  flex:0 0 220px;
+  border:1px solid var(--textveryfaint);
+  padding:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.3);
+  position:relative;
+}
+
+#sonar-mini-canvas-wrap::before {
+  content:'ORION POSITION · RECOVERED';
+  position:absolute;
+  top:8px; left:10px;
+  font-size:0.35rem;
+  letter-spacing:0.3em;
+  color:var(--textveryfaint);
+}
+
+#depth-data {
+  flex:1;
+  border:1px solid var(--textveryfaint);
+  padding:16px;
+  background:rgba(0,0,0,0.3);
+}
+
+.depth-title {
+  font-size:0.42rem;
+  letter-spacing:0.4em;
+  color:var(--textfaint);
+  margin-bottom:12px;
+  padding-bottom:8px;
+  border-bottom:1px solid var(--textveryfaint);
+}
+
+.depth-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  margin-bottom:8px;
+  font-size:0.52rem;
+}
+
+.depth-key { color:var(--textveryfaint); letter-spacing:0.1em; }
+.depth-val { color:var(--biolum); letter-spacing:0.06em; font-family:'Orbitron', monospace; font-size:0.62rem; }
+.depth-val.warn { color:var(--warn); }
+.depth-val.gold { color:var(--gold); }
+
+/* ── WAVEFORM ── */
+#waveform-wrap {
+  border:1px solid var(--textveryfaint);
+  border-top:2px solid var(--biolum);
+  padding:12px 16px;
+  margin-bottom:22px;
+  position:relative;
+  overflow:hidden;
+  background:rgba(0,0,0,0.3);
+}
+
+#waveform-wrap::before {
+  content:'SIGNAL AMPLITUDE · RECOVERY COMPLETE';
+  font-size:0.4rem;
+  letter-spacing:0.4em;
+  color:var(--textfaint);
+  display:block;
+  margin-bottom:8px;
+}
+
+#waveform-canvas {
+  display:block;
+  width:100%;
+}
+
+/* ── TICKER ── */
+#ticker-wrap {
+  border-top:1px solid var(--textveryfaint);
+  border-bottom:1px solid var(--textveryfaint);
+  overflow:hidden;
+  height:28px;
+  display:flex;
+  align-items:center;
+  margin-bottom:14px;
+  background:rgba(0,0,0,0.5);
+}
+
+#ticker-wrap::before {
+  content:'TX:';
+  font-size:0.45rem;
+  letter-spacing:0.3em;
+  color:var(--warn);
+  padding:0 10px;
+  white-space:nowrap;
+  border-right:1px solid var(--textveryfaint);
+  flex-shrink:0;
+}
+
+.ticker-inner {
+  white-space:nowrap;
+  animation: tickerScroll 80s linear infinite;
+  font-size:0.48rem;
+  letter-spacing:0.18em;
+  padding-left:20px;
+}
+
+@keyframes tickerScroll {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+
+.t-s { color:var(--biolum); }
+.t-w { color:var(--warn); }
+.t-g { color:var(--gold); }
+.t-d { color:var(--textveryfaint); margin:0 16px; }
+
+/* ── FOOTER ── */
+#footer {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-top:10px;
+  border-top:1px solid var(--textveryfaint);
+}
+
+#footer a {
+  font-size:0.42rem;
+  letter-spacing:0.3em;
+  color:var(--textveryfaint);
+  text-decoration:none;
+  text-transform:uppercase;
+  transition:color 0.3s;
+}
+
+#footer a:hover { color:var(--textfaint); }
+
+.footer-right {
+  font-size:0.42rem;
+  letter-spacing:0.25em;
+  color:var(--textveryfaint);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width:800px) {
+  #stats-row { grid-template-columns: repeat(2,1fr); }
+  #grid { grid-template-columns:1fr; }
+  .crew-grid { grid-template-columns:repeat(2,1fr); }
+  #sonar-mini-wrap { flex-direction:column; }
+  #sonar-mini-canvas-wrap { flex:none; height:180px; }
+}
+
+@media (max-width:480px) {
+  #stats-row { grid-template-columns:1fr 1fr; }
+  .crew-grid { grid-template-columns:1fr 1fr; }
+}
+
+/* Flicker animation for certain elements */
+@keyframes flicker {
+  0%, 97%, 100% { opacity:1; }
+  98% { opacity:0.5; }
+  99% { opacity:0.9; }
+}
+.station-name { animation: flicker 12s step-end infinite; }
+</style>
+</head>
+<body>
+
+<!-- Background sonar -->
+<div id="sonar-wrap">
+  <canvas id="sonar-canvas"></canvas>
+</div>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div class="sys-label">Pacific Recovery Station · Deep Signal Array · 00:07 GMT Confirmation</div>
+    <div class="station-name">Signal Recovered</div>
+    <div class="station-sub">Saturday · April 11 · 2026 · POST-SPLASHDOWN · "Four Crew Green"</div>
+    <div class="header-right">
+      <div style="font-size:0.5rem; letter-spacing:0.25em; color:var(--biolum);">
+        <span class="live-dot"></span>SIGNALS ACTIVE
+      </div>
+      <span class="header-time" id="live-clock">--:--:-- UTC</span>
+      <span class="header-time" style="margin-top:2px;">Islamabad Talks · Now in Progress</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div id="hero">
+    <div class="hero-kicker">ARTEMIS II · ORION "INTEGRITY" · SPLASHDOWN CONFIRMED</div>
+    <div class="hero-headline">They Came<br>Back From<br>The Moon</div>
+    <div class="hero-sub">
+      <strong>700,237 miles. 10 days. 4 humans. One perfect bullseye.</strong>
+      Orion Integrity struck the Pacific at 8:07 p.m. EDT on April 10 — approximately 40 miles off San Diego — with temperatures of 2,700°C on the heat shield and a three-minute blackout of silence from deep space's last threshold. Then: parachutes. Then: the water. Then: <strong>"four crew green."</strong> Humanity went back to the Moon and came home again.
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="stats-row">
+    <div class="stat-box">
+      <div class="stat-label">Total Distance Flown</div>
+      <div class="stat-value">700,237</div>
+      <div class="stat-unit">MILES · LAUNCH TO SPLASHDOWN</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Peak Velocity</div>
+      <div class="stat-value">24,664</div>
+      <div class="stat-unit">MPH · RE-ENTRY PEAK</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Farthest Distance</div>
+      <div class="stat-value">252,756</div>
+      <div class="stat-unit">MILES FROM EARTH · ALL-TIME RECORD</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Target Precision</div>
+      <div class="stat-value">&lt;1 mi</div>
+      <div class="stat-unit">FROM TARGET · NOT LUCK · 1,000 PEOPLE</div>
+    </div>
+  </div>
+
+  <!-- CREW -->
+  <div id="crew-section">
+    <div class="crew-grid">
+      <div class="crew-card">
+        <span class="crew-icon">👨‍🚀</span>
+        <div class="crew-name">Wiseman</div>
+        <div class="crew-role">Commander · NASA</div>
+        <div class="crew-badge">Last Out</div>
+      </div>
+      <div class="crew-card">
+        <span class="crew-icon">👨‍🚀</span>
+        <div class="crew-name">Glover</div>
+        <div class="crew-role">Pilot · NASA</div>
+        <div class="crew-badge first">1st Person of Colour → Moon</div>
+      </div>
+      <div class="crew-card">
+        <span class="crew-icon">👩‍🚀</span>
+        <div class="crew-name">Koch</div>
+        <div class="crew-role">Mission Spec. · NASA</div>
+        <div class="crew-badge first">1st Woman → Moon</div>
+      </div>
+      <div class="crew-card">
+        <span class="crew-icon">🧑‍🚀</span>
+        <div class="crew-name">Hansen</div>
+        <div class="crew-role">Mission Spec. · CSA</div>
+        <div class="crew-badge first">1st Non-American → Moon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MINI SONAR + DATA -->
+  <div id="sonar-mini-wrap">
+    <div id="sonar-mini-canvas-wrap">
+      <canvas id="mini-sonar" width="180" height="160"></canvas>
+    </div>
+    <div id="depth-data">
+      <div class="depth-title">MISSION TELEMETRY · FINAL LOG</div>
+      <div class="depth-row">
+        <span class="depth-key">Splashdown</span>
+        <span class="depth-val">APR 10 · 00:07 GMT</span>
+      </div>
+      <div class="depth-row">
+        <span class="depth-key">Landing Site</span>
+        <span class="depth-val">~40 mi off San Diego</span>
+      </div>
+      <div class="depth-row">
+        <span class="depth-key">Entry Range Flown</span>
+        <span class="depth-val">1,957 miles</span>
+      </div>
+      <div class="depth-row">
+        <span class="depth-key">Blackout Duration</span>
+        <span class="depth-val warn">3–6 min</span>
+      </div>
+      <div class="depth-row">
+        <span class="depth-key">Heat Shield Temp</span>
+        <span class="depth-val warn">2,700 °C</span>
+      </div>
+      <div class="depth-row">
+        <span class="depth-key">Recovery Ship</span>
+        <span class="depth-val">USS John P. Murtha</span>
+      </div>
+      <div class="depth-row">
+        <span class="depth-key">Crew Status</span>
+        <span class="depth-val" style="color:#7affdb;">FOUR GREEN · NOMINAL</span>
+      </div>
+      <div class="depth-row">
+        <span class="depth-key">Woken for Final Day</span>
+        <span class="depth-val gold">"Run to the Water"</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVEFORM -->
+  <div id="waveform-wrap">
+    <canvas id="waveform-canvas" height="60"></canvas>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div id="grid">
+
+    <!-- SPACE -->
+    <div class="channel">
+      <div class="ch-label space">CH-01 · DEEP SPACE</div>
+
+      <div class="ch-item">
+        <div class="ch-head">"A Perfect Bullseye Splashdown"</div>
+        <div class="ch-body">
+          Mission Control confirmed Orion hit its re-entry angle within <span class="hl">0.4%</span> of target — a quarter million miles from the Moon to a Pacific bull's-eye less than a mile across. The signal went dark for six minutes of fire, then returned.
+        </div>
+      </div>
+
+      <div class="ch-item">
+        <div class="ch-head">Christina Koch — First Out</div>
+        <div class="ch-body">
+          Koch emerged first from the capsule hatch, making her <span class="hl">the first woman to travel to lunar distance</span>. Wiseman was last out. All four were hoisted individually by helicopter to the USS Murtha.
+        </div>
+      </div>
+
+      <div class="ch-item">
+        <div class="ch-head">Solar Eclipse — "Greatest Gift"</div>
+        <div class="ch-body">
+          Victor Glover named the solar eclipse on April 6 — watching the sun disappear behind the Moon — as the mission's <span class="hl">highlight</span>: "It just blew us all away." The crew also photographed a crescent Earth above the lunar horizon.
+        </div>
+      </div>
+
+      <div class="ch-item">
+        <div class="ch-head">What Comes Next</div>
+        <div class="ch-body">
+          Engineers will now inspect the heat shield and service module valve design. The toilet issue needs resolution. <span class="hl">Artemis III</span> — a lunar landing — is slated for next year. The associate administrator said: "The path to the surface is open now."
+        </div>
+      </div>
+    </div>
+
+    <!-- WAR -->
+    <div class="channel">
+      <div class="ch-label war">CH-02 · CONFLICT SIGNALS</div>
+
+      <div class="ch-item">
+        <div class="ch-head">Islamabad Talks: Now Active</div>
+        <div class="ch-body">
+          JD Vance departed Friday for Pakistan to lead US-Iran peace negotiations. Both delegations have landed in Islamabad. Iran has reportedly set <span class="hl-warn">preconditions</span>. Trump warned simultaneously that warships are loaded and force may be used if talks fail.
+        </div>
+      </div>
+
+      <div class="ch-item">
+        <div class="ch-head">Lebanon: Toll Climbs</div>
+        <div class="ch-body">
+          The death toll from Israeli attacks on Lebanon since March 2 has risen to <span class="hl-warn">1,953 killed</span>, with 6,303 injured. April 8 alone saw 357 deaths. A French official called the Iran ceasefire "temporary" and "fragile."
+        </div>
+      </div>
+
+      <div class="ch-item">
+        <div class="ch-head">Ukraine Easter Truce</div>
+        <div class="ch-body">
+          Putin declared an Easter ceasefire from 16:00 Moscow time April 11 until end of April 12. <span class="hl-warn">Zelensky confirmed</span> Ukraine's readiness. Russian forces were ordered on alert for provocations. Drone strikes on Volgograd continued hours before the announcement.
+        </div>
+      </div>
+
+      <div class="ch-item">
+        <div class="ch-head">Strait of Hormuz</div>
+        <div class="ch-body">
+          The Iran-US ceasefire entered Day 3. Marine traffic cautiously resumed. Crude oil retreated from its $117 peak. France warns the calm is <span class="hl-warn">temporary</span>. The Strait carries 20% of global energy supply — every ship through it is a signal.
+        </div>
+      </div>
+    </div>
+
+    <!-- WORLD -->
+    <div class="channel">
+      <div class="ch-label world">CH-03 · WORLD FREQUENCY</div>
+
+      <div class="ch-item">
+        <div class="ch-head">AI Risk: Wall Street Briefed</div>
+        <div class="ch-body">
+          Treasury Secretary Scott Bessent and Fed Chair Jerome Powell met urgently with Wall Street executives over potential cyber risks from Anthropic's latest AI model. Banks were assessed for <span class="hl-gold">preparedness</span> against increasingly capable AI systems.
+        </div>
+      </div>
+
+      <div class="ch-item">
+        <div class="ch-head">Inflation Accelerates</div>
+        <div class="ch-body">
+          US consumer inflation hit its highest level since May 2024 in March, driven by a steep rise in energy prices from the Strait crisis. The war's economic shockwaves reach into <span class="hl-gold">every household</span>.
+        </div>
+      </div>
+
+      <div class="ch-item">
+        <div class="ch-head">Private Screening Before Liftoff</div>
+        <div class="ch-body">
+          Before strapping into Orion on April 1, the crew received a private screening of <span class="hl-gold">Project Hail Mary</span>. They also carried four tiny "organ-on-a-chip" avatars for radiation research — a bit of each of them already in space before they were.
+        </div>
+      </div>
+
+      <div class="ch-item">
+        <div class="ch-head">A Sonar Ping from History</div>
+        <div class="ch-body">
+          "Today was thousands of times better than Star Wars," said Orion program manager Howard Hu — who grew up watching those films with his father. His father did not survive to see this day. <span class="hl-gold">The signal reaches through grief.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LIVE FEED -->
+  <div id="feed">
+    <div id="feed-list"></div>
+  </div>
+
+  <!-- TICKER -->
+  <div id="ticker-wrap">
+    <div class="ticker-inner">
+      <span class="t-s">SPLASHDOWN CONFIRMED · APR 10 · 00:07 GMT · PACIFIC OCEAN · 40 MILES OFF SAN DIEGO</span>
+      <span class="t-d">◈</span>
+      <span class="t-s">FOUR CREW GREEN · WISEMAN · GLOVER · KOCH · HANSEN · ALL SAFE · ABOARD USS MURTHA</span>
+      <span class="t-d">◈</span>
+      <span class="t-w">ISLAMABAD TALKS ACTIVE · JD VANCE PRESENT · IRAN DELEGATION ARRIVED · PRECONDITIONS SET</span>
+      <span class="t-d">◈</span>
+      <span class="t-g">700,237 MILES FLOWN · 252,756 MILES PEAK DISTANCE · ALL-TIME HUMAN RECORD</span>
+      <span class="t-d">◈</span>
+      <span class="t-w">LEBANON TOLL: 1,953 KILLED SINCE MAR 2 · CEASEFIRE DOES NOT COVER LEBANON</span>
+      <span class="t-d">◈</span>
+      <span class="t-g">PEAK VELOCITY 24,664 MPH · RE-ENTRY TEMP 2,700°C · SIGNAL BLACKOUT 3–6 MIN</span>
+      <span class="t-d">◈</span>
+      <span class="t-w">UKRAINE EASTER TRUCE DECLARED · PUTIN 16:00 APR 11 TO END APR 12 · ZELENSKY CONFIRMS</span>
+      <span class="t-d">◈</span>
+      <span class="t-s">GLOVER: FIRST PERSON OF COLOUR TO LUNAR DISTANCE · KOCH: FIRST WOMAN · HANSEN: FIRST NON-AMERICAN</span>
+      <span class="t-d">◈</span>
+      <span class="t-w">CRUDE OIL RETREATING FROM $117 PEAK · STRAIT REOPENING · FRAGILE CALM</span>
+      <span class="t-d">◈</span>
+      <span class="t-s">FINAL WAKE-UP SONG: "RUN TO THE WATER" — CREW SELECTED · ARTEMIS III TARGETS LUNAR LANDING NEXT YEAR</span>
+      <span class="t-d">◈</span>
+      <!-- REPEAT -->
+      <span class="t-s">SPLASHDOWN CONFIRMED · APR 10 · 00:07 GMT · PACIFIC OCEAN · 40 MILES OFF SAN DIEGO</span>
+      <span class="t-d">◈</span>
+      <span class="t-s">FOUR CREW GREEN · WISEMAN · GLOVER · KOCH · HANSEN · ALL SAFE · ABOARD USS MURTHA</span>
+      <span class="t-d">◈</span>
+      <span class="t-w">ISLAMABAD TALKS ACTIVE · JD VANCE PRESENT · IRAN DELEGATION ARRIVED · PRECONDITIONS SET</span>
+      <span class="t-d">◈</span>
+      <span class="t-g">700,237 MILES FLOWN · 252,756 MILES PEAK DISTANCE · ALL-TIME HUMAN RECORD</span>
+      <span class="t-d">◈</span>
+      <span class="t-w">LEBANON TOLL: 1,953 KILLED SINCE MAR 2 · CEASEFIRE DOES NOT COVER LEBANON</span>
+      <span class="t-d">◈</span>
+      <span class="t-s">ARTEMIS III TARGETS LUNAR SURFACE LANDING · PATH TO THE SURFACE IS OPEN</span>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <a href="./history.html">▸ Signal Archive · All Editions</a>
+    <div class="footer-right">Transmitted from Earth · April 11 · 2026 · Post-Mission Day 0</div>
+  </div>
+
+</div>
+
+<script>
+// ── LIVE CLOCK ───────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2,'0');
+  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const s = String(now.getUTCSeconds()).padStart(2,'0');
+  const el = document.getElementById('live-clock');
+  if (el) el.textContent = `${h}:${m}:${s} UTC`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── BACKGROUND SONAR ─────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('sonar-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, sweepAngle = 0;
+  let pings = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Fixed echo points
+  const echoes = [
+    {a: 0.3, r: 0.35, label: 'ORION'},
+    {a: 1.1, r: 0.6, label: 'MOON'},
+    {a: 2.4, r: 0.45, label: ''},
+    {a: 4.2, r: 0.28, label: ''},
+    {a: 5.0, r: 0.52, label: ''},
+  ];
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const cx = W/2, cy = H/2;
+    const maxR = Math.min(W, H) * 0.48;
+
+    // Rings
+    for (let i = 1; i <= 5; i++) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, maxR * i/5, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(0,255,200,0.07)';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+
+    // Crosshairs
+    ctx.strokeStyle = 'rgba(0,255,200,0.05)';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.moveTo(cx-maxR, cy); ctx.lineTo(cx+maxR, cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, cy-maxR); ctx.lineTo(cx, cy+maxR); ctx.stroke();
+
+    // Sweep gradient
+    const sweep = ctx.createConicalGradient ?
+      null : null;
+    // Fallback sweep using arc fill
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR);
+    grad.addColorStop(0, 'rgba(0,255,200,0.0)');
+    grad.addColorStop(0.5, 'rgba(0,255,200,0.0)');
+    grad.addColorStop(1, 'rgba(0,255,200,0.0)');
+    // Draw sweep manually
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(sweepAngle);
+    const sweepGrad = ctx.createLinearGradient(0, 0, maxR, 0);
+    sweepGrad.addColorStop(0, 'rgba(0,255,200,0.35)');
+    sweepGrad.addColorStop(0.4, 'rgba(0,255,200,0.08)');
+    sweepGrad.addColorStop(1, 'rgba(0,255,200,0)');
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, maxR, -0.35, 0);
+    ctx.closePath();
+    ctx.fillStyle = sweepGrad;
+    ctx.fill();
+    ctx.restore();
+
+    // Echo points
+    echoes.forEach(e => {
+      const diff = ((sweepAngle - e.a) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
+      const fade = diff < 0.3 ? 1 : Math.max(0, 1 - (diff / (Math.PI * 2)) * 2.5);
+      if (fade <= 0) return;
+      const ex = cx + Math.cos(e.a) * maxR * e.r;
+      const ey = cy + Math.sin(e.a) * maxR * e.r;
+      ctx.beginPath();
+      ctx.arc(ex, ey, 4 * fade, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(0,255,200,${0.8*fade})`;
+      ctx.fill();
+      if (e.label && fade > 0.3) {
+        ctx.font = `bold ${Math.round(Math.min(W,H)*0.012)}px Share Tech Mono, monospace`;
+        ctx.fillStyle = `rgba(0,255,200,${0.5*fade})`;
+        ctx.textAlign = 'left';
+        ctx.fillText(e.label, ex+8, ey-5);
+      }
+    });
+
+    sweepAngle += 0.008;
+    if (sweepAngle > Math.PI*2) sweepAngle -= Math.PI*2;
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── MINI SONAR (splashdown position) ─────────────────────────────
+(function() {
+  const canvas = document.getElementById('mini-sonar');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+  const maxR = Math.min(W,H) * 0.44;
+  let sweep = 0;
+
+  const pts = [
+    {a: 0.5,  r: 0.55, label:'MOON', big:false},
+    {a: Math.PI + 0.2, r: 0.0, label:'EARTH', big:true},
+    {a: -0.8, r: 0.3, label:'ORION↓', big:false, recovered:true},
+  ];
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+
+    // rings
+    for (let i=1;i<=4;i++) {
+      ctx.beginPath();
+      ctx.arc(cx,cy,maxR*i/4,0,Math.PI*2);
+      ctx.strokeStyle='rgba(0,255,200,0.1)';
+      ctx.lineWidth=0.7;
+      ctx.stroke();
+    }
+
+    // Earth center
+    ctx.beginPath();
+    ctx.arc(cx,cy,7,0,Math.PI*2);
+    const eg=ctx.createRadialGradient(cx,cy,1,cx,cy,7);
+    eg.addColorStop(0,'rgba(0,200,255,0.9)');
+    eg.addColorStop(1,'rgba(0,80,150,0.4)');
+    ctx.fillStyle=eg;
+    ctx.fill();
+
+    // Sweep
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(sweep);
+    const sg=ctx.createLinearGradient(0,0,maxR,0);
+    sg.addColorStop(0,'rgba(0,255,200,0.3)');
+    sg.addColorStop(0.5,'rgba(0,255,200,0.05)');
+    sg.addColorStop(1,'rgba(0,255,200,0)');
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.arc(0,0,maxR,-0.4,0);
+    ctx.closePath();
+    ctx.fillStyle=sg;
+    ctx.fill();
+    ctx.restore();
+
+    pts.forEach(p => {
+      const diff=((sweep-p.a)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
+      const fade=diff<0.4?1:Math.max(0,1-(diff/(Math.PI*2))*3);
+      if(fade<=0&&!p.recovered) return;
+      const pf = p.recovered ? Math.max(0.6, fade) : fade;
+      const ex=cx+Math.cos(p.a)*maxR*p.r;
+      const ey=cy+Math.sin(p.a)*maxR*p.r;
+      if(p.recovered) {
+        // special recovered marker - X cross
+        ctx.strokeStyle=`rgba(0,255,200,${pf*0.9})`;
+        ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.moveTo(ex-5,ey-5); ctx.lineTo(ex+5,ey+5); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(ex+5,ey-5); ctx.lineTo(ex-5,ey+5); ctx.stroke();
+        ctx.beginPath(); ctx.arc(ex,ey,7,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(0,255,200,${pf*0.4})`;
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.arc(ex,ey,p.big?5:3,0,Math.PI*2);
+        ctx.fillStyle=`rgba(0,255,200,${pf*0.85})`;
+        ctx.fill();
+      }
+      if(p.label && pf>0.2) {
+        ctx.font='bold 9px Share Tech Mono, monospace';
+        ctx.fillStyle=`rgba(0,255,200,${pf*0.6})`;
+        ctx.textAlign='left';
+        ctx.fillText(p.label,ex+8,ey-3);
+      }
+    });
+
+    sweep+=0.012;
+    if(sweep>Math.PI*2) sweep-=Math.PI*2;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── WAVEFORM ─────────────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('waveform-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+  const H = 60;
+
+  function resize() {
+    canvas.width = canvas.parentElement.clientWidth - 32;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    const W = canvas.width;
+    ctx.clearRect(0,0,W,H);
+
+    // Grid
+    ctx.strokeStyle='rgba(0,255,200,0.05)';
+    ctx.lineWidth=0.5;
+    for(let y=0;y<H;y+=10) {
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    }
+
+    // Recovery signal - calm, steady, post-splashdown
+    ctx.beginPath();
+    const mid = H/2;
+    for(let x=0;x<W;x++) {
+      const phase = (x/W)*Math.PI*8 + t;
+      // Base calm wave with occasional excited burst (splashdown echo)
+      const burst = Math.max(0, Math.sin(x/W * Math.PI));
+      const amp = 6 + 18 * burst;
+      const y = mid
+        + Math.sin(phase) * amp * 0.6
+        + Math.sin(phase*2.3 + 0.5) * amp * 0.25
+        + Math.sin(phase*0.4) * 4;
+
+      if(x===0) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
+    }
+    const wg = ctx.createLinearGradient(0,0,W,0);
+    wg.addColorStop(0,'rgba(0,255,200,0.3)');
+    wg.addColorStop(0.3,'rgba(0,255,200,0.8)');
+    wg.addColorStop(0.7,'rgba(0,255,200,0.6)');
+    wg.addColorStop(1,'rgba(0,255,200,0.2)');
+    ctx.strokeStyle=wg;
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+
+    // Second channel (world events)
+    ctx.beginPath();
+    for(let x=0;x<W;x++) {
+      const phase = (x/W)*Math.PI*14 + t*1.3;
+      const y = mid
+        + Math.sin(phase) * 8
+        + Math.cos(phase*3.1) * 3;
+      if(x===0) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle='rgba(255,107,53,0.25)';
+    ctx.lineWidth=1;
+    ctx.stroke();
+
+    t += 0.018;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── LIVE FEED ─────────────────────────────────────────────────────
+const feedMessages = [
+  { time:'00:07 GMT', text:'<span class="ft-hl">SPLASHDOWN CONFIRMED</span> · Orion Integrity strikes Pacific · "A perfect bullseye" · Mission Control erupts', delay:200 },
+  { time:'00:09 GMT', text:'Reid Wiseman radios: <span class="ft-hl">"Four crew green"</span> · All crew members safe and in good spirits', delay:1000 },
+  { time:'00:23 GMT', text:'Recovery divers approach capsule · Sea anchor deployed · Inflatable collar secured around Orion base', delay:1800 },
+  { time:'00:45 GMT', text:'<span class="ft-hl">Christina Koch</span> exits first · First woman to travel to lunar distance · Hoisted to helicopter', delay:2600 },
+  { time:'01:02 GMT', text:'All four crew aboard USS John P. Murtha · Medical evaluations underway · <span class="ft-hl">Crew status: NOMINAL</span>', delay:3400 },
+  { time:'01:15 GMT', text:'<span class="ft-warn">ISLAMABAD</span> · JD Vance lands in Pakistan · Iran delegation arrives · Preconditions reported', delay:4200 },
+  { time:'01:47 GMT', text:'Howard Hu (Orion PM): <span class="ft-hl">"Today was thousands of times better than Star Wars"</span>', delay:5000 },
+  { time:'02:10 GMT', text:'Engineers begin heat shield inspection aboard USS Murtha · Valve redesign flagged for service module', delay:5800 },
+  { time:'02:40 GMT', text:'<span class="ft-warn">LEBANON</span> · Death toll since March 2 confirmed at 1,953 · Ceasefire does not cover Lebanon', delay:6600 },
+  { time:'03:00 GMT', text:'Artemis III lunar landing target confirmed for <span class="ft-hl">next year</span> · "The path to the surface is open now"', delay:7400 },
+  { time:'03:30 GMT', text:'<span class="ft-gold">UKRAINE</span> · Putin declares Easter truce from 16:00 Apr 11 · Zelensky confirms readiness', delay:8200 },
+  { time:'04:15 GMT', text:'Victor Glover: "Riding a fireball through the atmosphere is profound" — now safely aboard recovery vessel', delay:9000 },
+];
+
+function populateFeed() {
+  const list = document.getElementById('feed-list');
+  if (!list) return;
+  feedMessages.forEach((msg, i) => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = 'feed-item';
+      div.innerHTML = `<span class="feed-time">${msg.time}</span><span class="feed-text">${msg.text}</span>`;
+      div.style.animationDelay = '0s';
+      list.insertBefore(div, list.firstChild);
+      // Trim to 8 items
+      while(list.children.length > 8) list.removeChild(list.lastChild);
+    }, msg.delay);
+  });
+}
+populateFeed();
+</script>
+</body>
+</html>
