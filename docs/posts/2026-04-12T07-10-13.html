@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yuri's Night, 65 — April 12, 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --cream: #f5f0e8;
+  --paper: #ede7d9;
+  --ink:   #1a1530;
+  --deep:  #110d2a;
+  --indigo:#2d2260;
+  --gold:  #c8974a;
+  --rust:  #b54a2a;
+  --dim:   rgba(26,21,48,0.35);
+  --faint: rgba(26,21,48,0.12);
+}
+
+html, body {
+  width:100%;
+  min-height:100%;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Cormorant Garamond', serif;
+}
+
+/* GRAIN TEXTURE OVERLAY */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:9000;
+  opacity:0.5;
+}
+
+/* ── WRAPPER ── */
+#page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 28px 60px;
+  position: relative;
+}
+
+/* ── RULE LINES ── */
+.rule {
+  width: 100%;
+  height: 1px;
+  background: var(--ink);
+  margin: 0;
+  opacity: 0.5;
+}
+.rule.heavy {
+  height: 3px;
+  opacity: 1;
+}
+.rule.double {
+  border: none;
+  height: 4px;
+  background: transparent;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  opacity: 0.6;
+}
+
+/* ── MASTHEAD ── */
+#masthead {
+  text-align: center;
+  padding: 32px 0 20px;
+}
+
+.kicker-top {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: var(--indigo);
+  opacity: 0.7;
+  margin-bottom: 14px;
+}
+
+.broadside-title {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(2.4rem, 8vw, 5.8rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--deep);
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
+.broadside-title em {
+  font-style: italic;
+  color: var(--indigo);
+}
+
+.broadside-subtitle {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: clamp(1rem, 3vw, 1.7rem);
+  color: var(--indigo);
+  opacity: 0.85;
+  margin-bottom: 20px;
+  letter-spacing: 0.02em;
+}
+
+.date-line {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.45;
+  margin-top: 16px;
+}
+
+/* ── SVG CONSTELLATION ── */
+#cosmos-svg {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 700px;
+}
+
+/* ── PULL QUOTE ── */
+.pull-quote {
+  text-align: center;
+  padding: 28px 60px;
+  position: relative;
+  margin: 8px 0;
+}
+
+.pull-quote::before, .pull-quote::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 1px;
+  background: var(--gold);
+  margin: 0 auto 16px;
+}
+
+.pull-quote::after { margin: 16px auto 0; }
+
+.pull-quote p {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(1.1rem, 3.5vw, 2rem);
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--deep);
+  letter-spacing: 0.01em;
+}
+
+.pull-quote cite {
+  display: block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.46rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--indigo);
+  opacity: 0.6;
+  margin-top: 12px;
+  font-style: normal;
+}
+
+/* ── THREE-COLUMN BODY ── */
+#columns {
+  display: grid;
+  grid-template-columns: 1fr 0px 1fr 0px 1fr;
+  gap: 0;
+  margin: 24px 0;
+  align-items: start;
+}
+
+.col-divider {
+  width: 1px;
+  background: var(--ink);
+  opacity: 0.2;
+  align-self: stretch;
+  margin: 0 20px;
+}
+
+.col {
+  padding: 0 20px;
+}
+
+.col:first-child { padding-left: 0; }
+.col:last-child { padding-right: 0; }
+
+.col-head {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--indigo);
+  border-bottom: 1px solid var(--indigo);
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  opacity: 0.65;
+}
+
+.col-subhead {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--deep);
+  margin-bottom: 8px;
+  letter-spacing: 0.01em;
+}
+
+.col-body {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: rgba(26,21,48,0.82);
+  margin-bottom: 14px;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.col-body strong {
+  font-weight: 600;
+  color: var(--deep);
+}
+
+.col-body em {
+  font-style: italic;
+  color: var(--indigo);
+}
+
+.item-divider {
+  width: 30px;
+  height: 1px;
+  background: var(--dim);
+  margin: 12px 0;
+}
+
+/* ── TIMELINE BAND ── */
+#timeline {
+  background: var(--deep);
+  color: var(--cream);
+  padding: 24px 32px;
+  margin: 0 -28px;
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.tl-item {
+  flex: 1;
+  padding: 0 20px;
+  border-right: 1px solid rgba(245,240,232,0.12);
+  text-align: center;
+}
+
+.tl-item:last-child { border-right: none; }
+
+.tl-year {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.tl-note {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: rgba(245,240,232,0.6);
+  font-weight: 300;
+}
+
+/* ── LIVE CLOCK STRIP ── */
+#clock-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  margin: 0;
+}
+
+.clock-left {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.45rem;
+  letter-spacing: 0.4em;
+  color: var(--ink);
+  opacity: 0.35;
+  text-transform: uppercase;
+}
+
+.clock-right {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.3em;
+  color: var(--indigo);
+  opacity: 0.7;
+}
+
+/* ── DISPATCH TICKER ── */
+#dispatch {
+  background: var(--indigo);
+  padding: 10px 16px;
+  margin: 0 -28px;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+}
+
+#dispatch::before {
+  content: 'DISPATCH';
+  font-family: 'Space Mono', monospace;
+  font-size: 0.4rem;
+  letter-spacing: 0.45em;
+  color: var(--gold);
+  margin-right: 20px;
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  background: var(--indigo);
+  padding-right: 10px;
+}
+
+.dispatch-inner {
+  display: inline-block;
+  animation: dispatch-scroll 90s linear infinite;
+  padding-left: 120px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.44rem;
+  letter-spacing: 0.25em;
+  color: rgba(245,240,232,0.7);
+}
+
+@keyframes dispatch-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.d-s { color: var(--gold); }
+.d-w { color: #e07070; }
+.d-n { color: rgba(245,240,232,0.55); }
+.d-sep { color: rgba(245,240,232,0.2); margin: 0 18px; }
+
+/* ── ORBIT COUNTER ── */
+#orbit-counter {
+  text-align: center;
+  padding: 30px 20px 20px;
+  position: relative;
+}
+
+.orbit-num {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(4rem, 14vw, 9rem);
+  line-height: 1;
+  color: var(--paper);
+  -webkit-text-stroke: 2px var(--ink);
+  opacity: 0.55;
+  display: block;
+  letter-spacing: -0.03em;
+  position: relative;
+  z-index: 0;
+}
+
+.orbit-label-over {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: clamp(0.9rem, 2.5vw, 1.4rem);
+  color: var(--deep);
+  text-align: center;
+  width: 80%;
+  line-height: 1.3;
+  z-index: 1;
+}
+
+/* ── FOOTER ── */
+#footer {
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#footer a {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.4rem;
+  letter-spacing: 0.4em;
+  color: var(--ink);
+  opacity: 0.3;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: opacity 0.3s;
+}
+
+#footer a:hover { opacity: 0.6; }
+
+.footer-r {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.4rem;
+  letter-spacing: 0.3em;
+  color: var(--ink);
+  opacity: 0.25;
+  text-transform: uppercase;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 680px) {
+  #columns {
+    grid-template-columns: 1fr;
+  }
+  .col-divider { display: none; }
+  .col { padding: 0; margin-bottom: 24px; }
+  #timeline { flex-direction: column; gap: 16px; }
+  .tl-item { border-right: none; border-bottom: 1px solid rgba(245,240,232,0.12); padding-bottom: 16px; }
+  .pull-quote { padding: 24px 20px; }
+}
+
+/* ── ORNAMENTS ── */
+.orn {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--gold);
+  opacity: 0.5;
+  letter-spacing: 0.5em;
+  padding: 4px 0;
+  line-height: 1;
+}
+
+.orn-small {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--dim);
+  letter-spacing: 0.6em;
+  padding: 6px 0;
+}
+
+/* ── HIGHLIGHT DROP CAP ── */
+.drop {
+  float: left;
+  font-family: 'IM Fell English', serif;
+  font-size: 3.4em;
+  line-height: 0.72;
+  padding-right: 6px;
+  padding-top: 6px;
+  color: var(--deep);
+}
+
+/* ── LIVE ORBIT COUNT ── */
+#orbit-live {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 0.3em;
+  color: var(--indigo);
+  opacity: 0.7;
+  text-align: center;
+  padding: 6px 0 20px;
+}
+
+/* Gold accent spans */
+.gold { color: var(--gold); }
+.rust { color: var(--rust); }
+
+</style>
+</head>
+<body>
+
+<div id="page">
+
+  <!-- TOP RULES -->
+  <div class="rule heavy"></div>
+  <div style="height:4px;"></div>
+  <div class="rule"></div>
+
+  <!-- MASTHEAD -->
+  <div id="masthead">
+    <div class="kicker-top">International Day of Human Space Flight · Yuri's Night · 65th Anniversary</div>
+    <div class="broadside-title"><em>Yuri's</em> Night, 65</div>
+    <div class="broadside-subtitle">The Long Arc from Vostok to the Moon & Back</div>
+
+    <!-- CONSTELLATION SVG -->
+    <svg id="cosmos-svg" viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="star-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#c8974a" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#c8974a" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Earth -->
+      <circle cx="100" cy="90" r="22" fill="none" stroke="#1a1530" stroke-width="1" opacity="0.3"/>
+      <circle cx="100" cy="90" r="22" fill="none" stroke="#2d2260" stroke-width="0.5" stroke-dasharray="4 3" opacity="0.4"/>
+      <circle cx="100" cy="90" r="7" fill="#2d2260" opacity="0.5"/>
+      <text x="100" y="126" text-anchor="middle" font-family="Space Mono, monospace" font-size="7" fill="#1a1530" opacity="0.45" letter-spacing="2">EARTH</text>
+
+      <!-- Gagarin orbit arc -->
+      <ellipse cx="100" cy="90" rx="52" ry="38" fill="none" stroke="#1a1530" stroke-width="0.8" stroke-dasharray="3 4" opacity="0.25" transform="rotate(-15,100,90)"/>
+
+      <!-- Orbit line Earth → Moon -->
+      <path d="M 122 90 Q 400 10 578 90" fill="none" stroke="#2d2260" stroke-width="0.8" stroke-dasharray="6 4" opacity="0.3"/>
+
+      <!-- Moon -->
+      <circle cx="600" cy="90" r="28" fill="none" stroke="#1a1530" stroke-width="1" opacity="0.25"/>
+      <circle cx="600" cy="90" r="28" fill="#ede7d9" opacity="0.4"/>
+      <circle cx="600" cy="90" r="13" fill="none" stroke="#1a1530" stroke-width="0.5" opacity="0.2"/>
+      <text x="600" y="132" text-anchor="middle" font-family="Space Mono, monospace" font-size="7" fill="#1a1530" opacity="0.45" letter-spacing="2">MOON</text>
+
+      <!-- Stars scattered -->
+      <g opacity="0.4" fill="#2d2260">
+        <circle cx="200" cy="40" r="1.5"/>
+        <circle cx="230" cy="130" r="1"/>
+        <circle cx="290" cy="25" r="2"/>
+        <circle cx="340" cy="155" r="1.2"/>
+        <circle cx="390" cy="35" r="1.5"/>
+        <circle cx="430" cy="130" r="1"/>
+        <circle cx="470" cy="55" r="1.8"/>
+        <circle cx="510" cy="145" r="1"/>
+        <circle cx="540" cy="30" r="1.3"/>
+        <circle cx="160" cy="65" r="1"/>
+        <circle cx="260" cy="90" r="0.8"/>
+        <circle cx="350" cy="80" r="1.2"/>
+        <circle cx="440" cy="75" r="0.9"/>
+      </g>
+
+      <!-- Vostok 1 position (Gagarin) -->
+      <g transform="translate(148,52)">
+        <circle r="4" fill="#c8974a" opacity="0.7"/>
+        <circle r="7" fill="url(#star-glow)" opacity="0.4"/>
+        <text x="10" y="-8" font-family="IM Fell English, serif" font-style="italic" font-size="9" fill="#1a1530" opacity="0.6">Vostok 1, 1961</text>
+      </g>
+
+      <!-- Artemis Orion position (just returned) -->
+      <g transform="translate(540,108)">
+        <circle r="4" fill="#2d2260" opacity="0.7"/>
+        <circle r="8" fill="#2d2260" opacity="0.15"/>
+        <text x="10" y="4" font-family="IM Fell English, serif" font-style="italic" font-size="9" fill="#1a1530" opacity="0.6">Integrity, 2026</text>
+      </g>
+
+      <!-- Connector dots — the chain of humans in space -->
+      <g opacity="0.2" fill="#1a1530">
+        <circle cx="195" cy="60" r="1.5"/>
+        <circle cx="240" cy="42" r="1.5"/>
+        <circle cx="288" cy="38" r="1.5"/>
+        <circle cx="335" cy="45" r="1.5"/>
+        <circle cx="382" cy="55" r="1.5"/>
+        <circle cx="428" cy="67" r="1.5"/>
+        <circle cx="478" cy="82" r="1.5"/>
+        <circle cx="505" cy="95" r="1.5"/>
+      </g>
+
+      <!-- 108 min label -->
+      <text x="148" y="80" text-anchor="middle" font-family="Space Mono, monospace" font-size="6.5" fill="#1a1530" opacity="0.35" letter-spacing="1">108 min</text>
+
+      <!-- Labels for the arc -->
+      <text x="350" y="16" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="9.5" fill="#1a1530" opacity="0.3">65 years of human spaceflight</text>
+    </svg>
+
+    <div class="date-line" id="live-clock">Sunday · April 12, 2026 · --:--:-- UTC</div>
+  </div>
+  <!-- / MASTHEAD -->
+
+  <div class="rule"></div>
+  <div style="height:3px;"></div>
+  <div class="rule heavy"></div>
+
+  <!-- PULL QUOTE -->
+  <div class="pull-quote">
+    <p>"You are special, in all of this emptiness. You have this oasis, this beautiful place that we get to exist together."</p>
+    <cite>Victor Glover · Artemis II · April 2026 · 252,756 miles from Earth</cite>
+  </div>
+
+  <div class="rule"></div>
+
+  <!-- THREE COLUMNS -->
+  <div id="columns">
+
+    <!-- LEFT: Gagarin -->
+    <div class="col">
+      <div class="col-head">Column I · The First</div>
+
+      <div class="col-subhead">108 Minutes That Changed Everything</div>
+      <p class="col-body">
+        <span class="drop">O</span>n the morning of <strong>April 12, 1961</strong>, a 27-year-old Soviet Air Force pilot named Yuri Gagarin sat inside a sphere barely wider than a closet and let the Earth fall away beneath him. Vostok 1 completed a single orbit in 108 minutes. Gagarin returned.
+      </p>
+      <p class="col-body">
+        He called out his famous words over the radio as the cosmodrome shrank below him. The world — both sides of it — stopped to listen. That day is now <em>International Day of Human Space Flight</em>, marked by the United Nations and celebrated on every continent as Yuri's Night.
+      </p>
+      <div class="item-divider"></div>
+
+      <div class="col-subhead">The Sixty-Five Year Chain</div>
+      <p class="col-body">
+        From Gagarin's single orbit to the Space Shuttle's first flight on this same date in 1981 — another April 12 — to today, when four humans have only just returned from lunar distance: the chain is unbroken. <strong>Over 600 people</strong> from more than 40 countries have followed in Gagarin's wake.
+      </p>
+      <p class="col-body">
+        The first flight lasted under two hours. The most recent, ten days. The farthest reach: <em>252,756 miles</em> from home — the greatest distance any human being has ever stood from Earth.
+      </p>
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="col-divider"></div>
+
+    <!-- CENTER: Artemis II, fresh home -->
+    <div class="col" style="padding:0 20px;">
+      <div class="col-head">Column II · The Return</div>
+
+      <div class="col-subhead">They Came Home Two Days Ago</div>
+      <p class="col-body">
+        Orion <em>Integrity</em> touched the Pacific on April 10, 2026, at 8:07 p.m. EDT — barely 40 miles off San Diego. The blackout lasted six minutes. Then: parachutes. Then: the water. Commander Reid Wiseman radioed Houston: <strong>"four crew green."</strong>
+      </p>
+      <p class="col-body">
+        Christina Koch became the first woman to travel to lunar distance. Victor Glover, the first person of colour to do so. Jeremy Hansen, the first non-American. All four emerged from the capsule into the California sunlight having traveled <strong>700,237 miles</strong>, slowing from 24,661 mph through 2,700°C of re-entry fire.
+      </p>
+      <div class="item-divider"></div>
+
+      <div class="col-subhead">What Comes Next</div>
+      <p class="col-body">
+        Engineers are already back at Kennedy Space Center preparing the launch platform for <em>Artemis III</em>, which will place humans on the lunar surface for the first time since Apollo 17 in 1972. Gagarin orbited once. These four orbited the Moon.
+      </p>
+      <p class="col-body">
+        "We did it," said NASA's Lori Glaze. "To the generation that now knows what we're capable of: <strong>welcome to our moonshot.</strong>"
+      </p>
+      <div class="item-divider"></div>
+
+      <div class="col-subhead">The Solar Eclipse, From the Far Side</div>
+      <p class="col-body">
+        On April 6, Victor Glover watched the sun disappear behind the Moon from the other side of it. He called it the greatest gift of the mission. They also photographed a crescent Earth rising above the lunar horizon — their own Earthrise, in 2026.
+      </p>
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="col-divider"></div>
+
+    <!-- RIGHT: World on this day -->
+    <div class="col">
+      <div class="col-head">Column III · This World</div>
+
+      <div class="col-subhead">Hungary Votes Today</div>
+      <p class="col-body">
+        While the world marks Yuri's Night, Hungary holds what may be its most consequential election in a generation. After <strong>16 years</strong> in power, Prime Minister Viktor Orbán faces challenger Péter Magyar of the Tisza Party, who emerged from inside the system as a voice against corruption. Polls disagree sharply; results are expected tonight.
+      </p>
+      <p class="col-body">
+        The outcome will shape Europe's posture on Ukraine, Russia, and the meaning of democratic governance within the EU. A world anxiously watching elections while its astronauts come home from the Moon.
+      </p>
+      <div class="item-divider"></div>
+
+      <div class="col-subhead">Islamabad: No Agreement</div>
+      <p class="col-body">
+        The US-Iran talks in Islamabad concluded without specific agreements. Vice President Vance's delegation has left Pakistan. No date for a second round has been set. The Strait of Hormuz remains cautiously open; crude oil has retreated from its peak.
+      </p>
+      <div class="item-divider"></div>
+
+      <div class="col-subhead">Ukraine: Easter Truce Holds</div>
+      <p class="col-body">
+        Putin's Easter ceasefire, declared from 16:00 Moscow time on April 11, holds through today. Zelensky confirmed Ukraine's readiness. The silence is fragile. <em>France prepares for war</em>, its chief of armed forces says.
+      </p>
+      <div class="item-divider"></div>
+
+      <div class="col-subhead">Artemis III: Already in Motion</div>
+      <p class="col-body">
+        "No rest for the weary," said John Giles at Kennedy Space Center, already moving to reassemble the rocket for the Moon landing mission. The <em>core stage fuel tank</em> arrives later this month. Gagarin would have turned 92 in March.
+      </p>
+    </div>
+
+  </div>
+  <!-- / THREE COLUMNS -->
+
+  <div class="rule"></div>
+  <div style="height:3px;"></div>
+  <div class="rule"></div>
+
+  <!-- TIMELINE BAND -->
+  <div id="timeline">
+    <div class="tl-item">
+      <div class="tl-year">1961</div>
+      <div class="tl-note">Yuri Gagarin<br>Vostok 1<br>108 minutes · 1 orbit</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1969</div>
+      <div class="tl-note">Armstrong & Aldrin<br>Apollo 11<br>Lunar surface, first step</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1972</div>
+      <div class="tl-note">Cernan & Schmitt<br>Apollo 17<br>Last humans on the Moon</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1981</div>
+      <div class="tl-note">Columbia STS-1<br>First Shuttle flight<br>This same date</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2026</div>
+      <div class="tl-note">Wiseman, Glover,<br>Koch, Hansen<br>252,756 mi · home safe</div>
+    </div>
+  </div>
+
+  <!-- ORBIT COUNTER -->
+  <div id="orbit-counter">
+    <span class="orbit-num" id="orbit-big">65</span>
+    <div class="orbit-label-over">years of human spaceflight<br><span style="font-size:0.7em;opacity:0.6;font-style:italic;">Baikonur → Pacific · 1961–2026</span></div>
+  </div>
+  <div id="orbit-live">Earth has completed <span id="orbit-count">—</span> orbits of the Sun since Gagarin flew</div>
+
+  <div class="orn">· ✦ · ✦ · ✦ ·</div>
+
+  <div style="height:2px;"></div>
+  <div class="rule"></div>
+
+  <!-- DISPATCH TICKER -->
+  <div id="dispatch">
+    <div class="dispatch-inner">
+      <span class="d-s">APR 12 · YURI'S NIGHT 2026 · 65TH ANNIVERSARY OF VOSTOK 1 · FIRST HUMAN ORBIT</span>
+      <span class="d-sep">◆</span>
+      <span class="d-s">ARTEMIS II SAFE · WISEMAN · GLOVER · KOCH · HANSEN · 700,237 MI TOTAL · HOME APR 10</span>
+      <span class="d-sep">◆</span>
+      <span class="d-w">HUNGARY VOTES TODAY · ORBÁN VS MAGYAR · 16 YEARS OF FIDESZ RULE ON THE LINE</span>
+      <span class="d-sep">◆</span>
+      <span class="d-n">ISLAMABAD TALKS CONCLUDED WITHOUT AGREEMENT · VANCE DELEGATION DEPARTED PAKISTAN</span>
+      <span class="d-sep">◆</span>
+      <span class="d-s">ARTEMIS III IN PREPARATION · KENNEDY SPACE CENTER · LUNAR LANDING MISSION NEXT</span>
+      <span class="d-sep">◆</span>
+      <span class="d-w">UKRAINE EASTER TRUCE HOLDS · ZELENSKY CONFIRMED · FRAGILE SILENCE ON FRONT LINES</span>
+      <span class="d-sep">◆</span>
+      <span class="d-s">STS-1 COLUMBIA ALSO LAUNCHED APRIL 12 1981 · EXACTLY 20 YEARS AFTER GAGARIN · COINCIDENCE</span>
+      <span class="d-sep">◆</span>
+      <span class="d-n">600+ HUMANS FROM 40+ COUNTRIES HAVE NOW FLOWN IN SPACE · THE CHAIN IS UNBROKEN</span>
+      <span class="d-sep">◆</span>
+      <span class="d-w">FRANCE PREPARES FOR WAR · GENERAL MANDON: RUSSIAN THREAT REMAINS PRIMARY CONCERN</span>
+      <span class="d-sep">◆</span>
+      <!-- repeat -->
+      <span class="d-s">APR 12 · YURI'S NIGHT 2026 · 65TH ANNIVERSARY OF VOSTOK 1 · FIRST HUMAN ORBIT</span>
+      <span class="d-sep">◆</span>
+      <span class="d-s">ARTEMIS II SAFE · WISEMAN · GLOVER · KOCH · HANSEN · 700,237 MI TOTAL · HOME APR 10</span>
+      <span class="d-sep">◆</span>
+      <span class="d-w">HUNGARY VOTES TODAY · ORBÁN VS MAGYAR · 16 YEARS OF FIDESZ RULE ON THE LINE</span>
+      <span class="d-sep">◆</span>
+      <span class="d-n">ISLAMABAD TALKS CONCLUDED WITHOUT AGREEMENT · VANCE DELEGATION DEPARTED PAKISTAN</span>
+      <span class="d-sep">◆</span>
+      <span class="d-s">ARTEMIS III IN PREPARATION · KENNEDY SPACE CENTER · LUNAR LANDING MISSION NEXT</span>
+    </div>
+  </div>
+
+  <!-- CLOCK STRIP -->
+  <div id="clock-strip" style="margin-top:12px;">
+    <div class="clock-left">Transmitted from Earth · Sunday, April 12, 2026</div>
+    <div class="clock-right" id="footer-clock">--:--:-- UTC</div>
+  </div>
+
+  <div class="rule"></div>
+  <div style="height:3px;"></div>
+  <div class="rule heavy"></div>
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <a href="./history.html">▸ Archive · All Editions</a>
+    <div class="footer-r">Yuri's Night · Anno Domini 2026 · Edition No. 15</div>
+  </div>
+
+</div>
+
+<script>
+// Live clock
+function tick() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2,'0');
+  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const s = String(now.getUTCSeconds()).padStart(2,'0');
+  const timeStr = h + ':' + m + ':' + s + ' UTC';
+  const cl = document.getElementById('live-clock');
+  const fc = document.getElementById('footer-clock');
+  if (cl) cl.textContent = 'Sunday · April 12, 2026 · ' + timeStr;
+  if (fc) fc.textContent = timeStr;
+}
+setInterval(tick, 1000);
+tick();
+
+// Orbits of Earth since Gagarin (April 12, 1961)
+// Earth orbits Sun once per year, ~365.25 days
+function calcOrbits() {
+  const gagarin = new Date('1961-04-12T09:07:00Z');
+  const now = new Date();
+  const diffMs = now - gagarin;
+  const diffYears = diffMs / (365.25 * 24 * 3600 * 1000);
+  const orbits = Math.floor(diffYears * 1000) / 1000;
+  // For display, show decimal orbits with fractional
+  const wholeOrbits = Math.floor(diffYears);
+  const fracOrbit = ((diffYears - wholeOrbits) * 100).toFixed(4);
+  const el = document.getElementById('orbit-count');
+  if (el) el.textContent = wholeOrbits + '.' + fracOrbit.replace('0.','').padStart(4,'0');
+}
+setInterval(calcOrbits, 1000);
+calcOrbits();
+
+// Subtle SVG star twinkle
+(function() {
+  const svg = document.getElementById('cosmos-svg');
+  if (!svg) return;
+  const stars = svg.querySelectorAll('g[opacity] circle');
+  function twinkle() {
+    stars.forEach(star => {
+      const base = parseFloat(star.getAttribute('data-base') || star.getAttribute('r') || 1);
+      if (!star.getAttribute('data-base')) star.setAttribute('data-base', base);
+      const scale = 0.7 + Math.random() * 0.6;
+      star.setAttribute('r', (base * scale).toFixed(2));
+    });
+    setTimeout(twinkle, 800 + Math.random() * 1200);
+  }
+  twinkle();
+})();
+</script>
+</body>
+</html>

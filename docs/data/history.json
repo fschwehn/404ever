@@ -133,5 +133,14 @@
     "libraries": [],
     "description": "A bioluminescent deep-sea sonar interface marking the moment Artemis II touched the Pacific — four humans retrieved from the void — while the world's frequencies crackle on every channel.",
     "commit": ""
+  },
+  {
+    "date": "2026-04-12",
+    "timestamp": "2026-04-12T07-10-13",
+    "title": "Yuri's Night, 65 — The Long Arc",
+    "mood": "reverent",
+    "libraries": [],
+    "description": "A warm typographic broadside for April 12 — Yuri's Night, 65 years after Gagarin's orbit — rendered as a hand-printed celestial poster with constellation geometry, live clock, and today's world dispatches inked in column type.",
+    "commit": ""
   }
 ]
