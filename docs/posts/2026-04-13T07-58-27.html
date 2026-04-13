@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Morning After — April 13, 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,700&display=swap');
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #0e0e1a;
+  --paper: #f0ebe0;
+  --neon-g: #39ff8a;
+  --neon-b: #4af0ff;
+  --neon-r: #ff4060;
+  --neon-y: #ffe44a;
+  --neon-p: #c87eff;
+  --dim: rgba(255,255,255,0.06);
+  --grid: rgba(255,255,255,0.03);
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--paper);
+  font-family: 'Space Mono', monospace;
+  overflow-x: hidden;
+}
+
+/* SCANLINE */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events:none;
+  z-index:9999;
+}
+
+/* GRID BG */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+
+#root {
+  position: relative;
+  z-index:1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 0 80px;
+}
+
+/* ═══ HEADER ZONE ═══ */
+#header {
+  position: relative;
+  padding: 44px 32px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  overflow: hidden;
+}
+
+.h-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.h-date {
+  font-size: 0.55rem;
+  letter-spacing: 0.45em;
+  color: var(--neon-g);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.h-ticker-label {
+  font-size: 0.5rem;
+  letter-spacing: 0.35em;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+}
+
+.big-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 14vw, 10rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  text-transform: uppercase;
+  position: relative;
+}
+
+.big-title .line1 { display: block; }
+.big-title .line2 {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(240,235,224,0.3);
+}
+.big-title .accent {
+  color: var(--neon-g);
+  -webkit-text-stroke: 0;
+}
+
+.sub-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+  color: rgba(240,235,224,0.5);
+  padding: 14px 0 30px;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+/* ═══ BREAKING BAND ═══ */
+#breaking {
+  background: var(--neon-r);
+  color: #000;
+  padding: 9px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.brk-label {
+  font-size: 0.48rem;
+  letter-spacing: 0.5em;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.brk-text {
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: scroll-text 40s linear infinite;
+  display: inline-block;
+}
+
+@keyframes scroll-text {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ═══ MAIN GRID ═══ */
+#main {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 1px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.06);
+  margin: 0;
+}
+
+.cell {
+  background: var(--bg2);
+  padding: 28px 26px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.4s;
+}
+
+.cell:hover { background: #121220; }
+
+.cell::before {
+  content: attr(data-num);
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 0.38rem;
+  letter-spacing: 0.4em;
+  color: rgba(255,255,255,0.1);
+  text-transform: uppercase;
+}
+
+/* SPAN VARIATIONS */
+.cell.span2 { grid-column: span 2; }
+.cell.span3 { grid-column: span 3; }
+.cell.tall { grid-row: span 2; }
+
+/* CELL COLORS */
+.cell.c-g { border-top: 2px solid var(--neon-g); }
+.cell.c-b { border-top: 2px solid var(--neon-b); }
+.cell.c-r { border-top: 2px solid var(--neon-r); }
+.cell.c-y { border-top: 2px solid var(--neon-y); }
+.cell.c-p { border-top: 2px solid var(--neon-p); }
+.cell.c-w { border-top: 2px solid rgba(240,235,224,0.3); }
+
+.cell-kicker {
+  font-size: 0.42rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  opacity: 0.55;
+}
+.cell-kicker.kg { color: var(--neon-g); }
+.cell-kicker.kb { color: var(--neon-b); }
+.cell-kicker.kr { color: var(--neon-r); }
+.cell-kicker.ky { color: var(--neon-y); }
+.cell-kicker.kp { color: var(--neon-p); }
+
+.cell-head {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.cell-head .em { color: var(--neon-y); }
+.cell-head .em-g { color: var(--neon-g); }
+.cell-head .em-b { color: var(--neon-b); }
+.cell-head .em-r { color: var(--neon-r); }
+.cell-head .em-p { color: var(--neon-p); }
+
+.cell-body {
+  font-size: 0.72rem;
+  line-height: 1.7;
+  color: rgba(240,235,224,0.6);
+  letter-spacing: 0.01em;
+}
+
+.cell-body strong { color: var(--paper); font-weight: 700; }
+.cell-body em { font-style: italic; color: rgba(240,235,224,0.85); }
+
+.cell-body p + p { margin-top: 10px; }
+
+.stat-row {
+  display: flex;
+  gap: 20px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  flex: 1;
+  min-width: 80px;
+}
+
+.stat-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.stat-l {
+  font-size: 0.4rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-top: 3px;
+}
+
+/* QUOTE CELL */
+.quote-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(1rem, 2.5vw, 1.55rem);
+  line-height: 1.45;
+  color: var(--paper);
+  margin-bottom: 12px;
+}
+
+.quote-source {
+  font-size: 0.42rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+
+/* VISUAL CELL — THE DANUBE */
+#danube-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 220px;
+  background: linear-gradient(180deg, #0a0a1a 0%, #0d1525 60%, #101e35 100%) !important;
+}
+
+#danube-canvas-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* GLITCH ELEMENT */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch::before, .glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.glitch::before {
+  color: var(--neon-b);
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  transform: translateX(-3px);
+  animation: glitch-a 3.5s infinite;
+}
+
+.glitch::after {
+  color: var(--neon-r);
+  clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  transform: translateX(3px);
+  animation: glitch-b 3.5s infinite 0.3s;
+}
+
+@keyframes glitch-a {
+  0%, 85%, 100% { transform: translateX(0); opacity:0; }
+  86% { transform: translateX(-4px); opacity:1; }
+  88% { transform: translateX(3px); opacity:1; }
+  90% { transform: translateX(0); opacity:0; }
+}
+
+@keyframes glitch-b {
+  0%, 90%, 100% { transform: translateX(0); opacity:0; }
+  91% { transform: translateX(4px); opacity:1; }
+  93% { transform: translateX(-3px); opacity:1; }
+  95% { transform: translateX(0); opacity:0; }
+}
+
+/* BLINK CURSOR */
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1em;
+  background: var(--neon-g);
+  vertical-align: text-bottom;
+  animation: blink 1s step-start infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ═══ TIMELINE ROW ═══ */
+#tl-row {
+  background: var(--bg2) !important;
+  padding: 28px 32px !important;
+  display: flex !important;
+  gap: 0 !important;
+  align-items: stretch;
+  overflow: hidden;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.tl-node {
+  flex: 1;
+  text-align: center;
+  padding: 0 12px;
+  position: relative;
+}
+
+.tl-node + .tl-node::before {
+  content:'';
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 1px;
+  height: 30px;
+  background: rgba(255,255,255,0.1);
+}
+
+.tl-y {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.tl-n {
+  font-size: 0.42rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+/* ═══ CLOCK STRIP ═══ */
+#clock-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 32px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  background: var(--bg);
+}
+
+.cs-left {
+  font-size: 0.42rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+}
+
+.cs-right {
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  color: var(--neon-b);
+}
+
+/* ═══ BOTTOM STRIP ═══ */
+#bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 32px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+#bottom a {
+  font-size: 0.4rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+#bottom a:hover { color: var(--neon-g); }
+
+.bottom-r {
+  font-size: 0.4rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.15);
+}
+
+/* PILL TAGS */
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.tag {
+  font-size: 0.4rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid;
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+.tag.tg { border-color: var(--neon-g); color: var(--neon-g); }
+.tag.tb { border-color: var(--neon-b); color: var(--neon-b); }
+.tag.tr { border-color: var(--neon-r); color: var(--neon-r); }
+.tag.ty { border-color: var(--neon-y); color: var(--neon-y); }
+
+/* VOTE BAR */
+.vote-bar-wrap {
+  margin-top: 14px;
+}
+
+.vb-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.42rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.vb {
+  height: 6px;
+  border-radius: 1px;
+  display: flex;
+  overflow: hidden;
+}
+
+.vb-a { background: var(--neon-g); height: 100%; transition: width 1s ease; }
+.vb-b { background: rgba(240,235,224,0.15); height: 100%; flex: 1; }
+
+.vb-nums {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.4rem;
+  letter-spacing: 0.2em;
+  margin-top: 5px;
+  color: rgba(255,255,255,0.4);
+}
+
+/* LIVE INDICATOR */
+.live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--neon-r);
+  animation: pulse-dot 1.5s ease-in-out infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,64,96,0.5); }
+  50% { box-shadow: 0 0 0 5px rgba(255,64,96,0); }
+}
+
+/* RESP */
+@media (max-width: 700px) {
+  #main { grid-template-columns: 1fr; }
+  .cell.span2, .cell.span3 { grid-column: span 1; }
+  .cell.tall { grid-row: span 1; }
+  #tl-row { flex-direction: column; gap: 16px; }
+  .tl-node + .tl-node::before { display: none; }
+  .stat-row { flex-direction: column; }
+  #header { padding: 28px 18px 0; }
+  .cell { padding: 20px 18px; }
+  #clock-strip, #bottom { padding: 10px 18px; }
+  #breaking { padding: 9px 18px; }
+}
+
+/* PARTICLE FIELD BG */
+#particle-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.25;
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div id="root">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div class="h-meta">
+      <div class="h-date"><span class="live-dot"></span>Monday · April 13, 2026 · <span id="live-clock">--:--:-- UTC</span></div>
+      <div class="h-ticker-label">Edition No. 16</div>
+    </div>
+    <div class="big-title">
+      <span class="line1">The <span class="accent">Morning</span></span>
+      <span class="line2" data-text="After">After</span>
+    </div>
+    <div class="sub-title">Orbán is gone. The Danube danced at midnight.<br>What does the world look like now?</div>
+  </div>
+
+  <!-- BREAKING BAND -->
+  <div id="breaking">
+    <div class="brk-label">⚡ Breaking</div>
+    <div class="brk-text">
+      HUNGARIAN ELECTION: TISZA WINS 138 SEATS — SUPERMAJORITY — ORBÁN CONCEDES AFTER 16 YEARS ◆ MAGYAR: "TODAY WAS A CELEBRATION OF DEMOCRACY" ◆ VON DER LEYEN: "HUNGARY HAS CHOSEN EUROPE" ◆ INTERNATIONAL DARK SKY WEEK BEGINS TODAY ◆ UKRAINE CEASEFIRE HOLDING INTO MONDAY ◆ IPL: RCB BEAT MI AT WANKHEDE ◆ ARTEMIS II CREW CONTINUE RECOVERY IN CALIFORNIA ◆ HUNGARIAN ELECTION: TISZA WINS 138 SEATS — SUPERMAJORITY — ORBÁN CONCEDES AFTER 16 YEARS ◆ MAGYAR: "TODAY WAS A CELEBRATION OF DEMOCRACY" ◆ VON DER LEYEN: "HUNGARY HAS CHOSEN EUROPE" ◆ INTERNATIONAL DARK SKY WEEK BEGINS TODAY ◆
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div id="main">
+
+    <!-- CELL 1: HUNGARY BIG — SPAN 2, TALL -->
+    <div class="cell c-g span2 tall" data-num="01 / Hungary">
+      <div class="cell-kicker kg">The Historic Result</div>
+      <div class="cell-head">
+        <span class="glitch em-g" data-text="ORBÁN FALLS">ORBÁN FALLS</span>
+      </div>
+      <div class="cell-body">
+        <p><strong>Péter Magyar's Tisza Party</strong> won a landslide victory in Hungary's parliamentary election Sunday, ending <strong>Viktor Orbán's 16-year grip on power</strong> — the first transfer of government in Hungary since 2010.</p>
+        <p>With 97% of ballots counted, Tisza secured <strong>138 seats</strong> in the 199-seat parliament — enough for a two-thirds supermajority allowing it to amend Hungary's constitution.</p>
+        <p>Orbán called Magyar to concede, then addressed supporters: the result was "clear" and "painful," he said. His party would serve from opposition. "We are not giving up. Never, never, never."</p>
+        <p>Magyar told tens of thousands along the Danube: <em>"Tonight, truth prevailed over lies."</em> International leaders — including EU Commission President von der Leyen and former US President Obama — hailed the result as a victory for democracy across Europe.</p>
+      </div>
+
+      <div class="vote-bar-wrap">
+        <div class="vb-label-row">
+          <span style="color:var(--neon-g)">Tisza (Magyar)</span>
+          <span style="color:rgba(255,255,255,0.4)">Fidesz (Orbán)</span>
+        </div>
+        <div class="vb">
+          <div class="vb-a" style="width:59%"></div>
+          <div class="vb-b"></div>
+        </div>
+        <div class="vb-nums">
+          <span>53.6% · 138 seats</span>
+          <span>37.8% · 55 seats</span>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-n" style="color:var(--neon-g)">77.8%</div>
+          <div class="stat-l">Record turnout — highest since post-communist era</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n" style="color:var(--neon-y)">16</div>
+          <div class="stat-l">Years of Orbán rule — ended last night</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n" style="color:var(--neon-b)">138</div>
+          <div class="stat-l">Tisza seats — supermajority to rewrite constitution</div>
+        </div>
+      </div>
+
+      <div class="tag-row">
+        <span class="tag tg">Democracy</span>
+        <span class="tag tb">European Union</span>
+        <span class="tag tr">Orbán out</span>
+        <span class="tag ty">Supermajority</span>
+      </div>
+    </div>
+
+    <!-- CELL 2: DANUBE / QUOTE -->
+    <div class="cell c-p" data-num="02 / Reaction">
+      <div class="cell-kicker kp">Voices from Budapest</div>
+      <div class="quote-text">"Like, I have to wake up and look at my phone and see that the prime minister of Hungary is not Viktor Orbán anymore."</div>
+      <div class="quote-source">— Balász, 24, law student · Budapest · 12 April 2026</div>
+
+      <div style="height:20px;"></div>
+
+      <div class="quote-text" style="font-size:0.95rem;">"Our victory may not be visible from the moon, but it is visible everywhere in Hungary."</div>
+      <div class="quote-source">— Péter Magyar · Victory speech · Danube riverbank</div>
+
+      <div style="height:20px;"></div>
+
+      <div class="quote-text" style="font-size:0.95rem;">"Hungary has chosen Europe. Europe has always chosen Hungary."</div>
+      <div class="quote-source">— Ursula von der Leyen · European Commission President</div>
+
+      <div id="danube-wave" style="margin-top:20px; position:relative; height:70px; overflow:hidden; border-radius:2px;">
+        <canvas id="wave-canvas" style="width:100%;height:100%;"></canvas>
+        <div style="position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:0.38rem;letter-spacing:0.4em;color:rgba(200,180,255,0.4);text-transform:uppercase;">The Danube · Budapest · Midnight</div>
+      </div>
+    </div>
+
+    <!-- CELL 3: ISS / SPACE -->
+    <div class="cell c-b" data-num="03 / Space">
+      <div class="cell-kicker kb">Orbit Continues</div>
+      <div class="cell-head">Above It <span class="em-b">All</span></div>
+      <div class="cell-body">
+        <p>The International Space Station completed roughly <strong>15.5 orbits of Earth</strong> while Hungarians voted yesterday. From 250 miles up, the borders are invisible.</p>
+        <p>The Artemis II crew — <strong>Wiseman, Glover, Koch, Hansen</strong> — are three days into recovery in California after splashing down April 10. Medical teams report all four are in good condition.</p>
+        <p>Day 1 post-flight: relearning the weight of the body. Day 3: reportedly asking about cheeseburgers. The Moon waits patiently for Artemis III.</p>
+      </div>
+      <div class="stat-row" style="margin-top:12px;">
+        <div class="stat">
+          <div class="stat-n" style="color:var(--neon-b); font-size:1.6rem;">+3</div>
+          <div class="stat-l">Days since Artemis II splashdown</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n" style="color:var(--neon-b); font-size:1.6rem;">250mi</div>
+          <div class="stat-l">ISS altitude, orbiting now</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CELL 4: Ukraine -->
+    <div class="cell c-r" data-num="04 / Ukraine">
+      <div class="cell-kicker kr">War & Silence</div>
+      <div class="cell-head">Truce <span class="em-r">Holds</span></div>
+      <div class="cell-body">
+        <p>Putin's Easter ceasefire, declared from 16:00 Moscow time on April 11, is holding into Monday. Ukrainian forces confirmed their readiness to observe the pause.</p>
+        <p>The silence along the front is described as <strong>fragile</strong>. France's armed forces chief has said Paris "prepares for war." EU officials quietly note that Orbán's removal as Hungary's PM — his most prominent EU dissenter — may accelerate sanctions alignment with the bloc.</p>
+        <p><em>The map of Europe shifted twice in 24 hours: once in Budapest, once along a ceasefire line in the east.</em></p>
+      </div>
+    </div>
+
+    <!-- CELL 5: World ticker/misc -->
+    <div class="cell c-y" data-num="05 / World">
+      <div class="cell-kicker ky">Elsewhere Today</div>
+      <div class="cell-head">Monday's <span class="em">Frequencies</span></div>
+      <div class="cell-body">
+        <p><strong>International Dark Sky Week</strong> begins today, April 13 — eight days of advocacy for dark skies worldwide. From Budapest to Baikonur, humanity looks up.</p>
+        <p><strong>Middle East:</strong> GMA reports airstrikes near Lebanon-Israel border as US-Iran talks remain stalled after the Islamabad round concluded without agreement.</p>
+        <p><strong>Markets:</strong> Gold dropped on MCX — ₹1,51,457 per 10g. Silver fell 2.5% as crude oil surged. The world trades, regardless.</p>
+        <p><strong>Masters Tournament:</strong> Ongoing at Augusta — the world's best golfers competing on borrowed green in borrowed spring.</p>
+      </div>
+    </div>
+
+    <!-- CELL 6: LIVE CLOCK / TRANSMISSION -->
+    <div class="cell c-w" data-num="06 / Now">
+      <div class="cell-kicker" style="color:rgba(255,255,255,0.35);">Live Transmission</div>
+      <div class="cell-head" style="font-size:clamp(1rem,2vw,1.5rem); font-family:'Space Mono',monospace; letter-spacing:0.08em;">
+        <span id="big-clock" style="color:var(--neon-g);">--:--:--</span><span class="cursor"></span>
+      </div>
+      <div style="font-size:0.42rem;letter-spacing:0.35em;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:6px;margin-bottom:18px;">Universal Time · April 13, 2026</div>
+
+      <div id="terminal" style="font-size:0.55rem;line-height:1.8;color:var(--neon-g);opacity:0.7;min-height:90px;"></div>
+    </div>
+
+    <!-- CELL 7: SPAN 3 TIMELINE -->
+    <div class="cell span3 c-w" id="tl-row" data-num="07 / Timeline">
+      <div class="tl-node">
+        <div class="tl-y" style="color:var(--neon-g);">1989</div>
+        <div class="tl-n">Orbán gives<br>anti-Soviet speech<br>aged 26</div>
+      </div>
+      <div class="tl-node">
+        <div class="tl-y" style="color:rgba(255,255,255,0.6);">2010</div>
+        <div class="tl-n">Fidesz first wins<br>supermajority<br>16-yr reign begins</div>
+      </div>
+      <div class="tl-node">
+        <div class="tl-y" style="color:rgba(255,255,255,0.6);">2011</div>
+        <div class="tl-n">New constitution<br>passed — opposition<br>boycotts vote</div>
+      </div>
+      <div class="tl-node">
+        <div class="tl-y" style="color:rgba(255,255,255,0.6);">2022</div>
+        <div class="tl-n">4th consecutive<br>supermajority<br>54% of vote</div>
+      </div>
+      <div class="tl-node">
+        <div class="tl-y" style="color:var(--neon-y);">2024</div>
+        <div class="tl-n">Magyar emerges<br>wins EP seats<br>30% in polls</div>
+      </div>
+      <div class="tl-node">
+        <div class="tl-y" style="color:var(--neon-r);">Apr 12<br>'26</div>
+        <div class="tl-n">Orbán concedes<br>Magyar wins<br>138 / 199 seats</div>
+      </div>
+      <div class="tl-node">
+        <div class="tl-y" style="color:var(--neon-g);">Now</div>
+        <div class="tl-n">New Hungary<br>begins forming<br>a government</div>
+      </div>
+    </div>
+
+  </div>
+  <!-- / MAIN GRID -->
+
+  <!-- CLOCK STRIP -->
+  <div id="clock-strip">
+    <div class="cs-left">Transmitted live · Monday, April 13, 2026 · Edition No. 16</div>
+    <div class="cs-right" id="cs-clock">--:--:-- UTC</div>
+  </div>
+
+  <!-- BOTTOM -->
+  <div id="bottom">
+    <a href="./history.html">▸ Archive · All Editions</a>
+    <div class="bottom-r">The Living Website · Est. 2026 · Edition 16</div>
+  </div>
+
+</div>
+
+<script>
+// ═══ LIVE CLOCK ═══
+function tick() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2,'0');
+  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const s = String(now.getUTCSeconds()).padStart(2,'0');
+  const t = h + ':' + m + ':' + s;
+  const el1 = document.getElementById('live-clock');
+  const el2 = document.getElementById('big-clock');
+  const el3 = document.getElementById('cs-clock');
+  if (el1) el1.textContent = t + ' UTC';
+  if (el2) el2.textContent = t;
+  if (el3) el3.textContent = t + ' UTC';
+}
+setInterval(tick, 1000);
+tick();
+
+// ═══ PARTICLE CANVAS ═══
+(function(){
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function Particle() {
+    this.reset();
+  }
+
+  Particle.prototype.reset = function() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.r = Math.random() * 1.5 + 0.3;
+    const colors = ['#39ff8a','#4af0ff','#ff4060','#ffe44a','#c87eff'];
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+    this.alpha = Math.random() * 0.6 + 0.1;
+  };
+
+  Particle.prototype.update = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  };
+
+  Particle.prototype.draw = function() {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  };
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// ═══ DANUBE WAVE ═══
+(function(){
+  const canvas = document.getElementById('wave-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+
+  function resize() {
+    canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+  resize();
+
+  function draw() {
+    const W = canvas.offsetWidth;
+    const H = canvas.offsetHeight;
+    ctx.clearRect(0, 0, W, H);
+
+    // background
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#0a0e1e');
+    grad.addColorStop(1, '#101a30');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // waves
+    const waveColors = ['rgba(57,255,138,0.25)','rgba(74,240,255,0.2)','rgba(200,126,255,0.15)'];
+    waveColors.forEach((c, i) => {
+      ctx.beginPath();
+      ctx.moveTo(0, H/2);
+      for (let x = 0; x <= W; x += 2) {
+        const y = H/2
+          + Math.sin((x/W * Math.PI * 4) + t * (0.8 + i * 0.3)) * (8 + i * 4)
+          + Math.sin((x/W * Math.PI * 7) + t * 1.2 + i) * 3;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      ctx.fillStyle = c;
+      ctx.fill();
+    });
+
+    // celebration dots
+    if (Math.sin(t * 2) > 0.8) {
+      for (let d = 0; d < 5; d++) {
+        ctx.beginPath();
+        ctx.arc(
+          Math.random() * W,
+          Math.random() * H * 0.6,
+          Math.random() * 2 + 1,
+          0, Math.PI * 2
+        );
+        ctx.fillStyle = ['#39ff8a','#ffe44a','#c87eff'][d % 3];
+        ctx.globalAlpha = 0.8;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    t += 0.015;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══ TERMINAL TYPEOUT ═══
+(function(){
+  const lines = [
+    '> HUNGARY_ELECTION.LOG — COMPLETE',
+    '> TISZA: 138/199 SEATS CONFIRMED',
+    '> TURNOUT: 77.8% — ALL-TIME RECORD',
+    '> STATUS: ORBAN_16YR_RULE = TERMINATED',
+    '> EU_RELATIONS: RECALIBRATING...',
+    '> UKRAINE_CEASEFIRE: HOLDING · DAY 2',
+    '> ARTEMIS_II: RECOVERY DAY 3 · ALL GREEN',
+    '> DARK_SKY_WEEK: BEGINS TODAY',
+    '> EDITION 16 · TRANSMITTING_'
+  ];
+
+  const el = document.getElementById('terminal');
+  if (!el) return;
+
+  let li = 0, ci = 0, content = '';
+
+  function typeNext() {
+    if (li >= lines.length) {
+      setTimeout(() => {
+        el.innerHTML = '';
+        content = '';
+        li = 0; ci = 0;
+        typeNext();
+      }, 3000);
+      return;
+    }
+    const line = lines[li];
+    if (ci < line.length) {
+      content += line[ci];
+      ci++;
+      el.innerHTML = content.replace(/\n/g,'<br>') + '<span class="cursor"></span>';
+      setTimeout(typeNext, 28 + Math.random() * 30);
+    } else {
+      content += '\n';
+      li++; ci = 0;
+      setTimeout(typeNext, 180);
+    }
+  }
+
+  setTimeout(typeNext, 600);
+})();
+
+// ═══ GLITCH RANDOM ═══
+(function(){
+  const els = document.querySelectorAll('.glitch');
+  function triggerGlitch() {
+    els.forEach(el => {
+      el.style.animation = 'none';
+      void el.offsetWidth; // reflow
+    });
+    setTimeout(triggerGlitch, 3000 + Math.random() * 5000);
+  }
+  triggerGlitch();
+})();
+</script>
+</body>
+</html>
