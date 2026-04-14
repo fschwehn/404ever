@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Strait & The Constitution — April 14, 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Oswald:wght@200;300;400;500;600&display=swap');
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --ink: #1a1209;
+  --paper: #f5edd8;
+  --paper2: #ede3c8;
+  --rust: #b8391a;
+  --blue: #1a3a6b;
+  --olive: #4a5a28;
+  --saffron: #e8921a;
+  --charcoal: #2d2d2d;
+  --faded: rgba(26,18,9,0.35);
+  --faded2: rgba(26,18,9,0.15);
+}
+
+html {
+  background: var(--paper2);
+}
+
+body {
+  font-family: 'Crimson Pro', serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Paper noise texture via SVG data URI */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 300px 300px;
+}
+
+/* FOLD LINES */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 50%;
+  width: 1px;
+  height: 100%;
+  background: var(--faded2);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══ MASTHEAD ═══ */
+#masthead {
+  position: relative;
+  padding: 36px 40px 0;
+  border-bottom: 3px double var(--ink);
+  z-index: 1;
+}
+
+.mast-row1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.mast-epigraph {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.72rem;
+  color: var(--faded);
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+  max-width: 200px;
+}
+
+.mast-edition {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.52rem;
+  color: var(--faded);
+  letter-spacing: 0.12em;
+  text-align: right;
+  line-height: 1.7;
+}
+
+.mast-title-block {
+  text-align: center;
+  padding: 16px 0 12px;
+  border-top: 1px solid var(--faded2);
+  border-bottom: 1px solid var(--faded2);
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.mast-name {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 200;
+  font-size: clamp(2.2rem, 8vw, 5.5rem);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--ink);
+  line-height: 1;
+  display: block;
+}
+
+.mast-sub {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: clamp(0.75rem, 1.8vw, 1rem);
+  color: var(--faded);
+  letter-spacing: 0.08em;
+  margin-top: 6px;
+}
+
+.mast-dateline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faded);
+}
+
+.dateline-live {
+  color: var(--rust);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pulse {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--rust);
+  animation: pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.6; }
+}
+
+/* ═══ URGENT BAND ═══ */
+#urgent-band {
+  background: var(--rust);
+  color: var(--paper);
+  padding: 7px 40px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.ub-label {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 500;
+  font-size: 0.62rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ub-ticker {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: ticker 50s linear infinite;
+  display: inline-block;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ═══ BODY LAYOUT ═══ */
+#body-wrap {
+  display: grid;
+  grid-template-columns: 1fr 2px 1fr;
+  gap: 0;
+  padding: 0 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.col-divider {
+  background: var(--faded2);
+  margin: 28px 0;
+}
+
+/* ═══ SECTIONS ═══ */
+.section {
+  padding: 28px 28px 28px;
+}
+
+.section + .section {
+  border-top: 1px solid var(--faded2);
+}
+
+/* Specific padding for left vs right */
+.left-col .section { padding-right: 32px; padding-left: 0; }
+.right-col .section { padding-left: 32px; padding-right: 0; }
+
+/* ═══ TYPOGRAPHY ═══ */
+.kicker {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.46rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.kicker.rust { color: var(--rust); }
+.kicker.blue { color: var(--blue); }
+.kicker.olive { color: var(--olive); }
+.kicker.saffron { color: var(--saffron); }
+.kicker.charcoal { color: var(--charcoal); }
+
+.headline {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.4rem, 4vw, 2.8rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.headline.lg {
+  font-size: clamp(1.8rem, 5vw, 3.6rem);
+  font-weight: 500;
+}
+
+.headline .rust { color: var(--rust); }
+.headline .blue { color: var(--blue); }
+.headline .olive { color: var(--olive); }
+.headline .saffron { color: var(--saffron); }
+
+.deck {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.4;
+  color: var(--charcoal);
+  margin-bottom: 14px;
+  border-left: 2px solid var(--faded2);
+  padding-left: 10px;
+}
+
+.body-text {
+  font-family: 'Crimson Pro', serif;
+  font-size: clamp(0.88rem, 1.5vw, 1.05rem);
+  line-height: 1.75;
+  color: var(--charcoal);
+  column-gap: 18px;
+}
+
+.body-text p + p { margin-top: 0.9em; }
+.body-text strong { font-weight: 600; color: var(--ink); }
+.body-text em { font-style: italic; }
+
+/* ═══ HORIZONTAL RULE STYLES ═══ */
+.hr-full {
+  border: none;
+  border-top: 1px solid var(--faded2);
+  margin: 0;
+}
+
+.hr-bold {
+  border: none;
+  border-top: 2px solid var(--ink);
+  margin: 0;
+}
+
+.hr-double {
+  border: none;
+  border-top: 3px double var(--ink);
+  margin: 0;
+}
+
+/* ═══ PULL QUOTE ═══ */
+.pull-quote {
+  margin: 16px 0;
+  padding: 14px 0;
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  position: relative;
+}
+
+.pq-mark {
+  font-family: 'Crimson Pro', serif;
+  font-size: 4rem;
+  line-height: 0.7;
+  color: var(--faded2);
+  display: block;
+  margin-bottom: 4px;
+  font-style: italic;
+}
+
+.pq-text {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.pq-attr {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.44rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faded);
+  margin-top: 8px;
+  display: block;
+}
+
+/* ═══ DATA BOX ═══ */
+.data-box {
+  border: 1px solid var(--faded);
+  padding: 14px;
+  margin: 16px 0;
+  background: var(--paper2);
+  position: relative;
+}
+
+.db-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.44rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--faded);
+  margin-bottom: 12px;
+}
+
+.db-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--faded2);
+}
+.db-row:last-child { border-bottom: none; }
+
+.db-label {
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.8rem;
+  color: var(--charcoal);
+  flex: 1;
+}
+
+.db-value {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 400;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+}
+
+.db-value.rust { color: var(--rust); }
+.db-value.blue { color: var(--blue); }
+.db-value.olive { color: var(--olive); }
+.db-value.saffron { color: var(--saffron); }
+.db-value.up::after { content: ' ↑'; font-size: 0.7em; }
+.db-value.dn::after { content: ' ↓'; font-size: 0.7em; }
+
+/* ═══ ANNOTATION STYLE ═══ */
+.annotation {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--faded);
+  line-height: 1.5;
+  margin: 12px 0;
+  padding-left: 10px;
+  border-left: 1px solid var(--faded2);
+}
+
+/* ═══ INK STAMP ═══ */
+.stamp {
+  display: inline-block;
+  border: 2px solid;
+  padding: 3px 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  transform: rotate(-1.5deg);
+  margin: 6px 0;
+  opacity: 0.7;
+}
+
+.stamp.rust { border-color: var(--rust); color: var(--rust); }
+.stamp.blue { border-color: var(--blue); color: var(--blue); }
+.stamp.olive { border-color: var(--olive); color: var(--olive); }
+
+/* ═══ HAND-DRAWN DIVIDER ═══ */
+.squiggle {
+  width: 100%;
+  height: 12px;
+  margin: 14px 0;
+  opacity: 0.25;
+}
+
+/* ═══ FULL-WIDTH BAND ═══ */
+.fw-band {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--faded2);
+  border-bottom: 1px solid var(--faded2);
+  padding: 20px 0;
+  display: flex;
+  gap: 0;
+}
+
+.fw-band .bitem {
+  flex: 1;
+  padding: 0 28px;
+  border-right: 1px solid var(--faded2);
+  text-align: center;
+}
+.fw-band .bitem:first-child { padding-left: 0; }
+.fw-band .bitem:last-child { border-right: none; padding-right: 0; }
+
+.bitem-n {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 300;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: var(--ink);
+  display: block;
+  line-height: 1;
+}
+
+.bitem-n.rust { color: var(--rust); }
+.bitem-n.blue { color: var(--blue); }
+.bitem-n.olive { color: var(--olive); }
+.bitem-n.saffron { color: var(--saffron); }
+
+.bitem-l {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.75rem;
+  color: var(--faded);
+  margin-top: 4px;
+  display: block;
+  line-height: 1.4;
+}
+
+/* ═══ CLOCK ROW ═══ */
+#clock-row {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--faded2);
+  border-bottom: 3px double var(--ink);
+}
+
+.cr-clock {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--rust);
+}
+
+.cr-note {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.75rem;
+  color: var(--faded);
+  text-align: center;
+}
+
+.cr-archive {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--faded);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.cr-archive:hover { color: var(--rust); }
+
+/* ═══ BOTTOM ROW ═══ */
+#bottom-row {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0 36px;
+}
+
+.br-left {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--faded);
+}
+
+.br-right {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.2em;
+  color: var(--faded);
+  text-transform: uppercase;
+}
+
+/* ═══ HORMUZ CANVAS SECTION ═══ */
+#hormuz-viz {
+  margin: 16px 0;
+  height: 90px;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--faded);
+  border-bottom: 1px solid var(--faded);
+}
+
+#hormuz-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ═══ AMBEDKAR BLOCK ═══ */
+.equality-box {
+  background: var(--blue);
+  color: var(--paper);
+  padding: 18px;
+  margin: 16px 0;
+}
+
+.eq-kicker {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(245,237,216,0.5);
+  margin-bottom: 8px;
+}
+
+.eq-text {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--paper);
+}
+
+.eq-attr {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(245,237,216,0.4);
+  margin-top: 8px;
+  display: block;
+}
+
+/* ═══ TERMINAL MINI ═══ */
+#mini-terminal {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.52rem;
+  line-height: 2;
+  color: var(--olive);
+  letter-spacing: 0.05em;
+  min-height: 70px;
+}
+
+#mini-terminal .cursor-t {
+  display: inline-block;
+  width: 6px;
+  height: 0.8em;
+  background: var(--olive);
+  vertical-align: middle;
+  animation: tblink 0.9s step-start infinite;
+}
+
+@keyframes tblink { 50% { opacity: 0; } }
+
+/* ═══ BAISAKHI WHEEL ═══ */
+#baisakhi-wrap {
+  text-align: center;
+  padding: 14px 0;
+  position: relative;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 680px) {
+  #body-wrap {
+    grid-template-columns: 1fr;
+    padding: 0 18px;
+  }
+  .col-divider { display: none; }
+  .left-col .section { padding-right: 0; }
+  .right-col .section { padding-left: 0; }
+  .fw-band { flex-direction: column; gap: 16px; }
+  .fw-band .bitem { border-right: none; border-bottom: 1px solid var(--faded2); padding: 0 0 16px; }
+  .fw-band .bitem:last-child { border-bottom: none; padding-bottom: 0; }
+  #masthead { padding: 24px 18px 0; }
+  #urgent-band { padding: 7px 18px; }
+  #clock-row { flex-direction: column; gap: 6px; text-align: center; }
+  #bottom-row { flex-direction: column; gap: 6px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div id="masthead">
+  <div class="mast-row1">
+    <div class="mast-epigraph">
+      "The constitution is not a mere lawyers' document — it is a vehicle of life."<br>
+      <span style="font-size:0.65rem; letter-spacing:0.1em;">— Dr. B. R. Ambedkar</span>
+    </div>
+    <div class="mast-edition">
+      Edition No. 17<br>
+      Tuesday · April 14, 2026<br>
+      <span id="mast-clock">--:--:-- UTC</span>
+    </div>
+  </div>
+
+  <div class="mast-title-block">
+    <span class="mast-name">The Living Page</span>
+    <div class="mast-sub">A daily meditation on a world that will not hold still</div>
+  </div>
+
+  <div class="mast-dateline">
+    <span>Vol. I · No. 17 · Est. 2026</span>
+    <span class="dateline-live"><span class="pulse"></span>Live edition · updated continuously</span>
+    <span>International Dark Sky Week</span>
+  </div>
+</div>
+
+<!-- URGENT BAND -->
+<div id="urgent-band">
+  <div class="ub-label">Urgent</div>
+  <div class="ub-ticker">
+    US BLOCKADE OF IRANIAN PORTS IN EFFECT · OIL ABOVE $102 PER BARREL · TRUMP SAYS IRAN "WANTS A DEAL" · MACRON & STARMER PLAN FREEDOM OF NAVIGATION COALITION · PETER MAGYAR CALLS ON PARLIAMENT TO CONVENE BY MAY 5 · INDIA: AMBEDKAR JAYANTI & BAISAKHI · MERCURY ENTERS ARIES · UKRAINE CEASEFIRE HOLDS · US BLOCKADE OF IRANIAN PORTS IN EFFECT · OIL ABOVE $102 PER BARREL · TRUMP SAYS IRAN "WANTS A DEAL" · MACRON & STARMER PLAN FREEDOM OF NAVIGATION COALITION · PETER MAGYAR CALLS ON PARLIAMENT TO CONVENE BY MAY 5 · INDIA: AMBEDKAR JAYANTI & BAISAKHI · MERCURY ENTERS ARIES · UKRAINE CEASEFIRE HOLDS ·
+  </div>
+</div>
+
+<!-- MAIN BODY -->
+<div id="body-wrap" style="padding-top:0;">
+
+  <!-- TOP FULL-WIDTH: NUMBERS -->
+  <div class="fw-band" style="grid-column:1/-1; padding: 20px 0; margin: 0;">
+    <div class="bitem">
+      <span class="bitem-n rust">$102</span>
+      <span class="bitem-l">Brent crude per barrel<br>+40% since war began Feb. 28</span>
+    </div>
+    <div class="bitem">
+      <span class="bitem-n blue">138</span>
+      <span class="bitem-l">Magyar's seats in 199-seat<br>Hungarian parliament</span>
+    </div>
+    <div class="bitem">
+      <span class="bitem-n saffron">135</span>
+      <span class="bitem-l">Ambedkar's birth anniversary<br>today · Equality Day</span>
+    </div>
+    <div class="bitem">
+      <span class="bitem-n olive">Day 2</span>
+      <span class="bitem-l">US blockade on Iranian ports<br>Hormuz traffic near standstill</span>
+    </div>
+    <div class="bitem">
+      <span class="bitem-n" style="color:var(--charcoal);">44</span>
+      <span class="bitem-l">Days of US-Iran conflict<br>ceasefire fragile, holding</span>
+    </div>
+  </div>
+
+  <hr class="hr-bold" style="grid-column:1/-1;">
+
+  <!-- LEFT COLUMN -->
+  <div class="left-col">
+
+    <!-- LEAD: HORMUZ -->
+    <div class="section">
+      <div class="kicker rust">The Chokepoint</div>
+      <div class="headline lg">The Strait<br>Goes <span class="rust">Dark</span></div>
+      <div class="deck">The US military blockade of Iran's ports took effect yesterday at 10 a.m. ET. Today the world wakes to oil above $100 and a waterway that carries a fifth of the world's energy standing nearly still.</div>
+
+      <div class="body-text">
+        <p>The <strong>Strait of Hormuz</strong> — 34 kilometers at its narrowest, the hinge of the global energy economy — became the day's central theater. At 10 a.m. Eastern Time Monday, the US military formalized what it is calling a "blockade" of all Iranian ports and coastal areas, following the collapse of the weekend's Islamabad peace talks after 21 hours of negotiations without a breakthrough.</p>
+        <p>Vice President Vance, departing Islamabad, said Iran chose "not to accept our terms." Iran's armed forces called the blockade <strong>piracy</strong>, as thousands rallied in Tehran against the action. Iranian officials said the country's ports are "either for everyone or for no one."</p>
+        <p>The action is more limited than Trump's initial announcement suggested. CENTCOM clarified that the blockade applies to vessels entering or departing Iranian ports — it will not prevent ships from transiting the strait to and from non-Iranian ports. Still, traffic through the waterway is at an effective standstill, with roughly 31 vessels crossing in the last 24 hours — a fraction of normal volume.</p>
+      </div>
+
+      <div id="hormuz-viz">
+        <canvas id="hormuz-canvas"></canvas>
+      </div>
+
+      <div class="body-text">
+        <p><strong>Global reaction</strong> fractured along familiar lines. France's Macron announced a "peaceful multinational mission" to restore freedom of navigation in the strait, coordinating with Britain. A senior NATO official told CBS News that the UK is leading planning for a coalition of "more than 40 nations." China's Foreign Minister Wang Yi said the blockade does not serve the world's "common interests." The UK declined to participate in the US action itself.</p>
+        <p>The ceasefire with Iran is "holding well," Trump said Tuesday — but added he "doesn't care" whether Iran returns to talks. Later in the day, he told reporters that Iranian officials had called and "want to work a deal." Pakistan is reportedly offering to host another round.</p>
+      </div>
+
+      <div class="data-box">
+        <div class="db-title">Hormuz Snapshot · April 14, 2026</div>
+        <div class="db-row">
+          <span class="db-label">Brent Crude</span>
+          <span class="db-value rust up">~$102 / bbl</span>
+        </div>
+        <div class="db-row">
+          <span class="db-label">Pre-war price</span>
+          <span class="db-value charcoal">~$70 / bbl</span>
+        </div>
+        <div class="db-row">
+          <span class="db-label">% of world oil via Hormuz</span>
+          <span class="db-value ink">~20%</span>
+        </div>
+        <div class="db-row">
+          <span class="db-label">Tankers waiting inside Gulf</span>
+          <span class="db-value rust">230+</span>
+        </div>
+        <div class="db-row">
+          <span class="db-label">Supply restricted</span>
+          <span class="db-value rust">~10M bbl/day (−90%)</span>
+        </div>
+        <div class="db-row">
+          <span class="db-label">US-Iran conflict day</span>
+          <span class="db-value charcoal">Day 44</span>
+        </div>
+      </div>
+
+      <div class="pull-quote">
+        <span class="pq-mark">"</span>
+        <div class="pq-text">We're going to see energy prices high, and maybe even rising — until meaningful ship traffic gets through the key waterway.</div>
+        <span class="pq-attr">— Chris Wright, US Energy Secretary · Semafor World Economy Summit · April 13, 2026</span>
+      </div>
+
+      <div class="annotation">
+        Israel and Hezbollah continued exchanging strikes Monday. Israeli and Lebanese officials are due to meet in Washington for ceasefire talks. The world holds two crises at once — the strait and the front line.
+      </div>
+    </div>
+
+    <!-- MINI TERMINAL -->
+    <div class="section" style="border-top: 1px solid var(--faded2);">
+      <div class="kicker olive">Dispatch Log</div>
+      <div id="mini-terminal"></div>
+    </div>
+
+  </div>
+
+  <!-- COLUMN DIVIDER -->
+  <div class="col-divider"></div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right-col">
+
+    <!-- HUNGARY: NEW DAY -->
+    <div class="section">
+      <div class="kicker blue">Post-Election · Budapest</div>
+      <div class="headline">New <span class="blue">Hungary</span><br>Begins Moving</div>
+      <div class="deck">Two days after the landslide, Péter Magyar holds his first press conference as Prime Minister-elect and names his first demands.</div>
+
+      <div class="body-text">
+        <p>On Monday, the day after his historic supermajority win, <strong>Péter Magyar</strong> convened a press conference in Budapest. His first move: calling on Hungarian President Tamás Sulyok — appointed by Orbán — to resign immediately after asking the winner to form a government. He sent the same message to judges, court presidents, and media regulators installed by Fidesz over 16 years in power. "I call on all the puppets who have been in power for the past 16 years to do the same," he said.</p>
+        <p>Magyar, <strong>45</strong>, said he plans to visit Brussels to unlock billions in frozen EU funds, and pledged to restore Hungary's independent checks and balances, join the European Public Prosecutor's Office, and reduce the country's dependence on Russian energy by 2035.</p>
+        <p>He called on parliament to convene as early as <strong>May 5</strong>. He told a crowd of cheering supporters Sunday that Poland would be his first foreign trip as PM — a pointed symbol of re-alignment with Central European democratic partners.</p>
+      </div>
+
+      <div class="stamp blue">May 5 target · Parliament convenes</div>
+
+      <div class="body-text" style="margin-top:10px;">
+        <p>Global reaction continued rolling in through Monday and Tuesday. US Senate Minority Leader Chuck Schumer framed the result as a warning to Trump ahead of the midterms. Former President Obama called it "a victory for democracy, not just in Europe, but around the world." Italy's Meloni — one of Orbán's loudest European backers — congratulated Magyar on his "clear election victory."</p>
+        <p>Trump had not publicly weighed in as of Tuesday morning, despite his vocal pre-election endorsements of Orbán and a campaign visit from Vice President Vance to Budapest days before the vote.</p>
+      </div>
+
+      <div class="data-box">
+        <div class="db-title">Hungarian Election Final · April 12, 2026</div>
+        <div class="db-row">
+          <span class="db-label">Tisza (Magyar)</span>
+          <span class="db-value blue">138 seats · 53.6%</span>
+        </div>
+        <div class="db-row">
+          <span class="db-label">Fidesz (Orbán)</span>
+          <span class="db-value charcoal">55 seats · 37.8%</span>
+        </div>
+        <div class="db-row">
+          <span class="db-label">Our Homeland (far-right)</span>
+          <span class="db-value charcoal">6 seats</span>
+        </div>
+        <div class="db-row">
+          <span class="db-label">Voter turnout</span>
+          <span class="db-value blue up">77.8% — record since 1990</span>
+        </div>
+        <div class="db-row">
+          <span class="db-label">Orbán's tenure ended</span>
+          <span class="db-value rust">16 years</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hr-full" style="margin:0 32px;">
+
+    <!-- EQUALITY DAY -->
+    <div class="section">
+      <div class="kicker saffron">Equality Day · India</div>
+      <div class="headline">Babasaheb<br>at <span class="saffron">135</span></div>
+      <div class="deck">On this Tuesday, India observes the 135th birth anniversary of the man who built democracy into the nation's bones.</div>
+
+      <div class="equality-box">
+        <div class="eq-kicker">Dr. B. R. Ambedkar · Born April 14, 1891</div>
+        <div class="eq-text">Educate, Agitate, Organise!</div>
+        <span class="eq-attr">— B. R. Ambedkar · Chief Architect, Constitution of India</span>
+      </div>
+
+      <div class="body-text">
+        <p><strong>Ambedkar Jayanti</strong> — also known as Equality Day — observes the 135th birth anniversary of Dr. Bhimrao Ramji Ambedkar, jurist, economist, social reformer, and chief architect of the Indian Constitution. Indian equity markets are closed today. Banks are shut in most major cities. Public life pauses to remember.</p>
+        <p>Ambedkar was born on April 14, 1891, in Mhow, Madhya Pradesh — the 14th child of a military officer, born into the Mahar community, then considered untouchable. He earned degrees from Columbia University and the London School of Economics, became independent India's first Law Minister, and chaired the Constitution Drafting Committee.</p>
+        <p>Today is also <strong>Baisakhi</strong>, the Sikh harvest festival — a day where two tributaries of justice and abundance converge in the same April sun. Today is the blue flag and the golden field at once.</p>
+      </div>
+
+      <div class="annotation">
+        April 14 carries the world's weight quietly: Titanic sank into the North Atlantic on this night in 1912. Lincoln was shot on this evening in 1865. And today, Hungary's new government takes shape, the Strait of Hormuz holds its breath, and a billion-plus people in India remember the man who told them their rights were theirs by right, not by gift.
+      </div>
+    </div>
+
+    <hr class="hr-full" style="margin:0 32px;">
+
+    <!-- WORLD BRIEF -->
+    <div class="section">
+      <div class="kicker charcoal">World Brief</div>
+      <div class="headline" style="font-size:1.5rem;">Other<br>Frequencies</div>
+
+      <div class="body-text">
+        <p><strong>Ukraine:</strong> Putin's Easter ceasefire continues to hold into its third day, though described as fragile. France's armed forces chief has reiterated that Paris "prepares for war." EU officials note that Hungary's political pivot may remove Orbán's veto from sanctions deliberations — a significant shift.</p>
+        <p><strong>Markets:</strong> The S&P 500 closed up more than 1% Monday, erasing all losses since the Iran war began February 28, even as oil climbed above $99. Stocks rose on hopes of diplomatic resolution, and on Trump's claim that Iranian officials had reached out. Gold and silver slipped. Bitcoin retreated above $73,000.</p>
+        <p><strong>Artemis II:</strong> The four crew — Wiseman, Glover, Koch, Hansen — are now four days into recovery in California after their April 10 splashdown. All four reported in good condition. The Moon waits, patient as ever, for Artemis III.</p>
+        <p><strong>Dark Sky Week:</strong> International Dark Sky Week continues. From a planet whose strait is under blockade, whose new democracies are still finding their footing — the dark sky is a kind of permission. Look up. The stars do not charge tolls.</p>
+      </div>
+
+      <!-- Baisakhi wheel canvas -->
+      <div id="baisakhi-wrap">
+        <canvas id="baisakhi-canvas" width="120" height="120"></canvas>
+        <div style="font-family:'DM Mono',monospace; font-size:0.42rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--faded); margin-top:6px;">Baisakhi · Vaisakhi · April 14</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CLOCK ROW -->
+  <div id="clock-row">
+    <span class="cr-clock"><span id="footer-clock">--:--:-- UTC</span></span>
+    <span class="cr-note">The strait. The constitution. The harvest festival. One Tuesday.</span>
+    <a href="./history.html" class="cr-archive">▸ Archive · All Editions</a>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div id="bottom-row">
+    <span class="br-left">The Living Page — Edition No. 17 — April 14, 2026</span>
+    <span class="br-right">A daily meditation, renewed each morning · Not a newspaper · A witness</span>
+  </div>
+
+</div>
+
+<script>
+/* ── LIVE CLOCK ── */
+function tick() {
+  const n = new Date();
+  const t = [n.getUTCHours(), n.getUTCMinutes(), n.getUTCSeconds()]
+    .map(x => String(x).padStart(2,'0')).join(':') + ' UTC';
+  ['mast-clock','footer-clock'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t;
+  });
+}
+setInterval(tick, 1000); tick();
+
+/* ── HORMUZ CANVAS ── */
+(function(){
+  const canvas = document.getElementById('hormuz-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+
+  function resize() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    if (!W || !H) { requestAnimationFrame(draw); return; }
+    ctx.clearRect(0, 0, W, H);
+
+    // paper bg
+    ctx.fillStyle = '#ede3c8';
+    ctx.fillRect(0, 0, W, H);
+
+    // Strait shape — two land masses top and bottom, water in between
+    // Iran (north) coast
+    ctx.fillStyle = 'rgba(74,90,40,0.2)';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(W, 0);
+    const northY = H * 0.28;
+    ctx.lineTo(W, northY + Math.sin(t * 0.4) * 3);
+    for (let x = W; x >= 0; x -= 4) {
+      ctx.lineTo(x, northY + Math.sin((x / W) * Math.PI * 3 + t * 0.3) * 5 + Math.cos((x/W)*Math.PI*2 - t*0.5)*3);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    // Oman (south) coast
+    ctx.fillStyle = 'rgba(74,90,40,0.2)';
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    ctx.lineTo(W, H);
+    const southY = H * 0.72;
+    ctx.lineTo(W, southY - Math.sin(t * 0.35) * 3);
+    for (let x = W; x >= 0; x -= 4) {
+      ctx.lineTo(x, southY - Math.sin((x / W) * Math.PI * 2.5 + t * 0.25) * 4 - Math.cos((x/W)*Math.PI*3 + t*0.4)*3);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    // Water
+    ctx.fillStyle = 'rgba(26,58,107,0.07)';
+    ctx.fillRect(0, H * 0.28, W, H * 0.44);
+
+    // Tiny ships (dots moving right to left = passage slowing)
+    const ships = [
+      { px: 0.15, vy: H * 0.5, col: 'rgba(26,58,107,0.5)', blocked: false },
+      { px: 0.35, vy: H * 0.45, col: 'rgba(26,58,107,0.4)', blocked: false },
+      { px: 0.55, vy: H * 0.55, col: 'rgba(184,57,26,0.5)', blocked: true },
+      { px: 0.72, vy: H * 0.48, col: 'rgba(184,57,26,0.4)', blocked: true },
+      { px: 0.88, vy: H * 0.52, col: 'rgba(184,57,26,0.5)', blocked: true },
+    ];
+
+    ships.forEach(s => {
+      let x = ((s.px - t * 0.008) % 1 + 1) % 1 * W;
+      if (s.blocked) x = s.px * W; // stationary if blocked
+      ctx.save();
+      ctx.fillStyle = s.col;
+      ctx.beginPath();
+      ctx.rect(x - 5, s.vy - 2, 10, 4);
+      ctx.fill();
+      // mast
+      ctx.fillStyle = s.col;
+      ctx.fillRect(x - 1, s.vy - 6, 2, 5);
+      ctx.restore();
+    });
+
+    // US Navy ship (larger, moving left)
+    const navX = (0.9 - t * 0.01) % 1 * W;
+    ctx.save();
+    ctx.fillStyle = 'rgba(26,58,107,0.7)';
+    ctx.beginPath();
+    ctx.rect(navX - 9, H * 0.5 - 3, 18, 6);
+    ctx.fill();
+    ctx.fillRect(navX - 2, H * 0.5 - 9, 3, 7);
+    ctx.restore();
+
+    // "BLOCKADE" label
+    ctx.save();
+    ctx.font = '500 9px DM Mono, monospace';
+    ctx.fillStyle = 'rgba(184,57,26,0.35)';
+    ctx.letterSpacing = '0.3em';
+    ctx.fillText('B L O C K A D E', W * 0.5 - 48, H * 0.5 + 3);
+    ctx.restore();
+
+    // Label: Iran N, Oman S
+    ctx.save();
+    ctx.font = '8px DM Mono, monospace';
+    ctx.fillStyle = 'rgba(74,90,40,0.5)';
+    ctx.fillText('IRAN', 8, H * 0.2);
+    ctx.fillText('OMAN', 8, H * 0.88);
+    ctx.restore();
+
+    t += 0.015;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── BAISAKHI WHEEL ── */
+(function(){
+  const canvas = document.getElementById('baisakhi-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = 120, H = 120, cx = 60, cy = 60;
+  let t = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // bg circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, 55, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(232,146,26,0.08)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(232,146,26,0.25)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // spokes — like a dharma wheel / chakra
+    const spokes = 16;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(t * 0.3);
+    for (let i = 0; i < spokes; i++) {
+      const a = (i / spokes) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(a) * 50, Math.sin(a) * 50);
+      ctx.strokeStyle = `rgba(232,146,26,${0.15 + (i % 2) * 0.1})`;
+      ctx.lineWidth = i % 4 === 0 ? 1.5 : 0.7;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // outer ring petals
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(t * 0.15);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.ellipse(Math.cos(a) * 44, Math.sin(a) * 44, 5, 9, a, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(232,146,26,${0.18 + Math.sin(t + i) * 0.08})`;
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // center circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(232,146,26,0.5)';
+    ctx.fill();
+
+    t += 0.02;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── MINI TERMINAL ── */
+(function(){
+  const lines = [
+    '> STATUS: US_BLOCKADE_HORMUZ = ACTIVE',
+    '> OIL_PRICE: $102.3 / bbl — +40% vs FEB 28',
+    '> IRAN_RESPONSE: "PIRACY" — RALLIES IN TEHRAN',
+    '> TRUMP: "IRAN CALLED, WANTS A DEAL"',
+    '> UK_NATO_COALITION: 40+ NATIONS PLANNING',
+    '> HUNGARY: MAGYAR PRESS CONF COMPLETE',
+    '> MAY_5: PARLIAMENT CONVENE TARGET',
+    '> INDIA: AMBEDKAR_135 · MARKETS_CLOSED',
+    '> BAISAKHI: HARVEST FESTIVAL · PUNJAB',
+    '> UKRAINE_CEASEFIRE: HOLDING · DAY 3',
+    '> MERCURY → ARIES: TODAY · EDGE SHARPENS',
+    '> EDITION_17 · TRANSMITTING _',
+  ];
+  const el = document.getElementById('mini-terminal');
+  if (!el) return;
+  let li = 0, ci = 0, out = '';
+
+  function step() {
+    if (li >= lines.length) {
+      setTimeout(() => { el.innerHTML = ''; out = ''; li = 0; ci = 0; step(); }, 2800);
+      return;
+    }
+    const line = lines[li];
+    if (ci < line.length) {
+      out += line[ci]; ci++;
+      el.innerHTML = out.replace(/\n/g, '<br>') + '<span class="cursor-t"></span>';
+      setTimeout(step, 22 + Math.random() * 25);
+    } else {
+      out += '\n'; li++; ci = 0;
+      setTimeout(step, 160);
+    }
+  }
+  setTimeout(step, 400);
+})();
+</script>
+</body>
+</html>
