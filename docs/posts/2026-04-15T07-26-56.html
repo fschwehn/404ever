@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Da Vinci's Wednesday — April 15, 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700;900&display=swap');
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --gold: #c8960c;
+  --amber: #e8b84b;
+  --rust: #b8391a;
+  --cobalt: #1a3d7c;
+  --viridian: #2d6b4f;
+  --crimson: #8b1a2a;
+  --ochre: #c07c1a;
+  --plaster: #e8dcc8;
+  --ink: #1a1209;
+  --dust: rgba(26,18,9,0.08);
+}
+
+html, body {
+  width: 100%; min-height: 100vh;
+  background: #0a0a08;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Cormorant Garamond', serif;
+  position: relative;
+}
+
+/* ── LEAD CANVAS ── */
+#lead-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* ── FRESCO OVERLAY ── */
+#fresco-overlay {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* ── TOP TITLE BAR ── */
+#title-bar {
+  position: relative;
+  text-align: center;
+  padding: 42px 24px 24px;
+  border-bottom: 1px solid rgba(200,150,12,0.3);
+}
+
+.tb-date {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: rgba(200,150,12,0.6);
+  margin-bottom: 10px;
+}
+
+.tb-main {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 7vw, 5.5rem);
+  color: var(--amber);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 40px rgba(200,150,12,0.4), 0 2px 0 rgba(0,0,0,0.8);
+  line-height: 1.1;
+  display: block;
+}
+
+.tb-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(0.85rem, 2vw, 1.15rem);
+  color: rgba(232,184,75,0.55);
+  margin-top: 8px;
+  letter-spacing: 0.12em;
+}
+
+.tb-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.3em;
+  color: var(--rust);
+  text-transform: uppercase;
+}
+
+.pulse-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--rust);
+  animation: heartbeat 1.4s ease-in-out infinite;
+}
+@keyframes heartbeat {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.5; }
+}
+
+/* ── MOSAIC GRID ── */
+#mosaic {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 80px;
+  gap: 2px;
+  padding: 2px;
+  position: relative;
+}
+
+/* ── PANE BASE ── */
+.pane {
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: transform 0.35s cubic-bezier(.22,.61,.36,1),
+              filter 0.35s ease;
+  border: 1px solid rgba(0,0,0,0.5);
+}
+
+.pane:hover {
+  transform: scale(1.03) translateZ(0);
+  z-index: 10;
+  filter: brightness(1.2);
+}
+
+/* Color panes */
+.p-cobalt   { background: linear-gradient(135deg, #0e2450 0%, #1a3d7c 50%, #0d1f44 100%); }
+.p-rust     { background: linear-gradient(135deg, #6b1e0d 0%, #b8391a 50%, #7a2211 100%); }
+.p-viridian { background: linear-gradient(135deg, #1a4030 0%, #2d6b4f 50%, #163526 100%); }
+.p-gold     { background: linear-gradient(135deg, #7a5a08 0%, #c8960c 50%, #8a6410 100%); }
+.p-ochre    { background: linear-gradient(135deg, #7a4c10 0%, #c07c1a 50%, #7a4e14 100%); }
+.p-crimson  { background: linear-gradient(135deg, #5a0f1a 0%, #8b1a2a 50%, #4a0d18 100%); }
+.p-slate    { background: linear-gradient(135deg, #1a1a20 0%, #2e2e38 50%, #15151c 100%); }
+.p-plaster  { background: linear-gradient(135deg, #c8b898 0%, #e0cfa8 50%, #c4b094 100%); }
+
+/* Cracked-glass texture overlay */
+.pane::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='3' type='fractalNoise' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.12'/%3E%3C/svg%3E");
+  background-size: 200px;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+
+/* Lead light grout lines via box-shadow */
+.pane::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1.5px rgba(0,0,0,0.6);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── PANE CONTENT ── */
+.pc {
+  position: relative;
+  z-index: 3;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 8px 10px;
+}
+
+.pc-k {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.36rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  opacity: 0.7;
+  line-height: 1;
+}
+
+.pc-h {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: clamp(0.55rem, 1.8vw, 1.05rem);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.pc-b {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(0.55rem, 1.4vw, 0.78rem);
+  line-height: 1.45;
+  margin-top: 5px;
+  opacity: 0.82;
+}
+
+.pc-n {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(1.6rem, 5vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+  opacity: 0.92;
+}
+
+/* Light pane text */
+.p-plaster .pc, .p-gold .pc, .p-ochre .pc {
+  color: var(--ink);
+}
+.p-plaster .pc-k, .p-gold .pc-k, .p-ochre .pc-k { opacity: 0.5; }
+.p-plaster .pc-b, .p-gold .pc-b, .p-ochre .pc-b { opacity: 0.7; }
+
+/* Dark pane text */
+.p-cobalt .pc,
+.p-rust .pc,
+.p-viridian .pc,
+.p-crimson .pc,
+.p-slate .pc {
+  color: var(--plaster);
+}
+
+/* Canvas pane */
+.pane-canvas-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.pane-canvas-wrap canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── SPECIFIC PANE SPANS ── */
+/* Define grid placement with data attributes via CSS classes */
+
+/* TITLE PANE – center massive */
+.pane-title {
+  grid-column: 1 / 13;
+  grid-row: 1 / 3;
+}
+
+/* LEAD HORMUZ – large left */
+.pane-hormuz {
+  grid-column: 1 / 6;
+  grid-row: 3 / 8;
+}
+
+/* PENTAGON UPDATE */
+.pane-pentagon {
+  grid-column: 6 / 10;
+  grid-row: 3 / 5;
+}
+
+/* OIL PRICE BIG NUMBER */
+.pane-oil {
+  grid-column: 10 / 13;
+  grid-row: 3 / 5;
+}
+
+/* TALKS RESUME */
+.pane-talks {
+  grid-column: 6 / 10;
+  grid-row: 5 / 7;
+}
+
+/* CHINA REACTS */
+.pane-china {
+  grid-column: 10 / 13;
+  grid-row: 5 / 7;
+}
+
+/* IRELAND PANE */
+.pane-ireland {
+  grid-column: 6 / 13;
+  grid-row: 7 / 10;
+}
+
+/* WORLD ART DAY – large right */
+.pane-artday {
+  grid-column: 1 / 6;
+  grid-row: 8 / 12;
+}
+
+/* COALITION */
+.pane-coalition {
+  grid-column: 6 / 9;
+  grid-row: 10 / 12;
+}
+
+/* HUNGARY */
+.pane-hungary {
+  grid-column: 9 / 13;
+  grid-row: 10 / 12;
+}
+
+/* CEASEFIRE */
+.pane-ceasefire {
+  grid-column: 1 / 5;
+  grid-row: 12 / 14;
+}
+
+/* DA VINCI QUOTE */
+.pane-davinci {
+  grid-column: 5 / 9;
+  grid-row: 12 / 14;
+}
+
+/* IMF */
+.pane-imf {
+  grid-column: 9 / 13;
+  grid-row: 12 / 14;
+}
+
+/* FOOTER BAND */
+.pane-footer {
+  grid-column: 1 / 13;
+  grid-row: 14 / 15;
+}
+
+/* ── DIVINCI ORB CANVAS ── */
+#orb-pane {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── BOTTOM FOOTER ── */
+#footer-row {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px 24px;
+  border-top: 1px solid rgba(200,150,12,0.2);
+}
+
+.fr-left {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.75rem;
+  color: rgba(232,184,75,0.4);
+  letter-spacing: 0.06em;
+}
+
+.fr-clock {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.46rem;
+  letter-spacing: 0.3em;
+  color: rgba(184,57,26,0.7);
+  text-transform: uppercase;
+}
+
+.fr-archive {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.38rem;
+  letter-spacing: 0.28em;
+  color: rgba(200,150,12,0.35);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+.fr-archive:hover { color: var(--amber); }
+
+/* ── TICKER ── */
+#ticker-wrap {
+  background: var(--rust);
+  padding: 6px 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 3;
+}
+
+.ticker-inner {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll-left 70s linear infinite;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.44rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(232,220,200,0.9);
+  padding-left: 100%;
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── GLOW ANIMATIONS ── */
+@keyframes glow-cobalt {
+  0%,100% { box-shadow: inset 0 0 20px rgba(26,61,124,0.3); }
+  50% { box-shadow: inset 0 0 40px rgba(26,61,124,0.6); }
+}
+
+@keyframes glow-rust {
+  0%,100% { box-shadow: inset 0 0 20px rgba(184,57,26,0.4); }
+  50% { box-shadow: inset 0 0 50px rgba(184,57,26,0.7); }
+}
+
+.pane-hormuz { animation: glow-rust 4s ease-in-out infinite; }
+.pane-artday { animation: glow-cobalt 5s ease-in-out infinite; }
+
+/* ── LEAD CANVAS ── */
+#lead-canvas {
+  background: #0a0a08;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  #mosaic {
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: 90px;
+  }
+  .pane-title { grid-column: 1 / 7; grid-row: 1 / 3; }
+  .pane-hormuz { grid-column: 1 / 7; grid-row: 3 / 7; }
+  .pane-pentagon { grid-column: 1 / 4; grid-row: 7 / 9; }
+  .pane-oil { grid-column: 4 / 7; grid-row: 7 / 9; }
+  .pane-talks { grid-column: 1 / 4; grid-row: 9 / 11; }
+  .pane-china { grid-column: 4 / 7; grid-row: 9 / 11; }
+  .pane-ireland { grid-column: 1 / 7; grid-row: 11 / 14; }
+  .pane-artday { grid-column: 1 / 7; grid-row: 14 / 18; }
+  .pane-coalition { grid-column: 1 / 4; grid-row: 18 / 20; }
+  .pane-hungary { grid-column: 4 / 7; grid-row: 18 / 20; }
+  .pane-ceasefire { grid-column: 1 / 4; grid-row: 20 / 22; }
+  .pane-davinci { grid-column: 4 / 7; grid-row: 20 / 22; }
+  .pane-imf { grid-column: 1 / 7; grid-row: 22 / 24; }
+  .pane-footer { grid-column: 1 / 7; grid-row: 24 / 25; }
+}
+
+/* Visible crack divider art */
+.crack {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 4;
+}
+.crack svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+/* shimmer on large pane */
+@keyframes shimmer {
+  0%   { opacity: 0.03; }
+  50%  { opacity: 0.1;  }
+  100% { opacity: 0.03; }
+}
+.pane-artday .crack { animation: shimmer 6s ease-in-out infinite; }
+.pane-hormuz .crack { animation: shimmer 3.5s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<!-- LEAD CANVAS (background particle field) -->
+<canvas id="lead-canvas"></canvas>
+
+<!-- TICKER -->
+<div id="ticker-wrap">
+  <div class="ticker-inner">
+    BLOCKADE DAY 3 · PENTAGON: NO SHIPS PAST US BLOCKADE IN FIRST 24H · SIX MERCHANT SHIPS TURNED BACK · TRUMP: "SOMETHING COULD HAPPEN IN ISLAMABAD IN NEXT TWO DAYS" · CHINA CALLS BLOCKADE "DANGEROUS AND IRRESPONSIBLE" · IRELAND FACES NO-CONFIDENCE VOTE TONIGHT · BRENT CRUDE ~$102/BBL · WORLD ART DAY · DA VINCI'S 574TH BIRTHDAY · NATO COALITION 40+ NATIONS FORMING · MACRON-STARMER SUMMIT THIS WEEK · ISRAEL-LEBANON TALKS RESUME IN WASHINGTON · UKRAINE CEASEFIRE HOLDS · IPL 2026: CSK DEFEAT KKR · BLOCKADE DAY 3 · PENTAGON: NO SHIPS PAST US BLOCKADE IN FIRST 24H · SIX MERCHANT SHIPS TURNED BACK · TRUMP: "SOMETHING COULD HAPPEN IN ISLAMABAD IN NEXT TWO DAYS" · CHINA CALLS BLOCKADE "DANGEROUS AND IRRESPONSIBLE" · IRELAND FACES NO-CONFIDENCE VOTE TONIGHT · BRENT CRUDE ~$102/BBL · WORLD ART DAY · DA VINCI'S 574TH BIRTHDAY ·
+  </div>
+</div>
+
+<!-- TITLE BAR -->
+<div id="title-bar">
+  <div class="tb-date">Wednesday · April 15 · 2026 · Edition XVIII</div>
+  <span class="tb-main">The Living Page</span>
+  <div class="tb-sub">A world held between the sea and the canvas · Da Vinci's birthday · Day 46</div>
+  <div class="tb-live">
+    <span class="pulse-dot"></span>
+    <span id="main-clock">--:--:-- UTC</span>
+    &nbsp;·&nbsp; Live
+  </div>
+</div>
+
+<!-- MOSAIC -->
+<div id="mosaic">
+
+  <!-- PANE: TITLE BAND (visual only — animated stripe) -->
+  <div class="pane pane-title p-slate">
+    <div class="pane-canvas-wrap">
+      <canvas id="wave-canvas"></canvas>
+    </div>
+    <div class="pc" style="justify-content:center; align-items:center; text-align:center;">
+      <div class="pc-k" style="color:rgba(200,150,12,0.7); font-size:0.42rem; letter-spacing:0.5em;">World Art Day · Leonardo da Vinci · Born April 15, 1452</div>
+      <div class="pc-h" style="font-size:clamp(0.9rem,3vw,1.6rem); color:var(--amber); letter-spacing:0.15em;">"The noblest pleasure is the joy of understanding."</div>
+    </div>
+  </div>
+
+  <!-- PANE: HORMUZ LEAD -->
+  <div class="pane pane-hormuz p-rust">
+    <div class="crack">
+      <svg viewBox="0 0 300 400" preserveAspectRatio="none">
+        <path d="M60 0 L75 80 L50 160 L80 240 L55 320 L70 400" stroke="rgba(0,0,0,0.3)" stroke-width="1.5" fill="none"/>
+        <path d="M200 0 L185 90 L210 180 L195 260 L215 350 L200 400" stroke="rgba(0,0,0,0.2)" stroke-width="1" fill="none"/>
+        <path d="M0 150 L80 165 L160 148 L240 162 L300 150" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" fill="none"/>
+      </svg>
+    </div>
+    <div class="pc">
+      <div class="pc-k" style="color:rgba(232,184,75,0.7);">Strait of Hormuz · Day 3 Blockade</div>
+      <div class="pc-n">Day 3</div>
+      <div class="pc-h">Pentagon: No Ships Broke US Blockade in First 24 Hours</div>
+      <div class="pc-b">Six merchant vessels were turned back. CENTCOM says 10,000 sailors, Marines and airmen are enforcing the blockade alongside 15+ warships. The ceasefire — set to expire April 22 — grows more fragile by the hour. Trump signals new talks "could happen" within days.</div>
+    </div>
+  </div>
+
+  <!-- PANE: PENTAGON UPDATE -->
+  <div class="pane pane-pentagon p-cobalt">
+    <div class="pc">
+      <div class="pc-k" style="color:rgba(200,150,12,0.65);">CENTCOM · April 15</div>
+      <div class="pc-h">6 Ships Turned Back · 3 Non-Iranian Tankers Passed</div>
+      <div class="pc-b">Ships not bound for Iranian ports remain free to transit. Two US-sanctioned tankers among vessels that crossed. The blockade's edges are being tested — but the Pentagon says the line held on day one.</div>
+    </div>
+  </div>
+
+  <!-- PANE: OIL BIG NUMBER -->
+  <div class="pane pane-oil p-gold">
+    <div class="pc" style="color:#1a1209;">
+      <div class="pc-k" style="opacity:0.5;">Brent Crude · Apr 15</div>
+      <div class="pc-n" style="color:#5a2a00;">~$102</div>
+      <div class="pc-b" style="color:#3a1a00;">Per barrel. Up ~40% since war began Feb 28. Pre-war: ~$70. Energy Secretary Wright: prices may "peak" in coming weeks — if traffic flows again.</div>
+    </div>
+  </div>
+
+  <!-- PANE: TALKS COULD RESUME -->
+  <div class="pane pane-talks p-viridian">
+    <div class="pc">
+      <div class="pc-k" style="color:rgba(200,150,12,0.6);">Diplomacy · Islamabad</div>
+      <div class="pc-h">Trump: "Something Could Happen in the Next Two Days"</div>
+      <div class="pc-b">Speaking to the New York Post, Trump praised Pakistani Field Marshal Munir and suggested a second round of US-Iran talks. Vance — who led 21 hours of failed negotiations in Islamabad — said he believed Iranian envoys "wanted to make a deal."</div>
+    </div>
+  </div>
+
+  <!-- PANE: CHINA -->
+  <div class="pane pane-china p-crimson">
+    <div class="pc">
+      <div class="pc-k" style="color:rgba(232,184,75,0.6);">Beijing · Ministry of FA</div>
+      <div class="pc-h">China: Blockade is "Dangerous and Irresponsible"</div>
+      <div class="pc-b">China, Iran's largest oil customer, called the blockade a threat to the "fragile ceasefire." Beijing buys 80%+ of Iran's exported oil. Spokesman Guo Jiakun: only a full ceasefire can ease the situation.</div>
+    </div>
+  </div>
+
+  <!-- PANE: IRELAND -->
+  <div class="pane pane-ireland p-ochre">
+    <div class="crack">
+      <svg viewBox="0 0 700 240" preserveAspectRatio="none">
+        <path d="M100 0 L120 60 L90 120 L115 180 L100 240" stroke="rgba(0,0,0,0.2)" stroke-width="1.2" fill="none"/>
+        <path d="M400 0 L380 80 L410 160 L395 240" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" fill="none"/>
+      </svg>
+    </div>
+    <div class="pc" style="color:#1a1209;">
+      <div class="pc-k" style="opacity:0.5;">Dublin · No-Confidence Vote · Tonight</div>
+      <div class="pc-h" style="font-size:clamp(0.8rem,2.5vw,1.4rem);">Ireland's Government Faces Collapse Over Fuel Crisis</div>
+      <div class="pc-b" style="opacity:0.75;">PM Micheál Martin offered a €505 million package of fuel tax cuts after farmers and truckers blocked Ireland's only oil refinery for six days — more than a third of pumps ran dry. Sinn Féin called a no-confidence vote for this Tuesday evening. The crisis began when the Strait of Hormuz closed. From one blockade to another.</div>
+    </div>
+  </div>
+
+  <!-- PANE: WORLD ART DAY (large, with canvas) -->
+  <div class="pane pane-artday p-cobalt" id="orb-pane">
+    <div class="pane-canvas-wrap">
+      <canvas id="orb-canvas"></canvas>
+    </div>
+    <div class="crack">
+      <svg viewBox="0 0 300 320" preserveAspectRatio="none">
+        <path d="M0 80 L60 95 L120 78 L180 92 L240 80 L300 88" stroke="rgba(200,150,12,0.15)" stroke-width="1" fill="none"/>
+        <path d="M150 0 L162 100 L148 200 L158 320" stroke="rgba(200,150,12,0.1)" stroke-width="0.8" fill="none"/>
+      </svg>
+    </div>
+    <div class="pc" style="justify-content:flex-end;">
+      <div class="pc-k" style="color:rgba(200,150,12,0.7);">World Art Day · UNESCO · April 15</div>
+      <div class="pc-h" style="font-size:clamp(0.9rem,2.5vw,1.5rem); color:var(--amber);">Leonardo da Vinci · Born 1452 · 574 Years</div>
+      <div class="pc-b" style="color:rgba(232,184,75,0.75);">The date was chosen to honor a man who was painter, sculptor, architect, musician, scientist, inventor. Today, UNESCO asks: can art unite what geopolitics fractures? The 2026 theme — Art for Unity and Healing — lands on a world with blockaded seas and burning petrol stations in Dublin.</div>
+    </div>
+  </div>
+
+  <!-- PANE: COALITION -->
+  <div class="pane pane-coalition p-viridian">
+    <div class="pc">
+      <div class="pc-k" style="color:rgba(200,150,12,0.6);">NATO · UK-France</div>
+      <div class="pc-h">40+ Nations Plan Strait Coalition</div>
+      <div class="pc-b">Macron & Starmer convene a conference to assemble a "peaceful multinational mission" to restore freedom of navigation. The UK leads planning. The mission would be "strictly defensive," Macron said — separate from the warring parties.</div>
+    </div>
+  </div>
+
+  <!-- PANE: HUNGARY -->
+  <div class="pane pane-hungary p-slate">
+    <div class="pc">
+      <div class="pc-k" style="color:rgba(200,150,12,0.6);">Budapest · Post-Election</div>
+      <div class="pc-h">Magyar Sets May 5 Target for Parliament</div>
+      <div class="pc-b">Three days after his supermajority win, Péter Magyar — 45 — calls on Orbán-era judges, media regulators and court presidents to resign. Plans Brussels trip to unlock frozen EU funds. Poland will be his first foreign visit as PM.</div>
+    </div>
+  </div>
+
+  <!-- PANE: CEASEFIRE -->
+  <div class="pane pane-ceasefire p-slate">
+    <div class="pc">
+      <div class="pc-k" style="color:rgba(200,150,12,0.6);">Ukraine · Day 8 Ceasefire</div>
+      <div class="pc-h">Easter Ceasefire Holds — Barely</div>
+      <div class="pc-b">Putin's ceasefire, now in its eighth day, continues to hold — described by NATO officials as "fragile." France's armed forces chief says Paris "prepares for war." Hungary's pivot may remove Orbán's veto on EU sanctions — a seismic shift in European unity.</div>
+    </div>
+  </div>
+
+  <!-- PANE: DA VINCI QUOTE -->
+  <div class="pane pane-davinci p-plaster">
+    <div class="pc" style="justify-content:center; padding: 14px 16px;">
+      <div class="pc-k" style="color:rgba(26,18,9,0.4); margin-bottom:8px;">Da Vinci — Codex Atlanticus</div>
+      <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(0.85rem,2vw,1.15rem); color:#2a1a08; line-height:1.55; text-align:center;">"Iron rusts from disuse; water loses its purity from stagnation — even so does inaction sap the vigors of the mind."</div>
+      <div style="font-family:'Space Mono',monospace; font-size:0.36rem; letter-spacing:0.3em; color:rgba(26,18,9,0.35); margin-top:10px; text-align:center; text-transform:uppercase;">Leonardo da Vinci · 1452–1519</div>
+    </div>
+  </div>
+
+  <!-- PANE: IMF -->
+  <div class="pane pane-imf p-gold">
+    <div class="pc" style="color:#1a1209;">
+      <div class="pc-k" style="opacity:0.5;">IMF WEO · April 2026</div>
+      <div class="pc-h" style="font-size:clamp(0.65rem,1.8vw,0.95rem);">"Global Economy in the Shadow of War"</div>
+      <div class="pc-b" style="opacity:0.72;">The IMF's April 2026 World Economic Outlook finds armed conflicts generate "large and persistent output losses" — exceeding those from financial crises. Fertilizer prices forecast 15–20% higher through first half of 2026 if Hormuz crisis persists.</div>
+    </div>
+  </div>
+
+  <!-- PANE: FOOTER -->
+  <div class="pane pane-footer p-slate">
+    <div class="pc" style="flex-direction:row; justify-content:space-between; align-items:center; padding: 0 20px;">
+      <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:0.72rem; color:rgba(232,184,75,0.4);">Edition XVIII · April 15, 2026 · A daily witness</div>
+      <div style="font-family:'Space Mono',monospace; font-size:0.38rem; letter-spacing:0.3em; text-transform:uppercase; color:rgba(200,150,12,0.35);">Day 46 of conflict · Blockade day 3</div>
+      <a href="./history.html" style="font-family:'Space Mono',monospace; font-size:0.36rem; letter-spacing:0.28em; text-transform:uppercase; color:rgba(200,150,12,0.3); text-decoration:none;" onmouseover="this.style.color='rgba(232,184,75,0.8)'" onmouseout="this.style.color='rgba(200,150,12,0.3)'">▸ Archive</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER ROW -->
+<div id="footer-row">
+  <div class="fr-left">The Living Page — a daily meditation on a world that will not hold still</div>
+  <div class="fr-clock" id="footer-clock">--:--:-- UTC</div>
+  <a href="./history.html" class="fr-archive">▸ All Editions</a>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   LIVE CLOCK
+══════════════════════════════════════ */
+function tick() {
+  const n = new Date();
+  const t = [n.getUTCHours(), n.getUTCMinutes(), n.getUTCSeconds()]
+    .map(x => String(x).padStart(2,'0')).join(':') + ' UTC';
+  ['main-clock','footer-clock'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t;
+  });
+}
+setInterval(tick, 1000); tick();
+
+/* ══════════════════════════════════════
+   BACKGROUND PARTICLE FIELD
+══════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('lead-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  const particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Create sparse gold dust particles
+  for (let i = 0; i < 80; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.2 + 0.3,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: (Math.random() - 0.5) * 0.12,
+      alpha: Math.random() * 0.4 + 0.05,
+      hue: Math.random() > 0.5 ? 42 : 15, // gold or rust
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0a0a08';
+    ctx.fillRect(0, 0, W, H);
+
+    particles.forEach(p => {
+      p.x = (p.x + p.vx + W) % W;
+      p.y = (p.y + p.vy + H) % H;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${p.hue}, 80%, 55%, ${p.alpha})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ══════════════════════════════════════
+   WAVE CANVAS (title pane)
+══════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('wave-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+
+  function resize() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    if (!W || !H) { requestAnimationFrame(draw); return; }
+    ctx.clearRect(0, 0, W, H);
+
+    // Subtle waveform — the "sea" that underpins everything
+    const waves = [
+      { col: 'rgba(200,150,12,0.06)', amp: H * 0.3, freq: 0.006, phase: t * 0.4 },
+      { col: 'rgba(184,57,26,0.05)', amp: H * 0.25, freq: 0.009, phase: t * 0.3 + 1 },
+      { col: 'rgba(26,61,124,0.07)', amp: H * 0.2, freq: 0.007, phase: t * 0.5 + 2 },
+    ];
+
+    waves.forEach(w => {
+      ctx.beginPath();
+      ctx.moveTo(0, H / 2);
+      for (let x = 0; x <= W; x += 3) {
+        const y = H / 2 + Math.sin(x * w.freq + w.phase) * w.amp
+                        + Math.cos(x * w.freq * 0.6 + w.phase * 0.8) * w.amp * 0.4;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H);
+      ctx.lineTo(0, H);
+      ctx.closePath();
+      ctx.fillStyle = w.col;
+      ctx.fill();
+    });
+
+    t += 0.03;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ══════════════════════════════════════
+   ORB CANVAS (art day pane — Da Vinci rose window)
+══════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('orb-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+
+  function resize() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    if (!W || !H) { requestAnimationFrame(draw); return; }
+    ctx.clearRect(0, 0, W, H);
+
+    const cx = W / 2, cy = H * 0.42;
+    const R = Math.min(W, H) * 0.36;
+
+    // outer ring glow
+    const grd = ctx.createRadialGradient(cx, cy, R * 0.1, cx, cy, R * 1.2);
+    grd.addColorStop(0, 'rgba(200,150,12,0.18)');
+    grd.addColorStop(0.6, 'rgba(200,150,12,0.06)');
+    grd.addColorStop(1, 'rgba(200,150,12,0)');
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = grd;
+    ctx.fill();
+
+    // Rose window petals — 12 segments rotating slowly
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(t * 0.05);
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2;
+      const col = i % 3 === 0 ? 'rgba(200,150,12,0.12)'
+                : i % 3 === 1 ? 'rgba(26,61,124,0.12)'
+                              : 'rgba(184,57,26,0.1)';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, R, a, a + Math.PI / 6);
+      ctx.fillStyle = col;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(200,150,12,0.15)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Inner ring petals — counter-rotating
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(-t * 0.08);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.ellipse(
+        Math.cos(a) * R * 0.5,
+        Math.sin(a) * R * 0.5,
+        R * 0.22, R * 0.1, a, 0, Math.PI * 2
+      );
+      ctx.fillStyle = `rgba(200,150,12,${0.08 + Math.sin(t + i) * 0.04})`;
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Vitruvian spokes
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(t * 0.02);
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(a) * R, Math.sin(a) * R);
+      ctx.strokeStyle = `rgba(200,150,12,${0.06 + (i % 4 === 0 ? 0.06 : 0)})`;
+      ctx.lineWidth = i % 6 === 0 ? 1.2 : 0.4;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Center orb
+    const cGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.15);
+    cGrd.addColorStop(0, 'rgba(232,184,75,0.7)');
+    cGrd.addColorStop(0.6, 'rgba(200,150,12,0.4)');
+    cGrd.addColorStop(1, 'rgba(200,150,12,0)');
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 0.15, 0, Math.PI * 2);
+    ctx.fillStyle = cGrd;
+    ctx.fill();
+
+    // outer ring circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(200,150,12,0.22)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 0.6, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(200,150,12,0.12)';
+    ctx.lineWidth = 0.7;
+    ctx.stroke();
+
+    t += 0.012;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
