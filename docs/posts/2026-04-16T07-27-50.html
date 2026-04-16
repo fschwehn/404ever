@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Signal Room — April 16, 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --amber: #ffb000;
+  --amber-dim: #7a5200;
+  --amber-glow: rgba(255,176,0,0.12);
+  --red: #ff3b1f;
+  --green: #39ff5e;
+  --cyan: #00e5ff;
+  --bg: #080806;
+  --panel: #0c0c08;
+  --border: rgba(255,176,0,0.18);
+}
+
+html, body {
+  width: 100%; min-height: 100vh;
+  background: var(--bg);
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--amber);
+  overflow-x: hidden;
+}
+
+/* ── SCANLINE OVERLAY ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+}
+
+/* ── HEADER ── */
+#header {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px 10px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  position: relative;
+}
+
+#header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,176,0,0.05) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.hdr-left {
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  color: var(--amber-dim);
+  text-transform: uppercase;
+}
+
+.hdr-center {
+  text-align: center;
+}
+
+.hdr-title {
+  font-family: 'VT323', monospace;
+  font-size: clamp(1.6rem, 5vw, 3.2rem);
+  letter-spacing: 0.12em;
+  color: var(--amber);
+  text-shadow: 0 0 18px rgba(255,176,0,0.5), 0 0 40px rgba(255,176,0,0.2);
+  display: block;
+  line-height: 1;
+}
+
+.hdr-sub {
+  font-size: 0.48rem;
+  letter-spacing: 0.35em;
+  color: rgba(255,176,0,0.45);
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.hdr-right {
+  text-align: right;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: var(--amber-dim);
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--red);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  animation: blink-badge 2s step-end infinite;
+}
+
+@keyframes blink-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.pulse {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,100% { transform: scale(1); opacity:1; }
+  50% { transform: scale(1.8); opacity:0.5; }
+}
+
+/* ── TICKER BANNER ── */
+#ticker {
+  background: var(--red);
+  padding: 5px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.tick-inner {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker-run 80s linear infinite;
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,220,0.92);
+  padding-left: 100%;
+}
+
+@keyframes ticker-run {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── STATUS BAR ── */
+#status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.48rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,176,0,0.5);
+  text-transform: uppercase;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sb-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+}
+
+.sd-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.sd-red   { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+.sd-amber { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.sd-cyan  { background: var(--cyan);  box-shadow: 0 0 6px var(--cyan); }
+
+/* ── MAIN GRID ── */
+#grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 60px;
+  gap: 1px;
+  background: rgba(255,176,0,0.04);
+  padding: 1px;
+}
+
+/* ── PANEL BASE ── */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.3s;
+}
+
+.panel:hover {
+  border-color: rgba(255,176,0,0.5);
+  z-index: 5;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,176,0,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Panel header */
+.ph {
+  font-size: 0.38rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,176,0,0.45);
+  padding: 6px 10px 3px;
+  border-bottom: 1px solid rgba(255,176,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ph-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ph-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+}
+
+.ph-status {
+  font-size: 0.34rem;
+  opacity: 0.6;
+}
+
+/* Panel body */
+.pb {
+  flex: 1;
+  padding: 8px 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.pb-head {
+  font-family: 'VT323', monospace;
+  font-size: clamp(0.75rem, 2vw, 1.2rem);
+  color: var(--amber);
+  text-shadow: 0 0 8px rgba(255,176,0,0.4);
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+}
+
+.pb-body {
+  font-size: clamp(0.42rem, 1.2vw, 0.58rem);
+  line-height: 1.5;
+  color: rgba(255,176,0,0.68);
+  letter-spacing: 0.03em;
+}
+
+.pb-number {
+  font-family: 'VT323', monospace;
+  font-size: clamp(2rem, 7vw, 4rem);
+  line-height: 0.9;
+  color: var(--amber);
+  text-shadow: 0 0 20px rgba(255,176,0,0.5);
+  letter-spacing: -0.02em;
+}
+
+.pb-number-small {
+  font-family: 'VT323', monospace;
+  font-size: clamp(1.1rem, 3vw, 1.8rem);
+  color: var(--amber);
+  text-shadow: 0 0 10px rgba(255,176,0,0.4);
+  line-height: 1;
+}
+
+/* Teletype scrolling text */
+.teletype {
+  font-size: 0.45rem;
+  line-height: 1.6;
+  color: rgba(255,176,0,0.72);
+  overflow: hidden;
+  flex: 1;
+  position: relative;
+}
+
+.tt-line {
+  display: flex;
+  gap: 8px;
+}
+
+.tt-time {
+  color: rgba(255,176,0,0.35);
+  flex-shrink: 0;
+  font-size: 0.38rem;
+}
+
+.tt-msg { flex: 1; }
+
+/* Blinking cursor */
+.cursor::after {
+  content: '█';
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  0%,100% { opacity:1; }
+  50% { opacity:0; }
+}
+
+/* Accent colors */
+.accent-red   { color: var(--red); text-shadow: 0 0 8px rgba(255,59,31,0.5); }
+.accent-green { color: var(--green); text-shadow: 0 0 8px rgba(57,255,94,0.4); }
+.accent-cyan  { color: var(--cyan); text-shadow: 0 0 8px rgba(0,229,255,0.4); }
+.accent-amber { color: var(--amber); }
+
+/* Panel spans */
+.p-masthead { grid-column: 1/13; grid-row:1/2; }
+.p-hormuz-main { grid-column:1/6; grid-row:2/7; }
+.p-deal { grid-column:6/10; grid-row:2/5; }
+.p-blockade-impl { grid-column:10/13; grid-row:2/5; }
+.p-red-sea { grid-column:6/10; grid-row:5/7; }
+.p-iran-threat { grid-column:10/13; grid-row:5/7; }
+.p-markets { grid-column:1/5; grid-row:7/10; }
+.p-sp500 { grid-column:5/8; grid-row:7/10; }
+.p-oil { grid-column:8/10; grid-row:7/10; }
+.p-nasdaq { grid-column:10/13; grid-row:7/10; }
+.p-ireland { grid-column:1/6; grid-row:10/14; }
+.p-israel-leb { grid-column:6/10; grid-row:10/13; }
+.p-ceasefire { grid-column:10/13; grid-row:10/13; }
+.p-pope { grid-column:6/13; grid-row:13/15; }
+.p-food { grid-column:1/6; grid-row:14/16; }
+.p-quote { grid-column:6/13; grid-row:15/17; }
+.p-footer { grid-column:1/13; grid-row:16/17; }
+
+/* Special: masthead panel */
+.p-masthead {
+  background: #050503;
+  border-color: rgba(255,176,0,0.22);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  gap: 16px;
+}
+
+/* Oscilloscope canvas */
+.osc-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.osc-wrap canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0.35;
+}
+
+/* Corner decoration */
+.corner-tl, .corner-tr, .corner-bl, .corner-br {
+  position: absolute;
+  width: 10px; height: 10px;
+  border-color: rgba(255,176,0,0.4);
+  border-style: solid;
+  pointer-events: none;
+}
+.corner-tl { top:4px; left:4px; border-width:1px 0 0 1px; }
+.corner-tr { top:4px; right:4px; border-width:1px 1px 0 0; }
+.corner-bl { bottom:4px; left:4px; border-width:0 0 1px 1px; }
+.corner-br { bottom:4px; right:4px; border-width:0 1px 1px 0; }
+
+/* Bottom strip */
+#footer-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px 18px;
+  border-top: 1px solid var(--border);
+  font-size: 0.45rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,176,0,0.3);
+  text-transform: uppercase;
+}
+
+#footer-strip a {
+  color: rgba(255,176,0,0.35);
+  text-decoration: none;
+  transition: color 0.25s;
+}
+#footer-strip a:hover { color: var(--amber); }
+
+/* ── ALERT STRIPE ── */
+.alert-stripe {
+  background: linear-gradient(90deg, transparent, rgba(255,59,31,0.08), transparent);
+  border-top: 1px solid rgba(255,59,31,0.3);
+  border-bottom: 1px solid rgba(255,59,31,0.3);
+  padding: 5px 20px;
+  font-size: 0.5rem;
+  letter-spacing: 0.25em;
+  color: var(--red);
+  text-align: center;
+  text-transform: uppercase;
+  animation: alert-pulse 3s ease-in-out infinite;
+}
+@keyframes alert-pulse {
+  0%,100% { background: linear-gradient(90deg, transparent, rgba(255,59,31,0.08), transparent); }
+  50% { background: linear-gradient(90deg, transparent, rgba(255,59,31,0.18), transparent); }
+}
+
+/* Responsive */
+@media (max-width:768px) {
+  #grid { grid-template-columns: repeat(6,1fr); grid-auto-rows: 70px; }
+  .p-masthead { grid-column:1/7; grid-row:1/2; }
+  .p-hormuz-main { grid-column:1/7; grid-row:2/7; }
+  .p-deal { grid-column:1/4; grid-row:7/9; }
+  .p-blockade-impl { grid-column:4/7; grid-row:7/9; }
+  .p-red-sea { grid-column:1/4; grid-row:9/11; }
+  .p-iran-threat { grid-column:4/7; grid-row:9/11; }
+  .p-markets { grid-column:1/7; grid-row:11/13; }
+  .p-sp500 { grid-column:1/4; grid-row:13/15; }
+  .p-oil { grid-column:4/7; grid-row:13/15; }
+  .p-nasdaq { grid-column:1/4; grid-row:15/17; }
+  .p-ireland { grid-column:1/7; grid-row:17/21; }
+  .p-israel-leb { grid-column:1/4; grid-row:21/23; }
+  .p-ceasefire { grid-column:4/7; grid-row:21/23; }
+  .p-pope { grid-column:1/7; grid-row:23/25; }
+  .p-food { grid-column:1/7; grid-row:25/27; }
+  .p-quote { grid-column:1/7; grid-row:27/29; }
+  .p-footer { grid-column:1/7; grid-row:29/30; }
+}
+</style>
+</head>
+<body>
+
+<!-- ALERT STRIPE -->
+<div class="alert-stripe">
+  ⚠ blockade day 4 · ceasefire expires april 21 · 10 ships turned back · deal talks may resume this week · iran threatens red sea shipping ⚠
+</div>
+
+<!-- HEADER -->
+<div id="header">
+  <div class="hdr-left">
+    <div>Signal Room</div>
+    <div style="margin-top:3px;" id="hdr-date">Thu · Apr 16 · 2026</div>
+  </div>
+  <div class="hdr-center">
+    <span class="hdr-title">THE SIGNAL ROOM</span>
+    <div class="hdr-sub">Live Dispatch · Edition XIX · Day 47 of conflict · Day 4 blockade</div>
+  </div>
+  <div class="hdr-right">
+    <div class="live-badge"><span class="pulse"></span> LIVE FEED</div>
+    <div id="clock" style="margin-top:5px; font-size:0.72rem; color:rgba(255,176,0,0.7);">--:--:-- UTC</div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div id="ticker">
+  <div class="tick-inner">
+    BLOCKADE FULLY IMPLEMENTED · 10 SHIPS TURNED BACK · USS SPRUANCE REDIRECTS IRANIAN CARGO VESSEL · WHITE HOUSE: "GOOD PROSPECTS FOR A DEAL" · 2ND TALKS MAY RESUME IN ISLAMABAD AS EARLY AS THIS WEEK · CEASEFIRE EXPIRES APR 21 · IRAN THREATENS RED SEA SHIPPING · S&P 500 NEW RECORD: 7,022.95 · NASDAQ HITS 24,016 — 11TH STRAIGHT SESSION UP · IRELAND: GOVT SURVIVES NO-CONFIDENCE 92-78 · HEALY-RAE RESIGNS AS MINISTER OF STATE · BRENT CRUDE ~$95/BBL · POPE LEO XIV ON 11-DAY AFRICA TRIP · TRUMP: WAR "VERY CLOSE TO OVER" · PAKISTAN ARMY CHIEF IN TEHRAN · ISRAEL-LEBANON: FURTHER TALKS AGREED · NETFLIX EARNINGS TODAY · BLOCKADE FULLY IMPLEMENTED · 10 SHIPS TURNED BACK · USS SPRUANCE REDIRECTS IRANIAN CARGO VESSEL · WHITE HOUSE: "GOOD PROSPECTS FOR A DEAL" ·
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div id="status-bar">
+  <div class="sb-item"><div class="sb-dot sd-red"></div> HORMUZ: BLOCKADED — DAY 4</div>
+  <div class="sb-item"><div class="sb-dot sd-amber"></div> CEASEFIRE: EXPIRES APR 21</div>
+  <div class="sb-item"><div class="sb-dot sd-green"></div> TALKS: IN DISCUSSION</div>
+  <div class="sb-item"><div class="sb-dot sd-cyan"></div> S&P 500: 7,022 ▲ RECORD</div>
+  <div class="sb-item"><div class="sb-dot sd-amber"></div> BRENT: ~$95/BBL</div>
+  <div class="sb-item"><div class="sb-dot sd-green"></div> IRELAND: GOVT SURVIVED</div>
+  <div class="sb-item" style="margin-left:auto;"><a href="./history.html" style="color:rgba(255,176,0,0.4); text-decoration:none; font-size:0.42rem; letter-spacing:0.2em; text-transform:uppercase;" onmouseover="this.style.color='rgba(255,176,0,0.9)'" onmouseout="this.style.color='rgba(255,176,0,0.4)'">▸ ARCHIVE</a></div>
+</div>
+
+<!-- MAIN GRID -->
+<div id="grid">
+
+  <!-- MASTHEAD BAND -->
+  <div class="panel p-masthead">
+    <div style="font-size:0.42rem; letter-spacing:0.32em; color:rgba(255,176,0,0.4);">INCOMING PRIORITY TRANSMISSIONS — MULTIPLE CHANNELS — REAL TIME</div>
+    <canvas id="master-wave" style="height:36px; flex:1; max-width:60%; opacity:0.5;"></canvas>
+    <div style="font-size:0.42rem; letter-spacing:0.28em; color:rgba(255,176,0,0.35);">SIG-ROOM-XIX · CLASSIFIED: UNCLASSIFIED</div>
+  </div>
+
+  <!-- HORMUZ MAIN — LARGE LEFT -->
+  <div class="panel p-hormuz-main">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="corner-bl"></div><div class="corner-br"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-red"></div> STRAIT OF HORMUZ · CENTCOM</div>
+      <div class="ph-status">PRIORITY: FLASH</div>
+    </div>
+    <div class="pb">
+      <div style="font-size:0.4rem; letter-spacing:0.3em; color: rgba(255,59,31,0.8); text-transform:uppercase; margin-bottom:4px;">Day 4 of US Naval Blockade</div>
+      <div class="pb-number" style="font-size:clamp(2.5rem,8vw,5rem); line-height:0.85;">10</div>
+      <div style="font-size:0.5rem; letter-spacing:0.2em; color:rgba(255,176,0,0.55); margin-bottom:6px;">SHIPS TURNED BACK SINCE DAY 1</div>
+      <div class="pb-head" style="font-size:clamp(0.8rem,2.5vw,1.3rem); margin-bottom:6px;">Blockade "Fully Implemented" — Economic Trade Halted</div>
+      <div class="pb-body">The US military announced overnight that its blockade of Iranian ports has been "fully implemented" — US forces have "completely halted economic trade going into and out of Iran by sea." The USS Spruance (DDG-111) redirected an Iranian cargo vessel that attempted to evade the blockade.</div>
+      <div style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,176,0,0.1);">
+        <div class="pb-body accent-amber">Iran's armed forces threatened to block all shipping in the Persian Gulf, Sea of Oman, and Red Sea if the blockade continues. The ceasefire — set to expire April 21 — remains fragile.</div>
+      </div>
+      <div class="teletype" style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,176,0,0.08);" id="hormuz-tt">
+        <div class="tt-line"><span class="tt-time">04:22</span><span class="tt-msg">CENTCOM: Blockade enforcement 100% — all Iranian ports sealed</span></div>
+        <div class="tt-line"><span class="tt-time">03:47</span><span class="tt-msg">IRGC Navy warns: severe response to any ceasefire violation</span></div>
+        <div class="tt-line"><span class="tt-time">02:35</span><span class="tt-msg">Rich Star tanker stationary off Iran's Larak Island</span></div>
+        <div class="tt-line"><span class="tt-time">01:18</span><span class="tt-msg">Iran: NPC suspends petrochemical exports until further notice</span></div>
+        <div class="tt-line"><span class="tt-time">00:06</span><span class="tt-msg accent-red">Iran threatens to block Red Sea shipping <span class="cursor"></span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEAL TALKS -->
+  <div class="panel p-deal">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="corner-bl"></div><div class="corner-br"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-green"></div> DIPLOMACY · ISLAMABAD</div>
+      <div class="ph-status accent-green">ACTIVE</div>
+    </div>
+    <div class="pb">
+      <div class="pb-head">White House: "Good Prospects for a Deal"</div>
+      <div class="pb-body">A second round of US-Iran talks could resume as early as this week, two people familiar with negotiations told NBC News. Pakistan's army chief travelled to Tehran. Trump said the war is "very close to over." Iran's FM: messages still being exchanged via Islamabad.</div>
+      <div class="pb-body accent-green" style="margin-top:6px;">Vance expected to lead Round 2. Ceasefire clock: T-5 days.</div>
+    </div>
+  </div>
+
+  <!-- BLOCKADE IMPLEMENTED -->
+  <div class="panel p-blockade-impl">
+    <div class="osc-wrap"><canvas id="osc-canvas"></canvas></div>
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-amber"></div> MARKETS · ENERGY</div>
+      <div class="ph-status">BRENT CRUDE</div>
+    </div>
+    <div class="pb" style="z-index:1; position:relative;">
+      <div class="pb-number" style="font-size:clamp(1.6rem,5vw,3rem);">$95.77</div>
+      <div style="font-size:0.42rem; letter-spacing:0.22em; color:rgba(255,176,0,0.5); margin-bottom:4px;">/BBL · BRENT · APR 16</div>
+      <div class="pb-body">Up from $70 pre-war. Choppy session — dipped on deal optimism, then recovered. WTI: $91.72. Elevated through end of 2026 forecast.</div>
+    </div>
+  </div>
+
+  <!-- RED SEA THREAT -->
+  <div class="panel p-red-sea">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-red"></div> RED SEA · GULF OF OMAN</div>
+      <div class="ph-status accent-red">THREAT</div>
+    </div>
+    <div class="pb">
+      <div class="pb-head" style="font-size:clamp(0.65rem,1.8vw,0.95rem);">Iran Threatens All Shipping If Blockade Continues</div>
+      <div class="pb-body">Iran's armed forces warned they will block the Persian Gulf, Sea of Oman and Red Sea — a massive escalation that would affect shipping far beyond Hormuz. Roughly 20% of world oil transit at risk.</div>
+    </div>
+  </div>
+
+  <!-- IRAN THREAT -->
+  <div class="panel p-iran-threat">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-red"></div> TEHRAN · IRGC</div>
+      <div class="ph-status">NUCLEAR</div>
+    </div>
+    <div class="pb">
+      <div class="pb-head" style="font-size:clamp(0.65rem,1.8vw,0.95rem);">Nuclear Program — The Core Sticking Point</div>
+      <div class="pb-body">Iran maintains its nuclear program is civilian. US demands dismantling of major enrichment facilities. Iran lost track of mines in Hormuz — unable to fully open strait even if willing.</div>
+    </div>
+  </div>
+
+  <!-- MARKETS -->
+  <div class="panel p-markets">
+    <div class="osc-wrap"><canvas id="mkt-canvas"></canvas></div>
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="ph" style="position:relative; z-index:1;">
+      <div class="ph-label"><div class="ph-dot sd-green"></div> MARKETS · WALL STREET</div>
+      <div class="ph-status accent-green">RECORD HIGH</div>
+    </div>
+    <div class="pb" style="z-index:1; position:relative;">
+      <div class="pb-head" style="color:var(--green); text-shadow:0 0 8px rgba(57,255,94,0.4);">Markets Shrug Off War</div>
+      <div class="pb-body">S&P 500 hit new all-time record 7,022.95. Nasdaq's 11-day streak — its strongest run in history — closed at 24,016. Investors price in ceasefire optimism and AI-driven growth. Tesla +7% on AI5. BofA, Morgan Stanley post strong earnings.</div>
+      <div class="pb-body accent-green" style="margin-top:4px;">Futures edge higher Thursday ahead of Netflix, PepsiCo earnings.</div>
+    </div>
+  </div>
+
+  <!-- S&P 500 -->
+  <div class="panel p-sp500">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-green"></div> S&P 500</div>
+      <div class="ph-status accent-green">NEW ATH</div>
+    </div>
+    <div class="pb">
+      <div class="pb-number" style="color:var(--green); text-shadow:0 0 15px rgba(57,255,94,0.5); font-size:clamp(1.5rem,4vw,2.5rem);">7,022</div>
+      <div style="font-size:0.4rem; letter-spacing:0.22em; color:rgba(57,255,94,0.6); margin-bottom:4px;">+0.80% · ALL-TIME HIGH</div>
+      <div class="pb-body">Record close. 10th positive session in 11 days. Tech + AI lead.</div>
+    </div>
+  </div>
+
+  <!-- OIL PRICE -->
+  <div class="panel p-oil">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-amber"></div> NASDAQ</div>
+      <div class="ph-status">24K+</div>
+    </div>
+    <div class="pb">
+      <div class="pb-number" style="font-size:clamp(1.3rem,3.5vw,2.2rem);">24,016</div>
+      <div style="font-size:0.4rem; letter-spacing:0.22em; color:rgba(255,176,0,0.55); margin-bottom:4px;">+1.59% · 11-DAY WIN STREAK</div>
+      <div class="pb-body">Best 11-day run in Nasdaq history. Nasdaq-100 sets ATH.</div>
+    </div>
+  </div>
+
+  <!-- NASDAQ - now used for Dow -->
+  <div class="panel p-nasdaq">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-red"></div> DOW JONES</div>
+      <div class="ph-status">LAGGING</div>
+    </div>
+    <div class="pb">
+      <div class="pb-number-small" style="color:var(--red); text-shadow:0 0 10px rgba(255,59,31,0.4); font-size:clamp(1rem,3vw,1.8rem);">48,463</div>
+      <div style="font-size:0.4rem; letter-spacing:0.22em; color:rgba(255,59,31,0.55); margin-bottom:4px;">-0.15% · DOW SLIPS</div>
+      <div class="pb-body">Dow shed 72 pts. Materials, industrials underperform. 2,000 pts from record. US10Y: 4.281%.</div>
+    </div>
+  </div>
+
+  <!-- IRELAND -->
+  <div class="panel p-ireland">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="corner-bl"></div><div class="corner-br"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-green"></div> DUBLIN · DÁIL ÉIREANN</div>
+      <div class="ph-status accent-green">GOVT SURVIVES</div>
+    </div>
+    <div class="pb">
+      <div class="pb-head">Ireland: Government Wins Confidence Vote 92–78</div>
+      <div class="pb-body">The Fianna Fáil–Fine Gael coalition survived a Sinn Féin no-confidence motion — but not without drama. Junior Minister Michael Healy-Rae resigned mid-debate and voted against the government, calling it the "first significant crack in Coalition unity." The coalition's majority now rests on just five seats above the threshold.</div>
+      <div class="pb-body" style="margin-top:5px; color:rgba(255,176,0,0.6);">The crisis began when the Strait of Hormuz closed — Ireland's fuel prices exceeded €2.34/litre (over $8.59/gallon). Farmers and truckers blocked the sole oil refinery at Whitegate, County Cork for six days. A €505m package — 10c/litre excise cut on petrol and diesel — narrowly quieted the Dáil. From one blockade to another.</div>
+      <div class="teletype" style="margin-top:6px; border-top:1px solid rgba(255,176,0,0.08); padding-top:6px;">
+        <div class="tt-line"><span class="tt-time">19:44</span><span class="tt-msg">Final vote: 92 confidence, 78 no-confidence</span></div>
+        <div class="tt-line"><span class="tt-time">18:30</span><span class="tt-msg accent-red">SHOCK: Healy-Rae resigns as Minister of State, votes no</span></div>
+        <div class="tt-line"><span class="tt-time">16:12</span><span class="tt-msg">McDonald (SF): "Your time is up. People choosing heating or eating."</span></div>
+        <div class="tt-line"><span class="tt-time">15:00</span><span class="tt-msg">Martin: Govt package "largest in any European country" <span class="cursor"></span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ISRAEL-LEBANON -->
+  <div class="panel p-israel-leb">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-amber"></div> ISRAEL · LEBANON</div>
+      <div class="ph-status">TALKS AGREED</div>
+    </div>
+    <div class="pb">
+      <div class="pb-head" style="font-size:clamp(0.65rem,1.8vw,0.95rem);">First Major Talks Since 1993</div>
+      <div class="pb-body">After direct talks in Washington — the first high-level engagement since 1993 — Israel and Lebanon agreed to hold further negotiations "at a mutually agreed time and venue." Israel refused to commit to a ceasefire in south Lebanon. 2,167 killed in Israeli strikes on Lebanon total. Trump: leaders of both nations to speak — first time in 34 years.</div>
+    </div>
+  </div>
+
+  <!-- CEASEFIRE UKRAINE -->
+  <div class="panel p-ceasefire">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-green"></div> UKRAINE</div>
+      <div class="ph-status accent-green">CEASEFIRE</div>
+    </div>
+    <div class="pb">
+      <div class="pb-head" style="font-size:clamp(0.6rem,1.5vw,0.85rem);">Easter Ceasefire — Day 9</div>
+      <div class="pb-body">Ukraine ceasefire holds into its ninth day. NATO calls it "fragile." Hungary's Orbán exit removes longstanding EU veto bloc. Peter Magyar sets May 5 for new parliament — Brussels trip to unlock frozen EU funds planned.</div>
+    </div>
+  </div>
+
+  <!-- POPE AFRICA -->
+  <div class="panel p-pope">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-cyan"></div> POPE LEO XIV · AFRICA APOSTOLIC JOURNEY</div>
+      <div class="ph-status" style="color:var(--cyan);">11-DAY TRIP</div>
+    </div>
+    <div class="pb">
+      <div class="pb-head" style="color:var(--cyan); text-shadow:0 0 8px rgba(0,229,255,0.3); font-size:clamp(0.65rem,1.8vw,0.95rem);">Chicago-Born Pope on Dizzying 4-Nation Africa Trip</div>
+      <div class="pb-body">Pope Leo XIV departed for his 11-day apostolic journey to Africa, calling for peace as global conflict escalates. Trump previously criticized the Pope's handling of the Iran war — Leo stepped up criticism of the violence starting Palm Sunday. He leads vigils for peace amid a world that struggles to find any.</div>
+    </div>
+  </div>
+
+  <!-- FOOD CRISIS -->
+  <div class="panel p-food">
+    <div class="corner-tl"></div><div class="corner-tr"></div>
+    <div class="corner-bl"></div><div class="corner-br"></div>
+    <div class="ph">
+      <div class="ph-label"><div class="ph-dot sd-red"></div> GLOBAL FOOD · SUDAN · IMF</div>
+      <div class="ph-status accent-red">CRITICAL</div>
+    </div>
+    <div class="pb">
+      <div class="pb-head" style="font-size:clamp(0.65rem,1.8vw,0.95rem);">The War the World Is Not Watching</div>
+      <div class="pb-body">Sudan: 80%+ of displaced families skipping meals. 1.3M refugees in Chad. Chef José Andrés warns the Iran war is devastating global food supply — not just fuel. Fertilizer prices forecast 15–20% higher if Hormuz crisis persists through planting season. IMF: armed conflicts generate "large and persistent output losses" exceeding financial crises. Iraq: new president tasked with PM selection — US-Iran conflict makes compromise harder.</div>
+    </div>
+  </div>
+
+  <!-- QUOTE -->
+  <div class="panel p-quote" style="background:#05050a; border-color:rgba(0,229,255,0.15);">
+    <div class="corner-tl" style="border-color:rgba(0,229,255,0.25);"></div>
+    <div class="corner-tr" style="border-color:rgba(0,229,255,0.25);"></div>
+    <div class="corner-bl" style="border-color:rgba(0,229,255,0.25);"></div>
+    <div class="corner-br" style="border-color:rgba(0,229,255,0.25);"></div>
+    <div class="ph" style="border-color:rgba(0,229,255,0.1);">
+      <div class="ph-label" style="color:rgba(0,229,255,0.5);"><div class="ph-dot sd-cyan"></div> TRANSMISSION · SIGNAL ROOM CLOSE</div>
+      <div class="ph-status" style="color:rgba(0,229,255,0.4);">EDITION XIX</div>
+    </div>
+    <div class="pb" style="justify-content:center; align-items:center; text-align:center; padding: 12px 20px;">
+      <div style="font-family:'VT323',monospace; font-size:clamp(0.9rem,2.5vw,1.5rem); color:rgba(0,229,255,0.85); text-shadow:0 0 16px rgba(0,229,255,0.3); line-height:1.4; letter-spacing:0.03em;">"Iron rusts from disuse; water loses its purity from stagnation — even so does inaction sap the vigors of the mind."</div>
+      <div style="font-size:0.4rem; letter-spacing:0.35em; color:rgba(0,229,255,0.35); margin-top:10px; text-transform:uppercase;">Leonardo da Vinci · 1452–1519 · The Living Page transmits daily</div>
+    </div>
+  </div>
+
+  <!-- FOOTER PANEL -->
+  <div class="panel p-footer" style="background:#050503;">
+    <div class="pb" style="flex-direction:row; justify-content:space-between; align-items:center; padding: 0 20px;">
+      <div style="font-size:0.42rem; letter-spacing:0.22em; color:rgba(255,176,0,0.3);">SIGNAL ROOM · EDITION XIX · APR 16 2026 · DAY 47 CONFLICT</div>
+      <div id="footer-clock" style="font-size:0.55rem; letter-spacing:0.25em; color:rgba(255,59,31,0.5);">--:--:-- UTC</div>
+      <a href="./history.html" style="font-size:0.4rem; letter-spacing:0.28em; text-transform:uppercase; color:rgba(255,176,0,0.28); text-decoration:none;" onmouseover="this.style.color='rgba(255,176,0,0.8)'" onmouseout="this.style.color='rgba(255,176,0,0.28)'">▸ ALL EDITIONS</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER STRIP -->
+<div id="footer-strip">
+  <div>The Signal Room — a daily witness to what the world is transmitting</div>
+  <div id="fs-clock">--:--:-- UTC</div>
+  <a href="./history.html">▸ Archive</a>
+</div>
+
+<script>
+/* ── CLOCK ── */
+function tick() {
+  const n = new Date();
+  const t = [n.getUTCHours(), n.getUTCMinutes(), n.getUTCSeconds()]
+    .map(x => String(x).padStart(2,'0')).join(':') + ' UTC';
+  ['clock','footer-clock','fs-clock'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t;
+  });
+}
+setInterval(tick, 1000); tick();
+
+/* ── MASTER WAVE (header) ── */
+(function() {
+  const c = document.getElementById('master-wave');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  let t = 0;
+  function resize() {
+    c.width = c.offsetWidth * devicePixelRatio;
+    c.height = c.offsetHeight * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    const W = c.offsetWidth, H = c.offsetHeight;
+    ctx.clearRect(0, 0, W, H);
+    const grad = ctx.createLinearGradient(0, 0, W, 0);
+    grad.addColorStop(0, 'rgba(255,176,0,0)');
+    grad.addColorStop(0.2, 'rgba(255,176,0,0.8)');
+    grad.addColorStop(0.8, 'rgba(255,176,0,0.8)');
+    grad.addColorStop(1, 'rgba(255,176,0,0)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x++) {
+      const y = H/2
+        + Math.sin(x * 0.04 + t) * H * 0.25
+        + Math.sin(x * 0.08 + t * 1.3) * H * 0.12
+        + Math.sin(x * 0.02 + t * 0.7) * H * 0.18;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    t += 0.04;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── OSCILLOSCOPE (oil price panel) ── */
+(function() {
+  const c = document.getElementById('osc-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  let t = 0;
+
+  function resize() {
+    c.width = c.parentElement.offsetWidth;
+    c.height = c.parentElement.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(255,176,0,0.5)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x++) {
+      const y = H/2
+        + Math.sin(x * 0.05 + t) * H * 0.3
+        + Math.cos(x * 0.12 + t * 0.7) * H * 0.15
+        + (Math.random() - 0.5) * H * 0.05;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,176,0,0.07)';
+    ctx.lineWidth = 0.5;
+    for (let i = 1; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, H * i / 4);
+      ctx.lineTo(W, H * i / 4);
+      ctx.stroke();
+    }
+    for (let i = 1; i < 6; i++) {
+      ctx.beginPath();
+      ctx.moveTo(W * i / 6, 0);
+      ctx.lineTo(W * i / 6, H);
+      ctx.stroke();
+    }
+
+    t += 0.025;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── MARKET CANVAS ── */
+(function() {
+  const c = document.getElementById('mkt-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  let t = 0;
+  const data = [];
+  for (let i = 0; i < 80; i++) {
+    data.push(0.3 + Math.random() * 0.4 + i * 0.003);
+  }
+
+  function resize() {
+    c.width = c.parentElement.offsetWidth;
+    c.height = c.parentElement.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Upward trending sparkline
+    const pts = data.map((v, i) => ({
+      x: (i / (data.length-1)) * W,
+      y: H - (v + Math.sin(t + i * 0.2) * 0.05) * H * 0.8
+    }));
+
+    // Fill
+    ctx.beginPath();
+    pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+    const fg = ctx.createLinearGradient(0, 0, 0, H);
+    fg.addColorStop(0, 'rgba(57,255,94,0.12)');
+    fg.addColorStop(1, 'rgba(57,255,94,0)');
+    ctx.fillStyle = fg;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = 'rgba(57,255,94,0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    t += 0.02;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── TELETYPE ANIMATION (hormuz feed) ── */
+(function() {
+  const lines = [
+    ['04:52', 'WHITE HOUSE: prospects for deal are "good"', false],
+    ['04:33', 'CENTCOM: 10 ships turned back, blockade 100% implemented', false],
+    ['04:22', 'CENTCOM: Economic trade into/out of Iran halted by sea', false],
+    ['03:47', 'IRGC: Any military vessel approaching strait = ceasefire violation', true],
+    ['03:15', 'PAK ARMY CHIEF arrives in Tehran as mediator', false],
+    ['02:35', 'USS Spruance redirects Iranian cargo vessel off Larak Island', false],
+    ['02:10', 'NBCNEWS: Round 2 talks could resume this week', false],
+    ['01:18', 'Iran NPC: petrochemical exports suspended until further notice', false],
+    ['00:44', 'Trump: war "very close to over" — Iran still exchanging messages', false],
+    ['00:06', 'IRAN ARMED FORCES: will block Red Sea if blockade continues', true],
+  ];
+
+  const container = document.getElementById('hormuz-tt');
+  if (!container) return;
+  container.innerHTML = '';
+  let idx = 0;
+
+  function addLine() {
+    if (idx >= lines.length) idx = 0;
+    const [time, msg, isRed] = lines[idx];
+    const div = document.createElement('div');
+    div.className = 'tt-line';
+    div.innerHTML = `<span class="tt-time">${time}</span><span class="tt-msg${isRed ? ' accent-red' : ''}">${msg}</span>`;
+    div.style.opacity = '0';
+    div.style.transition = 'opacity 0.5s';
+    container.appendChild(div);
+    setTimeout(() => div.style.opacity = '1', 50);
+
+    // Keep only last 6
+    while (container.children.length > 6) {
+      container.removeChild(container.firstChild);
+    }
+    idx++;
+  }
+
+  addLine();
+  setInterval(addLine, 3200);
+})();
+
+/* ── PHOSPHOR GLOW EFFECT ON NUMBERS ── */
+document.querySelectorAll('.pb-number, .pb-number-small').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    el.style.transition = 'text-shadow 0.3s';
+    el.style.textShadow = '0 0 30px rgba(255,176,0,0.9), 0 0 60px rgba(255,176,0,0.4)';
+  });
+  el.addEventListener('mouseleave', () => {
+    el.style.textShadow = '';
+  });
+});
+
+/* ── SUBTLE PANEL GLOW ON HOVER ── */
+document.querySelectorAll('.panel').forEach(panel => {
+  panel.addEventListener('mouseenter', () => {
+    panel.style.background = '#0e0e0a';
+    panel.style.boxShadow = 'inset 0 0 30px rgba(255,176,0,0.04)';
+  });
+  panel.addEventListener('mouseleave', () => {
+    panel.style.background = '';
+    panel.style.boxShadow = '';
+  });
+});
+</script>
+</body>
+</html>
